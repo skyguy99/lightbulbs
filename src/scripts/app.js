@@ -7,9 +7,12 @@ import { radians, map, distance } from './helpers';
 export default class App {
   setup() {
 
+console.log("SKY");
+
+//constantss
     this.gutter = { size: 4 };
     this.meshes = [];
-    this.grid = { rows: 11, cols: 7 };
+    this.grid = { rows: 5, cols: 5 };
     this.width = window.innerWidth;
     this.height = window.innerHeight;
     this.mouse3D = new THREE.Vector2();
@@ -20,6 +23,14 @@ export default class App {
     ];
 
     this.raycaster = new THREE.Raycaster();
+
+    this.mouse = new THREE.Vector2();
+    this.target = new THREE.Vector2();
+    this.windowHalf = new THREE.Vector2( window.innerWidth / 2, window.innerHeight / 2 );
+    this.spotlight = new THREE.SpotLight();
+
+    //logic
+    this.loadingHasStarted = false;
   }
 
   createScene() {
@@ -37,9 +48,10 @@ export default class App {
   }
 
   createCamera() {
-    this.camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 1);
-    this.camera.position.set(0, 65, 0);
-    this.camera.rotation.x = -1.57;
+
+    this.camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 1);
+    this.camera.position.set(0, 10, 0);
+    //this.camera.rotation.x = -1.57;
 
     this.scene.add(this.camera);
   }
@@ -50,13 +62,14 @@ export default class App {
     this.scene.add(light);
   }
 
+//follows mouse
   addSpotLight() {
-    const ligh = new THREE.SpotLight('#7bccd7', 1, 1000);
+    this.spotlight = new THREE.SpotLight('#7bccd7', 1, 1000);
 
-    ligh.position.set(0, 27, 0);
-    ligh.castShadow = true;
+    this.spotlight.position.set(0, 27, 0);
+    this.spotlight.castShadow = true;
 
-    this.scene.add(ligh);
+    this.scene.add(this.spotlight);
   }
 
   addRectLight() {
@@ -76,6 +89,16 @@ export default class App {
     this.scene.add(light);
   }
 
+  startLoading()
+  {
+    if(!this.loadingHasStarted)
+    {
+      this.loadingHasStarted = true;
+      console.log("Starting load to back");
+      //wait 3 seconds, then go
+    }
+  }
+
   addFloor() {
     const geometry = new THREE.PlaneGeometry(100, 100);
     const material = new THREE.ShadowMaterial({ opacity: .3 });
@@ -86,6 +109,156 @@ export default class App {
     this.floor.rotateX(- Math.PI / 2);
 
     this.scene.add(this.floor);
+  }
+
+  cubeCloud()
+  {
+    const geometry = new THREE.BoxBufferGeometry();
+    const material = new THREE.MeshStandardMaterial( {
+
+    color: 0xffffff,
+
+    roughness: 0.5,
+    metalness: 0.5
+
+    // roughnessMap: roughnessMap,
+    // metalnessMap: metalnessMap,
+    //
+    // envMap: envMap, // important -- especially for metals!
+    // envMapIntensity: envMapIntensity
+
+} );
+
+    for ( let i = 0; i < 1000; i ++ ) {
+
+      const object = new THREE.Mesh( geometry, material );
+      object.position.x = Math.random() * 80 - 40;
+      object.position.y = Math.random() * 80 - 40;
+      object.position.z = Math.random() * 80 - 40;
+      object.rotation.x = Math.random() * 2 * Math.PI;
+      object.rotation.y = Math.random() * 2 * Math.PI;
+      object.rotation.z = Math.random() * 2 * Math.PI;
+      this.scene.add( object );
+
+		}
+  }
+
+  makeIntoShape()
+  {
+
+    //LOCAL VARS---------------
+    var localThis = this;
+    var particleMeshes = [];
+    var pScale = 0.3;
+    const meshParams = {
+      color: '#ff00ff',
+      metalness: .58,
+      emissive: '#222222',
+      roughness: .18,
+    };
+
+    var particleContainer = new THREE.Object3D();
+
+    const material = new THREE.MeshPhysicalMaterial(meshParams);
+    var loader = new THREE.ObjectLoader();
+//---------------------------------
+
+    loader.load(
+    	// DEBUG
+      "./src/scripts/elements/Icosphere.json",
+
+      //DEPLOY
+    	//"https://dojusticeandlettheskiesfall.firebaseapp.com/elements/Icosphere.json",
+
+    	function ( obj ) {
+
+        var geoFromScene = new THREE.Geometry();
+
+    		//localThis.scene.add( obj );
+        obj.position.set(0, 4, 0);
+        obj.scale.set(3, 3, 3);
+
+        obj.traverse( function (child){
+          if(child.isMesh)
+          {
+
+                geoFromScene = (new THREE.Geometry()).fromBufferGeometry(child.geometry);
+                //console.log(geometry.vertices.length);
+          }
+});
+
+        var particleCount = geoFromScene.vertices.length;
+
+        for (var p = 0; p < particleCount; p ++) {
+            // var particle = model.geometry.vertices[p];
+            // particles.vertices.push(particle);
+
+            //console.log(geometry2.vertices[p].x); //Test get a vertex
+
+            const geometry = localThis.getRandomGeometry();
+            const mesh = localThis.getMesh(geometry.geom, material);
+
+            mesh.position.set(geoFromScene.vertices[p].x, geoFromScene.vertices[p].y, geoFromScene.vertices[p].z);
+            mesh.scale.set(pScale, pScale, pScale);
+            // mesh.position.set(col + (col * this.gutter.size), 0, row + (row * this.gutter.size));
+            mesh.rotation.x = geometry.rotationX;
+            mesh.rotation.y = geometry.rotationY;
+            mesh.rotation.z = geometry.rotationZ;
+
+            // store the initial values of each element so we can animate back
+            mesh.initialRotation = {
+              x: mesh.rotation.x,
+              y: mesh.rotation.y,
+              z: mesh.rotation.z,
+            };
+            mesh.initialPosition = {
+              x: mesh.position.x,
+              y: mesh.position.y,
+              z: mesh.position.z,
+            };
+            mesh.initialScale = pScale;
+
+            //do if statement - if there isn't already a particle at this location
+
+            var canAdd = true;
+            particleMeshes.forEach(function(s) {
+              //console.log(s.position);
+              if(s.position.equals(mesh.position))
+              {
+                canAdd = false;
+              }
+
+              });
+
+              if(canAdd)
+              {
+                particleMeshes.push(mesh);
+                  particleContainer.add(mesh);
+              }
+            // store the element inside our array so we can get back when need to animate
+            //localThis.meshes[0][p] = mesh;
+
+        } //end of for
+        particleContainer.scale.set(8, 8, 8);
+        particleContainer.position.set(0, 8, 0);
+        localThis.scene.add(particleContainer);
+
+    	},
+
+    	// onProgress callback -------------------------------
+    	function ( xhr ) {
+    		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+    	},
+
+    	// onError callback
+    	function ( err ) {
+    		console.error( 'Sky - An error happened' );
+    	}
+    );
+    //assign to global array
+    //this.overallParticleMeshes = particleMeshes;
+    //this.overallParticleContainer = particleContainer; //is groupmesh
+
   }
 
   getRandomGeometry() {
@@ -210,15 +383,17 @@ export default class App {
 
     this.addAmbientLight();
 
-    this.addSpotLight();
+    this.cubeCloud();
 
-    this.addRectLight();
+    //this.addSpotLight();
+
+    //this.addRectLight();
 
     this.addPointLight(0xfff000, { x: 0, y: 10, z: -100 });
-
-    this.addPointLight(0x79573e, { x: 100, y: 10, z: 0 });
-
-    this.addPointLight(0xc27439, { x: 20, y: 5, z: 20 });
+    //
+    // this.addPointLight(0x79573e, { x: 100, y: 10, z: 0 });
+    //
+    // this.addPointLight(0xc27439, { x: 20, y: 5, z: 20 });
 
     this.animate();
 
@@ -232,11 +407,29 @@ export default class App {
   onMouseMove({ clientX, clientY }) {
     this.mouse3D.x = (clientX / this.width) * 2 - 1;
     this.mouse3D.y = -(clientY / this.height) * 2 + 1;
+
+    this.mouse.x = (clientX - this.windowHalf.x );
+    this.mouse.y = (clientY - this.windowHalf.x );
+
+    if(this.mouse.y > this.height * 0.088)
+    {
+      this.startLoading();
+    } else {
+      this.loadingHasStarted = false;
+    }
   }
+
+//   onMouseWheel( event ) {
+//
+//   this.camera.position.z += event.deltaY * 0.1; // move camera along z-axis
+//
+// }
 
   onResize() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
+
+    this.windowHalf.set( this.width / 2, this.height / 2 );
 
     this.camera.aspect = this.width / this.height;
     this.camera.updateProjectionMatrix();
@@ -245,6 +438,13 @@ export default class App {
 
   animate() {
     this.draw();
+
+    const resistance = 0.002;
+    this.target.x = ( 1 - this.mouse.x ) * resistance;
+    this.target.y = ( 1 - this.mouse.y ) * resistance;
+
+    this.camera.rotation.x += 0.05 * ( this.target.y - this.camera.rotation.x );
+    this.camera.rotation.y += 0.05 * ( this.target.x - this.camera.rotation.y );
 
     this.renderer.render(this.scene, this.camera);
 
