@@ -27,7 +27,7 @@ console.log("SKY");
     this.mouse = new THREE.Vector2();
     this.target = new THREE.Vector2();
     this.windowHalf = new THREE.Vector2( window.innerWidth / 2, window.innerHeight / 2 );
-    this.spotlight = new THREE.SpotLight();
+    this.movableLight = new THREE.PointLight();
 
     //logic
     this.loadingHasStarted = false;
@@ -45,6 +45,7 @@ console.log("SKY");
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     document.body.appendChild(this.renderer.domElement);
+    this.scene.background = new THREE.Color( 0x424242 );
   }
 
   createCamera() {
@@ -64,16 +65,17 @@ console.log("SKY");
 
 //follows mouse
   addSpotLight() {
-    this.spotlight = new THREE.SpotLight('#7bccd7', 1, 1000);
+    const spotlight = new THREE.SpotLight('#7bccd7', 1, 1000);
+    //const spotlight = new THREE.SpotLight('#7bccd7', 1, 1000);
 
-    this.spotlight.position.set(0, 27, 0);
-    this.spotlight.castShadow = true;
+    spotlight.position.set(0, 27, 0);
+    spotlight.castShadow = true;
 
-    this.scene.add(this.spotlight);
+    //this.scene.add(spotlight);
   }
 
   addRectLight() {
-    const light = new THREE.RectAreaLight('#341212', 1, 2000, 2000);
+    const light = new THREE.RectAreaLight('#ffffff', 1, 2000, 2000);
 
     light.position.set(5, 50, 50);
     light.lookAt(0, 0, 0);
@@ -82,11 +84,11 @@ console.log("SKY");
   }
 
   addPointLight(color, position) {
-    const light = new THREE.PointLight(color, 1, 1000, 1);
+    this.movableLight = new THREE.PointLight(color, 0.2, 1000, 1); //2nd num is intensity
 
-    light.position.set(position.x, position.y, position.z);
+    this.movableLight.position.set(position.x, position.y, position.z);
 
-    this.scene.add(light);
+    this.scene.add(this.movableLight);
   }
 
   startLoading()
@@ -118,8 +120,8 @@ console.log("SKY");
 
     color: 0xffffff,
 
-    roughness: 0.5,
-    metalness: 0.5
+    roughness: 0.3,
+    metalness: 1
 
     // roughnessMap: roughnessMap,
     // metalnessMap: metalnessMap,
@@ -389,11 +391,7 @@ console.log("SKY");
 
     //this.addRectLight();
 
-    this.addPointLight(0xfff000, { x: 0, y: 10, z: -100 });
-    //
-    // this.addPointLight(0x79573e, { x: 100, y: 10, z: 0 });
-    //
-    // this.addPointLight(0xc27439, { x: 20, y: 5, z: 20 });
+    this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 });
 
     this.animate();
 
@@ -408,6 +406,8 @@ console.log("SKY");
     this.mouse3D.x = (clientX / this.width) * 2 - 1;
     this.mouse3D.y = -(clientY / this.height) * 2 + 1;
 
+    //this.movableLight.position.set(this.mouse.position);
+
     this.mouse.x = (clientX - this.windowHalf.x );
     this.mouse.y = (clientY - this.windowHalf.x );
 
@@ -418,7 +418,6 @@ console.log("SKY");
       this.loadingHasStarted = false;
     }
   }
-
 //   onMouseWheel( event ) {
 //
 //   this.camera.position.z += event.deltaY * 0.1; // move camera along z-axis
