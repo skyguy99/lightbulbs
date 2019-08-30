@@ -23,7 +23,7 @@ console.log("SKY");
     ];
 
     this.raycaster = new THREE.Raycaster();
-
+this.testCube = new THREE.Mesh();
     this.mouse = new THREE.Vector2();
     this.target = new THREE.Vector2();
     this.windowHalf = new THREE.Vector2( window.innerWidth / 2, window.innerHeight / 2 );
@@ -45,7 +45,7 @@ console.log("SKY");
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     document.body.appendChild(this.renderer.domElement);
-    this.scene.background = new THREE.Color( 0x424242 );
+    //this.scene.background = new THREE.Color( 0x424242 );
   }
 
   createCamera() {
@@ -143,6 +143,51 @@ console.log("SKY");
       this.scene.add( object );
 
 		}
+  }
+
+  addModelToScene(position, string)
+  {
+    var loader = new THREE.ObjectLoader();
+//---------------------------------
+
+    loader.load(
+    	// DEBUG
+      //"./src/scripts/elements/Icosphere.json",
+        string,
+
+      //DEPLOY
+    	//"https://dojusticeandlettheskiesfall.firebaseapp.com/elements/Icosphere.json",
+
+    	function ( obj ) {
+
+        var geoFromScene = new THREE.Geometry();
+
+    		localThis.scene.add( obj ); //overalladd
+
+        obj.position.set(0, 10, 5);
+        obj.scale.set(3, 3, 3);
+
+        obj.traverse( function (child){
+          if(child.isMesh)
+          {
+            geoFromScene = (new THREE.Geometry()).fromBufferGeometry(child.geometry);
+          }
+});
+
+
+
+    	},
+
+    	// onProgress callback -------------------------------
+    	function ( xhr ) {
+    		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+    	},
+
+    	// onError callback
+    	function ( err ) {
+    		console.error( 'Sky - An error happened' );
+    	}
+    );
   }
 
   makeIntoShape()
@@ -267,6 +312,30 @@ console.log("SKY");
     return this.geometries[Math.floor(Math.random() * Math.floor(this.geometries.length))];
   }
 
+  addTestObject()
+  {
+
+    const geometry = new THREE.BoxBufferGeometry();
+    const material = new THREE.MeshStandardMaterial( {
+
+    color: 0xff0000,
+
+    roughness: 0.3,
+    metalness: 0.2
+
+    // roughnessMap: roughnessMap,
+    // metalnessMap: metalnessMap,
+    //onmous
+    // envMap: envMap, // important -- especially for metals!
+    // envMapIntensity: envMapIntensity
+
+} );
+
+  this.testCube = new THREE.Mesh( geometry, material );
+  this.testCube.position.set(0,0,0);
+  this.scene.add(this.testCube);
+  }
+
   createGrid() {
     this.groupMesh = new THREE.Object3D();
 
@@ -387,6 +456,8 @@ console.log("SKY");
 
     this.cubeCloud();
 
+    this.addTestObject();
+
     //this.addSpotLight();
 
     //this.addRectLight();
@@ -406,10 +477,11 @@ console.log("SKY");
     this.mouse3D.x = (clientX / this.width) * 2 - 1;
     this.mouse3D.y = -(clientY / this.height) * 2 + 1;
 
-    //this.movableLight.position.set(this.mouse.position);
-
     this.mouse.x = (clientX - this.windowHalf.x );
     this.mouse.y = (clientY - this.windowHalf.x );
+
+    //this.movableLight.position.set(this.mouse.x, this.mouse.y, 0);
+    //this.testCube.position.set(this.mouse.x, this.mouse.y, 0);
 
     if(this.mouse.y > this.height * 0.088)
     {
@@ -417,6 +489,17 @@ console.log("SKY");
     } else {
       this.loadingHasStarted = false;
     }
+
+    //track to mouse
+  var vector = new THREE.Vector3(this.mouse3D.x, this.mouse3D.y, 0.5);
+	vector.unproject( this.camera );
+	var dir = vector.sub( this.camera.position ).normalize();
+	var distance = - this.camera.position.z / dir.z;
+	var pos = this.camera.position.clone().add( dir.multiplyScalar( distance ) );
+
+	this.movableLight.position.copy(pos);
+  //this.testCube.position.copy(pos);
+
   }
 //   onMouseWheel( event ) {
 //
