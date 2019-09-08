@@ -12,15 +12,16 @@ article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,su
 body {
 	--color-text: #fff;
 	--color-bg: #424242;
-	--color-link: #ad836d;
-	--color-link-hover: #79573e;
+	--color-link: #ffffff; //text color general
+	--color-link-hover: #424242;
 	--color-bgtitle: #48271b;
 	--color-bgsubtitle: #c13535;
-	color: #79573e;
+	color: #ffffff;
+	text-transform: uppercase;
 	color: var(--color-text);
 	background-color: #262221;
 	background-color: var(--color-bg);
-	font-family: Futura, "futura-pt", Arial, sans-serif;
+	font-family: ProximaNova, "futura-pt", Arial, sans-serif;
 	overflow: hidden;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -48,12 +49,13 @@ a:focus {
 	outline: none;
 }
 
-.frame {
-	padding: 3rem 5vw;
-	text-align: center;
-	position: relative;
-	z-index: 1000;
-}
+
+// .frame {
+// 	padding: 3rem 5vw;
+// 	text-align: center;
+// 	position: relative;
+// 	z-index: 1000;
+// }
 
 .frame__title {
 	font-size: 1rem;
@@ -81,6 +83,14 @@ a:focus {
 .github {
 	text-transform: lowercase;
 	margin-left: 1rem;
+}
+
+.bottomright {
+	position: absolute;
+bottom: 30px;
+right: 40px;
+overflow: hidden;
+z-index: 300;
 }
 
 .content {

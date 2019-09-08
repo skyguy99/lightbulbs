@@ -113,6 +113,12 @@ this.testCube = new THREE.Mesh();
     this.scene.add(this.floor);
   }
 
+  playAudio(){
+    var a = new Audio("./src/resources/test.mp3");
+    a.loop = true;
+    a.play();
+  }
+
   cubeCloud()
   {
     const geometry = new THREE.BoxBufferGeometry();
@@ -443,6 +449,8 @@ this.testCube = new THREE.Mesh();
 
   init() {
     this.setup();
+
+    this.playAudio();
 
     this.createScene();
 
