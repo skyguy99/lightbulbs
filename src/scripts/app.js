@@ -51,7 +51,7 @@ this.testCube = new THREE.Mesh();
   createCamera() {
 
     this.camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 1);
-    this.camera.position.set(0, 10, 0);
+    this.camera.position.set(0, 5, 0); //0,10,0
     //this.camera.rotation.x = -1.57;
 
     this.scene.add(this.camera);
@@ -151,42 +151,89 @@ this.testCube = new THREE.Mesh();
 		}
   }
 
-  addModelToScene(position, string)
+  addModelToScene(position, string, materialName)
   {
     var loader = new THREE.ObjectLoader();
+    var localThis = this;
+
+    const textureLoader = new THREE.TextureLoader();
+
+  // Load a texture. See the note in chapter 4 on working locally, or the page
+  // https://threejs.org/docs/#manual/introduction/How-to-run-things-locally
+  // if you run into problems here
+  const texture = textureLoader.load( "./src/images/cartdiff.jpg");
+
+  // set the "color space" of the texture
+  texture.encoding = THREE.sRGBEncoding;
+  var material = new THREE.MeshStandardMaterial({
+    //side: THREE.DoubleSide,
+    color: 0xffffff,
+    roughness: 0.5,
+    metalness: 0.5,
+    refractionRatio: 0.98,
+    envMapIntensity: 1.0,
+    map: texture,
+    //normalMap: materials.normalMap,
+    //roughnessMap: materials.roughnessMap,
+    //metalnessMap: materials.metalnessMap,
+    //envMap: me.reflectionCube,
+    normalScale: new THREE.Vector2( 1, -1 )
+});
+
+//material.map = new THREE.TextureLoader().load("./src/images/cartdiff.jpg");
+//material.bumpMap = new THREE.TextureLoader().load("./src/images/cartbump.jpg");
+
+    // switch(materialName)
+    // {
+    //   case 'globalMat':
+    //   material = new THREE.MeshPhysicalMaterial({
+    //       color: '#00ff00',
+    //       metalness: .58,
+    //       emissive: '#000000',
+    //       roughness: .05,
+    //     });
+    //     model.material.needsUpdate = true;
+    //
+    //     break;
+    //   default:
+    //   console.log("no material for custom model");
+    //     break;
+    // }
 //---------------------------------
 
     loader.load(
-    	// DEBUG
-      //"./src/scripts/elements/Icosphere.json",
         string,
 
       //DEPLOY
     	//"https://dojusticeandlettheskiesfall.firebaseapp.com/elements/Icosphere.json",
-
     	function ( obj ) {
 
         var geoFromScene = new THREE.Geometry();
-
-    		localThis.scene.add( obj ); //overalladd
-
-        obj.position.set(0, 10, 5);
-        obj.scale.set(3, 3, 3);
-
         obj.traverse( function (child){
           if(child.isMesh)
           {
+
             geoFromScene = (new THREE.Geometry()).fromBufferGeometry(child.geometry);
           }
-});
 
+          var theModel = new THREE.Mesh();
+          theModel.geometry = geoFromScene;
+          theModel.material = material;
+          theModel.position.set(0,5,-10);
+          theModel.scale.set(5, 5, 5);
+
+
+            //assign materials and add to scene
+          localThis.scene.add(theModel);
+
+});
 
 
     	},
 
     	// onProgress callback -------------------------------
     	function ( xhr ) {
-    		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+    		console.log( (xhr.loaded / xhr.total * 100) + '% of model loaded' );
     	},
 
     	// onError callback
@@ -194,6 +241,7 @@ this.testCube = new THREE.Mesh();
     		console.error( 'Sky - An error happened' );
     	}
     );
+
   }
 
   makeIntoShape()
@@ -337,9 +385,13 @@ this.testCube = new THREE.Mesh();
 
 } );
 
-  this.testCube = new THREE.Mesh( geometry, material );
-  this.testCube.position.set(0,0,0);
-  this.scene.add(this.testCube);
+this.testCube.geometry = geometry;
+this.testCube.material = material;
+// Finally, set the pivot's position as well, so that it follows the camera.
+this.testCube.scale.set(15,15,15);
+this.testCube.position.set(0,5,-10);
+this.scene.add(this.testCube);
+
   }
 
   createGrid() {
@@ -462,9 +514,11 @@ this.testCube = new THREE.Mesh();
 
     this.addAmbientLight();
 
-    this.cubeCloud();
+    //this.cubeCloud();
 
-    this.addTestObject();
+    //this.addTestObject();
+
+    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/Icosphere.json");
 
     //this.addSpotLight();
 
@@ -527,6 +581,7 @@ this.testCube = new THREE.Mesh();
   }
 
   animate() {
+
     this.draw();
 
     const resistance = 0.002;
