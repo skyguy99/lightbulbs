@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "three": "^0.96.0",
+    "three-fbx-loader": "^1.0.3",
     "threejs-controls": "^1.0.6"
   }
 }

@@ -160,7 +160,6 @@ this.testCube = new THREE.Mesh();
   texture.encoding = THREE.sRGBEncoding;
 
   var material = new THREE.MeshStandardMaterial({
-    //side: THREE.DoubleSide,
     color: 0xffffff,
     roughness: 0.5,
     metalness: 0.5,
@@ -192,47 +191,79 @@ this.testCube = new THREE.Mesh();
     }
 //---------------------------------
 
-    loader.load(
-        string,
+    // loader.load(
+    //     string,
 
       //DEPLOY
     	//"https://dojusticeandlettheskiesfall.firebaseapp.com/elements/Icosphere.json",
-    	function ( obj ) {
+//     	function ( obj ) {
+//
+//         var geoFromScene = new THREE.Geometry();
+//         obj.traverse( function (child){
+//           if(child.isMesh)
+//           {
+//
+//             geoFromScene = (new THREE.Geometry()).fromBufferGeometry(child.geometry);
+//           }
+//
+//           var theModel = new THREE.Mesh();
+//           theModel.geometry = geoFromScene;
+//           theModel.material = material;
+//           theModel.position.set(0,5,-10);
+//           theModel.scale.set(5, 5, 5);
+//
+//
+//             //assign materials and add to scene
+//           localThis.scene.add(theModel);
+//
+// });
+//
+//
+//     	},
+//
+//     	// onProgress callback -------------------------------
+//     	function ( xhr ) {
+//     		console.log( (xhr.loaded / xhr.total * 100) + '% of model loaded' );
+//     	},
+//
+//     	// onError callback
+//     	function ( err ) {
+//     		console.error( 'Sky - An error happened' );
+//     	}
+//     );
 
-        var geoFromScene = new THREE.Geometry();
-        obj.traverse( function (child){
-          if(child.isMesh)
-          {
+//FBX LOADER
+var geoFromScene = new THREE.Geometry();
+var FBXLoader = require('three-fbx-loader');
+var loader = new FBXLoader();
+				loader.load(string, function ( object ) {
 
-            geoFromScene = (new THREE.Geometry()).fromBufferGeometry(child.geometry);
-          }
+					//mixer = new THREE.AnimationMixer( object );
+					//var action = mixer.clipAction( object.animations[ 0 ] );
+					//action.play();
+
+					object.traverse( function ( child ) {
+						if ( child.isMesh ) {
+							child.castShadow = true;
+							child.receiveShadow = true;
+
+              geoFromScene = (new THREE.Geometry()).fromBufferGeometry(child.geometry);
+
+						}
+
+
+					} );
 
           var theModel = new THREE.Mesh();
           theModel.geometry = geoFromScene;
           theModel.material = material;
-          theModel.position.set(0,5,-10);
-          theModel.scale.set(5, 5, 5);
+          theModel.position.set(0,5,-8);
+          theModel.rotation.set(new THREE.Vector3( 0, 0, Math.PI / 2));
+          theModel.scale.set(15, 15, 15);
+					localThis.scene.add(theModel);
+          console.log("GOT FBX: "+theModel);
 
-
-            //assign materials and add to scene
-          localThis.scene.add(theModel);
-
-});
-
-
-    	},
-
-    	// onProgress callback -------------------------------
-    	function ( xhr ) {
-    		console.log( (xhr.loaded / xhr.total * 100) + '% of model loaded' );
-    	},
-
-    	// onError callback
-    	function ( err ) {
-    		console.error( 'Sky - An error happened' );
-    	}
-    );
-
+				} );
   }
 
   makeIntoShape()
