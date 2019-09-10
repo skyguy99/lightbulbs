@@ -156,15 +156,9 @@ this.testCube = new THREE.Mesh();
     var loader = new THREE.ObjectLoader();
     var localThis = this;
 
-    const textureLoader = new THREE.TextureLoader();
-
-  // Load a texture. See the note in chapter 4 on working locally, or the page
-  // https://threejs.org/docs/#manual/introduction/How-to-run-things-locally
-  // if you run into problems here
-  const texture = textureLoader.load( "./src/images/cartdiff.jpg");
-
-  // set the "color space" of the texture
+  const texture = new THREE.TextureLoader().load( "./src/images/cartdiff.jpg");
   texture.encoding = THREE.sRGBEncoding;
+
   var material = new THREE.MeshStandardMaterial({
     //side: THREE.DoubleSide,
     color: 0xffffff,
@@ -180,25 +174,22 @@ this.testCube = new THREE.Mesh();
     normalScale: new THREE.Vector2( 1, -1 )
 });
 
-//material.map = new THREE.TextureLoader().load("./src/images/cartdiff.jpg");
-//material.bumpMap = new THREE.TextureLoader().load("./src/images/cartbump.jpg");
+    switch(materialName)
+    {
+      case 'globalMat':
+      material = new THREE.MeshPhysicalMaterial({
+          color: '#00ff00',
+          metalness: .58,
+          emissive: '#000000',
+          roughness: .05,
+        });
+        model.material.needsUpdate = true;
 
-    // switch(materialName)
-    // {
-    //   case 'globalMat':
-    //   material = new THREE.MeshPhysicalMaterial({
-    //       color: '#00ff00',
-    //       metalness: .58,
-    //       emissive: '#000000',
-    //       roughness: .05,
-    //     });
-    //     model.material.needsUpdate = true;
-    //
-    //     break;
-    //   default:
-    //   console.log("no material for custom model");
-    //     break;
-    // }
+        break;
+      default:
+      console.log("no material for custom model");
+        break;
+    }
 //---------------------------------
 
     loader.load(
@@ -518,7 +509,7 @@ this.scene.add(this.testCube);
 
     //this.addTestObject();
 
-    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/Icosphere.json");
+    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/cig.fbx");
 
     //this.addSpotLight();
 
