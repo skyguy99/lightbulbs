@@ -28,6 +28,8 @@ this.testCube = new THREE.Mesh();
     this.target = new THREE.Vector2();
     this.windowHalf = new THREE.Vector2( window.innerWidth / 2, window.innerHeight / 2 );
     this.movableLight = new THREE.PointLight();
+    this.mixer = new THREE.AnimationMixer();
+    this.clock = new THREE.Clock();
 
     //logic
     this.loadingHasStarted = false;
@@ -239,15 +241,6 @@ var FBXLoader = require('three-fbx-loader');
 var loader = new FBXLoader();
 				loader.load(string, function ( object ) {
 
-					var mixer = new THREE.AnimationMixer( object );
-          if(object.animations.count > 0)
-          {
-            var action = mixer.clipAction( object.animations[ 0 ] );
-  					action.play();
-          } else {
-            console.log("No animations");
-          }
-
 					object.traverse( function ( child ) {
 						if ( child.isMesh ) {
 							child.castShadow = true;
@@ -265,9 +258,18 @@ var loader = new FBXLoader();
           theModel.material = material;
           theModel.position.set(5,5,-8);
           //theModel.rotation.set(new THREE.Vector3( 0, MATH.pi/2, 0));
-          theModel.scale.set(15, 15, 15);
+          theModel.scale.set(0.1, 0.1, 0.1);
 					localThis.scene.add(theModel);
-          //console.log("GOT FBX: "+theModel);
+
+          localThis.mixer = new THREE.AnimationMixer(theModel);
+
+          if(theModel.animations[0])
+          {
+            var action = localThis.mixer.clipAction(theModel.animations[0]);
+  					action.play();
+          } else {
+            console.log("No animations");
+          }
 
 				} );
   }
@@ -546,7 +548,7 @@ this.scene.add(this.testCube);
 
     //this.addTestObject();
 
-    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/cig.fbx");
+    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/Tiltworld.fbx");
 
     //this.addSpotLight();
 
@@ -619,6 +621,8 @@ this.scene.add(this.testCube);
     this.camera.rotation.x += 0.05 * ( this.target.y - this.camera.rotation.x );
     this.camera.rotation.y += 0.05 * ( this.target.x - this.camera.rotation.y );
 
+    this.mixer.update(this.clock.getDelta());
+    //console.log(this.mixer.clipAction);
     this.renderer.render(this.scene, this.camera);
 
     requestAnimationFrame(this.animate.bind(this));
