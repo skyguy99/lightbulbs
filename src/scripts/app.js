@@ -156,7 +156,8 @@ this.testCube = new THREE.Mesh();
     var loader = new THREE.ObjectLoader();
     var localThis = this;
 
-  const texture = new THREE.TextureLoader().load( "./src/images/cartdiff.jpg");
+  //const texture = new THREE.TextureLoader().load( "./src/images/cartdiff.jpg");
+  const texture = new THREE.TextureLoader().load( "./src/images/DeadEnds_globalmaterial.png");
   texture.encoding = THREE.sRGBEncoding;
 
   var material = new THREE.MeshStandardMaterial({
@@ -238,9 +239,14 @@ var FBXLoader = require('three-fbx-loader');
 var loader = new FBXLoader();
 				loader.load(string, function ( object ) {
 
-					//mixer = new THREE.AnimationMixer( object );
-					//var action = mixer.clipAction( object.animations[ 0 ] );
-					//action.play();
+					var mixer = new THREE.AnimationMixer( object );
+          if(object.animations.count > 0)
+          {
+            var action = mixer.clipAction( object.animations[ 0 ] );
+  					action.play();
+          } else {
+            console.log("No animations");
+          }
 
 					object.traverse( function ( child ) {
 						if ( child.isMesh ) {
@@ -257,11 +263,11 @@ var loader = new FBXLoader();
           var theModel = new THREE.Mesh();
           theModel.geometry = geoFromScene;
           theModel.material = material;
-          theModel.position.set(0,5,-8);
-          theModel.rotation.set(new THREE.Vector3( 0, 0, Math.PI / 2));
+          theModel.position.set(5,5,-8);
+          //theModel.rotation.set(new THREE.Vector3( 0, MATH.pi/2, 0));
           theModel.scale.set(15, 15, 15);
 					localThis.scene.add(theModel);
-          console.log("GOT FBX: "+theModel);
+          //console.log("GOT FBX: "+theModel);
 
 				} );
   }
