@@ -155,7 +155,7 @@ this.testCube = new THREE.Mesh();
 
   addModelToScene(position, string, materialName)
   {
-    var loader = new THREE.ObjectLoader();
+    //var loader = new THREE.ObjectLoader();
     var localThis = this;
 
   //const texture = new THREE.TextureLoader().load( "./src/images/cartdiff.jpg");
@@ -239,39 +239,57 @@ this.testCube = new THREE.Mesh();
 var geoFromScene = new THREE.Geometry();
 var FBXLoader = require('three-fbx-loader');
 var loader = new FBXLoader();
-				loader.load(string, function ( object ) {
+loader.load( string, function ( object ) {
+					localThis.mixer = new THREE.AnimationMixer( object );
+					var action = localThis.mixer.clipAction( object.animations[ 0 ] );
+					action.play();
 
 					object.traverse( function ( child ) {
 						if ( child.isMesh ) {
 							child.castShadow = true;
 							child.receiveShadow = true;
-
-              geoFromScene = (new THREE.Geometry()).fromBufferGeometry(child.geometry);
-
 						}
-
-
 					} );
 
-          var theModel = new THREE.Mesh();
-          theModel.geometry = geoFromScene;
-          theModel.material = material;
-          theModel.position.set(5,5,-8);
-          //theModel.rotation.set(new THREE.Vector3( 0, MATH.pi/2, 0));
-          theModel.scale.set(0.1, 0.1, 0.1);
-					localThis.scene.add(theModel);
+          object.position.set(5,5,-8)
+          object.scale.set(0.1, 0.1, 0.1);
+					localThis.scene.add( object );
 
-          localThis.mixer = new THREE.AnimationMixer(theModel);
-
-          if(theModel.animations[0])
-          {
-            var action = localThis.mixer.clipAction(theModel.animations[0]);
-  					action.play();
-          } else {
-            console.log("No animations");
-          }
 
 				} );
+				// loader.load(string, function ( object ) {
+        //
+				// 	object.traverse( function ( child ) {
+				// 		if ( child.isMesh ) {
+				// 			child.castShadow = true;
+				// 			child.receiveShadow = true;
+        //
+        //       geoFromScene = (new THREE.Geometry()).fromBufferGeometry(child.geometry);
+        //
+				// 		}
+        //
+        //
+				// 	} );
+        //
+        //   var theModel = new THREE.Mesh();
+        //   theModel.geometry = geoFromScene;
+        //   theModel.material = material;
+        //   theModel.position.set(5,5,-8);
+        //   //theModel.rotation.set(new THREE.Vector3( 0, MATH.pi/2, 0));
+        //   theModel.scale.set(0.1, 0.1, 0.1);
+				// 	localThis.scene.add(theModel);
+        //
+        //   localThis.mixer = new THREE.AnimationMixer(theModel);
+        //
+        //   if(theModel.animations[0])
+        //   {
+        //     var action = localThis.mixer.clipAction(theModel.animations[0]);
+  			// 		action.play();
+        //   } else {
+        //     console.log("No animations");
+        //   }
+        //
+				// } );
   }
 
   makeIntoShape()
@@ -532,8 +550,6 @@ this.scene.add(this.testCube);
   init() {
     this.setup();
 
-    this.playAudio();
-
     this.createScene();
 
     this.createCamera();
@@ -548,7 +564,7 @@ this.scene.add(this.testCube);
 
     //this.addTestObject();
 
-    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/Tiltworld.fbx");
+    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.fbx");
 
     //this.addSpotLight();
 
@@ -557,6 +573,8 @@ this.scene.add(this.testCube);
     this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 });
 
     this.animate();
+
+    //this.playAudio();
 
     window.addEventListener('resize', this.onResize.bind(this));
 
@@ -621,10 +639,10 @@ this.scene.add(this.testCube);
     this.camera.rotation.x += 0.05 * ( this.target.y - this.camera.rotation.x );
     this.camera.rotation.y += 0.05 * ( this.target.x - this.camera.rotation.y );
 
-    this.mixer.update(this.clock.getDelta());
     //console.log(this.mixer.clipAction);
     this.renderer.render(this.scene, this.camera);
 
     requestAnimationFrame(this.animate.bind(this));
+    this.mixer.update(this.clock.getDelta());
   }
 }
