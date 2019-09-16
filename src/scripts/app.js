@@ -3,8 +3,7 @@ import Cone from './elements/cone';
 import Tourus from './elements/tourus';
 import Cylinder from './elements/cylinder';
 import { radians, map, distance } from './helpers';
-// import * as THREEJS from 'three';
-// import * as THREE_ADDONS from 'three-addons';
+import System from 'three-nebula';
 
 export default class App {
   setup() {
@@ -54,12 +53,13 @@ this.testCube = new THREE.Mesh();
 
   createCamera() {
 
-    //this.camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 1);
 
     var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
   	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
   	this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
-    this.camera.position.set(0, 5, 0); //0,10,0
+    this.camera.position.set(0, 5, 0);
+    //this.camera.position.set(0, 5, 0);
+
     //this.camera.rotation.x = -1.57;
 
     this.scene.add(this.camera);
@@ -511,6 +511,164 @@ var geometry = new THREE.SphereGeometry( 30, 32, 16 );
     mesh.add(sprite);
 }
 
+particleemitter()
+{
+
+const json = {
+  preParticles: 500,
+  integrationType: 'euler',
+  emitters: [
+    {
+      rate: {
+        particlesMin: 5,
+        particlesMax: 7,
+        perSecondMin: 0.01,
+        perSecondMax: 0.02,
+      },
+      position: {
+        x: 0,
+        y: 5,
+      },
+      initializers: [
+        {
+          type: 'Mass',
+          properties: {
+            min: 1,
+            max: 1,
+          },
+        },
+        {
+          type: 'Life',
+          properties: {
+            min: 2,
+            max: 2,
+          },
+        },
+        {
+          type: 'BodySprite',
+          properties: {
+            texture: './src/images/glow.png',
+          },
+        },
+        {
+          type: 'Radius',
+          properties: {
+            width: 8,
+            height: 8,
+          },
+        },
+      ],
+      behaviours: [
+        {
+          type: 'Alpha',
+          properties: {
+            alphaA: 1,
+            alphaB: 0,
+          },
+        },
+        {
+          type: 'Color',
+          properties: {
+            colorA: '#4F1500',
+            colorB: '#0029FF',
+          },
+        },
+        {
+          type: 'Scale',
+          properties: {
+            scaleA: 2,
+            scaleB: 2,
+          },
+        },
+        {
+          type: 'Force',
+          properties: {
+            fx: 0,
+            fy: 0,
+            fz: -20,
+          },
+        },
+      ],
+    },
+    // {
+    //   rate: {
+    //     particlesMin: 5,
+    //     particlesMax: 7,
+    //     perSecondMin: 0.01,
+    //     perSecondMax: 0.02,
+    //   },
+    //   position: {
+    //     x: 2,
+    //     y: 0,
+    //   },
+    //   initializers: [
+    //     {
+    //       type: 'Mass',
+    //       properties: {
+    //         min: 1,
+    //         max: 1,
+    //       },
+    //     },
+    //     {
+    //       type: 'Life',
+    //       properties: {
+    //         min: 2,
+    //         max: 2,
+    //       },
+    //     },
+    //     {
+    //       type: 'BodySprite',
+    //       properties: {
+    //         texture: './src/images/glow.png',
+    //       },
+    //     },
+    //     {
+    //       type: 'Radius',
+    //       properties: {
+    //         width: 80,
+    //         height: 80,
+    //       },
+    //     },
+    //   ],
+    //   behaviours: [
+    //     {
+    //       type: 'Alpha',
+    //       properties: {
+    //         alphaA: 1,
+    //         alphaB: 0,
+    //       },
+    //     },
+    //     {
+    //       type: 'Color',
+    //       properties: {
+    //         colorA: '#004CFE',
+    //         colorB: '#6600FF',
+    //       },
+    //     },
+    //     {
+    //       type: 'Scale',
+    //       properties: {
+    //         scaleA: 1,
+    //         scaleB: 0.5,
+    //       },
+    //     },
+    //     {
+    //       type: 'Force',
+    //       properties: {
+    //         fx: 0,
+    //         fy: 0,
+    //         fz: -20,
+    //       },
+    //     },
+    //   ],
+    // },
+  ],
+};
+
+const system = new System.fromJSONAsync(json, THREE).then(console.log);
+
+}
+
   glassSphere()
   {
     //*note for later - just render out a skybox of the scene then feed that into glass shader it will look ok
@@ -573,6 +731,7 @@ var geometry = new THREE.SphereGeometry( 30, 32, 16 );
   	this.sphere = new THREE.Mesh( sphereGeometry, customMaterial);
 
   	this.sphere.position.set(0,9,-10);
+    //this.sphere.position.set(0,5,0);
 
   	this.scene.add(this.sphere);
 
@@ -701,11 +860,13 @@ var geometry = new THREE.SphereGeometry( 30, 32, 16 );
 
     //this.addTestObject();
 
-    this.stemoskiScene();
+    //this.stemoskiScene();
 
     this.glassSphere();
 
-    this.glowSphere();
+    this.particleemitter();
+
+    //this.glowSphere();
 
     //this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.fbx");
 
@@ -782,16 +943,18 @@ var geometry = new THREE.SphereGeometry( 30, 32, 16 );
     this.camera.rotation.x += 0.05 * ( this.target.y - this.camera.rotation.x );
     this.camera.rotation.y += 0.05 * ( this.target.x - this.camera.rotation.y );
 
-    //console.log(this.mixer.clipAction);
+    //anything glass----------
     this.sphere.visible = false;
         //this.refractSphereCamera.clear();
         //this.refractSphereCamera.updateCubeMap( this.renderer, this.scene );
       //this.refractSphereCamera.update();
       this.sphere.visible = true;
+    //-------------------------
 
     this.renderer.render(this.scene, this.camera);
 
     requestAnimationFrame(this.animate.bind(this));
+    //console.log(this.mixer);
     this.mixer.update(this.clock.getDelta());
   }
 }
