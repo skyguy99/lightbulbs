@@ -3,6 +3,8 @@ import Cone from './elements/cone';
 import Tourus from './elements/tourus';
 import Cylinder from './elements/cylinder';
 import { radians, map, distance } from './helpers';
+// import * as THREEJS from 'three';
+// import * as THREE_ADDONS from 'three-addons';
 
 export default class App {
   setup() {
@@ -52,7 +54,11 @@ this.testCube = new THREE.Mesh();
 
   createCamera() {
 
-    this.camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 1);
+    //this.camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 1);
+
+    var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+  	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+  	this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
     this.camera.position.set(0, 5, 0); //0,10,0
     //this.camera.rotation.x = -1.57;
 
@@ -442,6 +448,101 @@ this.scene.add(this.testCube);
 
   }
 
+  stemoskiScene()
+{
+  // LIGHT
+  var light = new THREE.PointLight(0xffffff);
+  light.position.set(0,250,0);
+  this.scene.add(light);
+  // FLOOR
+  var floorTexture = new THREE.TextureLoader().load( './src/images/checkerboard.jpg' );
+  floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+  floorTexture.repeat.set( 10, 10 );
+  var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+  var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+  var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+  floor.position.y = -50.5;
+  floor.rotation.x = Math.PI / 2;
+  this.scene.add(floor);
+  // SKYBOX
+  var imagePrefix = "./src/images/dawnmountain-";
+  var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+  var imageSuffix = ".png";
+  var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
+
+  this.urls = [];
+  for (var i = 0; i < 6; i++)
+    this.urls.push( imagePrefix + directions[i] + imageSuffix );
+
+  var materialArray = [];
+  for (var i = 0; i < 6; i++)
+    materialArray.push( new THREE.MeshBasicMaterial({
+      map: new THREE.TextureLoader().load( imagePrefix + directions[i] + imageSuffix ),
+      side: THREE.BackSide
+    }));
+
+    // for (var i = 0; i < 6; i++)
+    // 	materialArray.push( new THREE.MeshBasicMaterial({
+    // 		map: new THREE.TextureLoader().load("./src/scripts/images/bg.png"),
+    // 		side: THREE.BackSide
+    // 	}));
+
+  var skyBox = new THREE.Mesh(skyGeometry, materialArray);
+  this.scene.add( skyBox );
+}
+
+  glassSphere()
+  {
+      //glass no refraction---------
+    var textureCube = new THREE.CubeTextureLoader().load(this.urls);
+  				textureCube.mapping = THREE.CubeRefractionMapping;
+
+
+  				var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity: 0.9 } );
+          var cubeMaterial2 = new THREE.MeshPhongMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
+				var cubeMaterial1 = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
+    //------------------------
+
+    this.refractSphereCamera = new THREE.CubeCamera( 0.1, 10000, 512 );
+  	this.scene.add( this.refractSphereCamera );
+
+  	var fShader = THREE.FresnelShader;
+
+  	var fresnelUniforms =
+  	{
+  		"mRefractionRatio": { type: "f", value: 1.02 },
+  		"mFresnelBias": 	{ type: "f", value: 0.1 },
+  		"mFresnelPower": 	{ type: "f", value: 2.0 },
+  		"mFresnelScale": 	{ type: "f", value: 1.0 },
+  		"tCube": 			{ type: "t", value: this.refractSphereCamera.texture} //textureCube
+  	};
+
+  	// create custom material for the shader
+  	var customMaterial = new THREE.ShaderMaterial(
+  	{
+  	    uniforms: 		fresnelUniforms,
+  		vertexShader:   fShader.vertexShader,
+  		fragmentShader: fShader.fragmentShader
+  	}   );
+
+    const material3 = new THREE.MeshStandardMaterial( {
+
+    color: 0xff0000,
+
+    roughness: 0.3,
+    metalness: 0.2
+} );
+
+  	var sphereGeometry = new THREE.SphereGeometry( 1, 64, 32 );
+  	this.sphere = new THREE.Mesh( sphereGeometry, customMaterial);
+
+  	this.sphere.position.set(0,5,-10);
+
+  	this.scene.add(this.sphere);
+
+  	this.refractSphereCamera.position.set(this.sphere.position);
+  }
+
   createGrid() {
     this.groupMesh = new THREE.Object3D();
 
@@ -564,7 +665,11 @@ this.scene.add(this.testCube);
 
     //this.addTestObject();
 
-    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.fbx");
+    this.stemoskiScene();
+
+    this.glassSphere();
+
+    //this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.fbx");
 
     //this.addSpotLight();
 
@@ -640,6 +745,12 @@ this.scene.add(this.testCube);
     this.camera.rotation.y += 0.05 * ( this.target.x - this.camera.rotation.y );
 
     //console.log(this.mixer.clipAction);
+    this.sphere.visible = false;
+        //this.refractSphereCamera.clear();
+        //this.refractSphereCamera.updateCubeMap( this.renderer, this.scene );
+      //this.refractSphereCamera.update();
+      this.sphere.visible = true;
+
     this.renderer.render(this.scene, this.camera);
 
     requestAnimationFrame(this.animate.bind(this));
