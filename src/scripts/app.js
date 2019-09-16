@@ -491,8 +491,29 @@ this.scene.add(this.testCube);
   this.scene.add( skyBox );
 }
 
+glowSphere()
+  {
+//https://stemkoski.github.io/Three.js/Shader-Glow.html
+var geometry = new THREE.SphereGeometry( 30, 32, 16 );
+    var material = new THREE.MeshLambertMaterial( { color: 0x000088 } );
+    var mesh = new THREE.Mesh( geometry, material );
+    mesh.position.set(0,3,-10);
+    mesh.scale.set(0.1,0.1, 0.1);
+    this.scene.add(mesh);
+
+    var spriteMaterial = new THREE.SpriteMaterial(
+    {
+      map: new THREE.TextureLoader().load( './src/images/glow.png' ),
+      color: 0xffff00, transparent: true, blending: THREE.AdditiveBlending,
+    });
+    var sprite = new THREE.Sprite( spriteMaterial );
+    sprite.scale.set(200, 200, 1.0);
+    mesh.add(sprite);
+}
+
   glassSphere()
   {
+    //*note for later - just render out a skybox of the scene then feed that into glass shader it will look ok
 
       var imagePrefix = "./src/images/dawnmountain-";
       var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
@@ -551,7 +572,7 @@ this.scene.add(this.testCube);
   	var sphereGeometry = new THREE.SphereGeometry( 1, 64, 32 );
   	this.sphere = new THREE.Mesh( sphereGeometry, customMaterial);
 
-  	this.sphere.position.set(0,5,-10);
+  	this.sphere.position.set(0,9,-10);
 
   	this.scene.add(this.sphere);
 
@@ -683,6 +704,8 @@ this.scene.add(this.testCube);
     this.stemoskiScene();
 
     this.glassSphere();
+
+    this.glowSphere();
 
     //this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.fbx");
 
