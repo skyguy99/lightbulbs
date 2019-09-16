@@ -493,7 +493,22 @@ this.scene.add(this.testCube);
 
   glassSphere()
   {
-      //glass no refraction---------
+
+      var imagePrefix = "./src/images/dawnmountain-";
+      var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+      var imageSuffix = ".png";
+      var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
+
+      this.urls = [];
+      for (var i = 0; i < 6; i++)
+        this.urls.push( imagePrefix + directions[i] + imageSuffix );
+
+      var materialArray = [];
+      for (var i = 0; i < 6; i++)
+        materialArray.push( new THREE.MeshBasicMaterial({
+          map: new THREE.TextureLoader().load( imagePrefix + directions[i] + imageSuffix ),
+          side: THREE.BackSide
+        }));
     var textureCube = new THREE.CubeTextureLoader().load(this.urls);
   				textureCube.mapping = THREE.CubeRefractionMapping;
 
@@ -514,7 +529,7 @@ this.scene.add(this.testCube);
   		"mFresnelBias": 	{ type: "f", value: 0.1 },
   		"mFresnelPower": 	{ type: "f", value: 2.0 },
   		"mFresnelScale": 	{ type: "f", value: 1.0 },
-  		"tCube": 			{ type: "t", value: this.refractSphereCamera.texture} //textureCube
+  		"tCube": 			{ type: "t", value: textureCube} //textureCube
   	};
 
   	// create custom material for the shader
