@@ -424,9 +424,14 @@ loader.load( string, function ( object ) {
   {
 
     var video = document.createElement( 'video' );
-    video.src = './src/images/sintel.ogv';
+    video.src = './src/images/sintel.mp4';
     video.load(); // must call after setting/changing source
-    video.play();
+    video.preload = 'auto';
+    video.autoload = true;
+    // video.play();
+
+    this.videoTex = video;
+
 
     var texture = new THREE.VideoTexture( video );
     texture.minFilter = THREE.LinearFilter;
@@ -532,91 +537,20 @@ var geometry = new THREE.SphereGeometry( 30, 32, 16 );
     mesh.add(sprite);
 }
 
+addParticleEngine(parameters)
+{
+  var engine = new ParticleEngine();
+  // engine.setValues( Examples.fountain );
+
+  engine.position.set(0,5,0);
+    engine.setValues(parameters);
+  engine.initialize();
+
+}
+
 particleemitter()
 {
-
-const json = {
-  preParticles: 500,
-  integrationType: 'euler',
-  emitters: [
-    {
-      rate: {
-        particlesMin: 5,
-        particlesMax: 7,
-        perSecondMin: 0.01,
-        perSecondMax: 0.02,
-      },
-      position: {
-        x: 0,
-        y: 1,
-      },
-      initializers: [
-        {
-          type: 'Mass',
-          properties: {
-            min: 1,
-            max: 1,
-          },
-        },
-        {
-          type: 'Life',
-          properties: {
-            min: 2,
-            max: 2,
-          },
-        },
-        {
-          type: 'BodySprite',
-          properties: {
-            texture: './src/images/dawnmountain-zneg.png',
-          },
-        },
-        {
-          type: 'Radius',
-          properties: {
-            width: 18,
-            height: 18,
-          },
-        },
-      ],
-      behaviours: [
-        {
-          type: 'Alpha',
-          properties: {
-            alphaA: 1,
-            alphaB: 0,
-          },
-        },
-        {
-          type: 'Color',
-          properties: {
-            colorA: '#4F1500',
-            colorB: '#0029FF',
-          },
-        },
-        {
-          type: 'Scale',
-          properties: {
-            scaleA: 2,
-            scaleB: 2,
-          },
-        },
-        {
-          type: 'Force',
-          properties: {
-            fx: 0,
-            fy: 0,
-            fz: -20,
-          },
-        },
-      ],
-    },
-  ],
-};
-
-const system = new System.fromJSONAsync(json, THREE).then(console.log);
-//this.scene.add(system);
-
+  this.addParticleEngine(Examples.fireball);
 }
 
   glassSphere()
@@ -816,7 +750,7 @@ const system = new System.fromJSONAsync(json, THREE).then(console.log);
 
     this.glassSphere();
 
-    this.particleemitter();
+    //this.particleemitter();
 
     //this.glowSphere();
 
@@ -835,6 +769,7 @@ const system = new System.fromJSONAsync(json, THREE).then(console.log);
     window.addEventListener('resize', this.onResize.bind(this));
 
     window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
+    window.addEventListener('keydown', this.onKeyDown.bind(this));
 
     this.onMouseMove({ clientX: 0, clientY: 0 });
   }
@@ -867,11 +802,14 @@ const system = new System.fromJSONAsync(json, THREE).then(console.log);
   //this.testCube.position.copy(pos);
 
   }
-//   onMouseWheel( event ) {
-//
-//   this.camera.position.z += event.deltaY * 0.1; // move camera along z-axis
-//
-// }
+onKeyDown(event)
+{
+  //console.log("keydown "+event.keycode);
+  if(this.videoTex)
+  {
+    this.videoTex.play();
+  }
+}
 
   onResize() {
     this.width = window.innerWidth;
