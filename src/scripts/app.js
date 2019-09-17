@@ -424,7 +424,8 @@ loader.load( string, function ( object ) {
   {
 
     var video = document.createElement( 'video' );
-    video.src = './src/images/sintel.mp4';
+    //video.src = './src/images/sintel.mp4';
+    video.src = './src/images/dancer1.webm';
     video.load(); // must call after setting/changing source
     video.preload = 'auto';
     video.autoload = true;
@@ -438,10 +439,13 @@ loader.load( string, function ( object ) {
     texture.magFilter = THREE.LinearFilter;
     texture.format = THREE.RGBFormat;
 
-    // var runnerTexture = new THREE.ImageUtils.loadTexture( 'images/run.png' );
-  	// annie = new TextureAnimator( runnerTexture, 10, 1, 10, 75 ); // texture, #horiz, #vert, #total, duration.
-  	var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
+  	var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide } );
   	var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
+    runnerMaterial.transparent = true;
+    runnerMaterial.alphaMap = texture;
+    // runnerMaterial.alphaMap.magFilter = THREE.NearestFilter;
+    // runnerMaterial.alphaMap.wrapT = THREE.RepeatWrapping;
+    // runnerMaterial.alphaMap.repeat.y = 1;
   	var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
   	runner.position.set(0,5,-10);
   	this.scene.add(runner);
@@ -548,9 +552,26 @@ addParticleEngine(parameters)
 
 }
 
-particleemitter()
+particleemitter() //test - doesnt work
 {
   this.addParticleEngine(Examples.fireball);
+}
+
+animatedTexturePngs()
+{
+
+  var alphaMap = new THREE.TextureLoader().load("./src/images/explosion.jpg"); //also use for diffuse
+
+  var runnerMaterial = new THREE.MeshBasicMaterial( { map: alphaMap, alphaMap: alphaMap, transparent: true, side:THREE.DoubleSide, alphaTest: 0.5 } );
+  runnerMaterial.alphaMap.magFilter = THREE.NearestFilter;
+  runnerMaterial.alphaMap.wrapT = THREE.RepeatWrapping;
+  runnerMaterial.alphaMap.repeat.y = 1;
+
+  var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
+  var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
+  runner.position.set(0,1,0);
+  this.scene.add(runner);
+
 }
 
   glassSphere()
@@ -745,6 +766,8 @@ particleemitter()
     //this.addTestObject();
 
     this.addTextureAnimationObject();
+
+    //this.animatedTexturePngs();
 
     //this.stemoskiScene();
 
