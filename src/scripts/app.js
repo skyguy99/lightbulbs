@@ -437,15 +437,11 @@ loader.load( string, function ( object ) {
     var texture = new THREE.VideoTexture( video );
     texture.minFilter = THREE.LinearFilter;
     texture.magFilter = THREE.LinearFilter;
-    texture.format = THREE.RGBFormat;
+    texture.format = THREE.RGBAFormat;
 
-  	var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide } );
+  	var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0.5 } );
   	var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
     runnerMaterial.transparent = true;
-    runnerMaterial.alphaMap = texture;
-    // runnerMaterial.alphaMap.magFilter = THREE.NearestFilter;
-    // runnerMaterial.alphaMap.wrapT = THREE.RepeatWrapping;
-    // runnerMaterial.alphaMap.repeat.y = 1;
   	var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
   	runner.position.set(0,5,-10);
   	this.scene.add(runner);
