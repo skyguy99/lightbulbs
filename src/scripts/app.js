@@ -57,7 +57,7 @@ this.testCube = new THREE.Mesh();
     var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
   	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
   	this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
-    this.camera.position.set(0, 5, 0);
+    this.camera.position.set(0, 5, 15);
     //this.camera.position.set(0, 5, 0);
 
     //this.camera.rotation.x = -1.57;
@@ -420,6 +420,28 @@ loader.load( string, function ( object ) {
     return this.geometries[Math.floor(Math.random() * Math.floor(this.geometries.length))];
   }
 
+  addTextureAnimationObject()
+  {
+
+    var video = document.createElement( 'video' );
+    video.src = './src/images/sintel.ogv';
+    video.load(); // must call after setting/changing source
+    video.play();
+
+    var texture = new THREE.VideoTexture( video );
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.format = THREE.RGBFormat;
+
+    // var runnerTexture = new THREE.ImageUtils.loadTexture( 'images/run.png' );
+  	// annie = new TextureAnimator( runnerTexture, 10, 1, 10, 75 ); // texture, #horiz, #vert, #total, duration.
+  	var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
+  	var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
+  	var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
+  	runner.position.set(0,5,-10);
+  	this.scene.add(runner);
+  }
+
   addTestObject()
   {
 
@@ -430,7 +452,6 @@ loader.load( string, function ( object ) {
 
     roughness: 0.3,
     metalness: 0.2
-
     // roughnessMap: roughnessMap,
     // metalnessMap: metalnessMap,
     //onmous
@@ -527,7 +548,7 @@ const json = {
       },
       position: {
         x: 0,
-        y: 5,
+        y: 1,
       },
       initializers: [
         {
@@ -547,14 +568,14 @@ const json = {
         {
           type: 'BodySprite',
           properties: {
-            texture: './src/images/glow.png',
+            texture: './src/images/dawnmountain-zneg.png',
           },
         },
         {
           type: 'Radius',
           properties: {
-            width: 8,
-            height: 8,
+            width: 18,
+            height: 18,
           },
         },
       ],
@@ -590,82 +611,11 @@ const json = {
         },
       ],
     },
-    // {
-    //   rate: {
-    //     particlesMin: 5,
-    //     particlesMax: 7,
-    //     perSecondMin: 0.01,
-    //     perSecondMax: 0.02,
-    //   },
-    //   position: {
-    //     x: 2,
-    //     y: 0,
-    //   },
-    //   initializers: [
-    //     {
-    //       type: 'Mass',
-    //       properties: {
-    //         min: 1,
-    //         max: 1,
-    //       },
-    //     },
-    //     {
-    //       type: 'Life',
-    //       properties: {
-    //         min: 2,
-    //         max: 2,
-    //       },
-    //     },
-    //     {
-    //       type: 'BodySprite',
-    //       properties: {
-    //         texture: './src/images/glow.png',
-    //       },
-    //     },
-    //     {
-    //       type: 'Radius',
-    //       properties: {
-    //         width: 80,
-    //         height: 80,
-    //       },
-    //     },
-    //   ],
-    //   behaviours: [
-    //     {
-    //       type: 'Alpha',
-    //       properties: {
-    //         alphaA: 1,
-    //         alphaB: 0,
-    //       },
-    //     },
-    //     {
-    //       type: 'Color',
-    //       properties: {
-    //         colorA: '#004CFE',
-    //         colorB: '#6600FF',
-    //       },
-    //     },
-    //     {
-    //       type: 'Scale',
-    //       properties: {
-    //         scaleA: 1,
-    //         scaleB: 0.5,
-    //       },
-    //     },
-    //     {
-    //       type: 'Force',
-    //       properties: {
-    //         fx: 0,
-    //         fy: 0,
-    //         fz: -20,
-    //       },
-    //     },
-    //   ],
-    // },
   ],
 };
 
 const system = new System.fromJSONAsync(json, THREE).then(console.log);
+//this.scene.add(system);
 
 }
 
@@ -727,11 +677,11 @@ const system = new System.fromJSONAsync(json, THREE).then(console.log);
     metalness: 0.2
 } );
 
-  	var sphereGeometry = new THREE.SphereGeometry( 1, 64, 32 );
+  	var sphereGeometry = new THREE.SphereGeometry( 2, 64, 32 );
   	this.sphere = new THREE.Mesh( sphereGeometry, customMaterial);
 
-  	this.sphere.position.set(0,9,-10);
-    //this.sphere.position.set(0,5,0);
+  	//this.sphere.position.set(0,9,-10);
+    this.sphere.position.set(0,9,0);
 
   	this.scene.add(this.sphere);
 
@@ -860,6 +810,8 @@ const system = new System.fromJSONAsync(json, THREE).then(console.log);
 
     //this.addTestObject();
 
+    this.addTextureAnimationObject();
+
     //this.stemoskiScene();
 
     this.glassSphere();
@@ -868,7 +820,7 @@ const system = new System.fromJSONAsync(json, THREE).then(console.log);
 
     //this.glowSphere();
 
-    //this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.fbx");
+    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.fbx");
 
     //this.addSpotLight();
 
@@ -954,6 +906,7 @@ const system = new System.fromJSONAsync(json, THREE).then(console.log);
     this.renderer.render(this.scene, this.camera);
 
     requestAnimationFrame(this.animate.bind(this));
+
     //console.log(this.mixer);
     this.mixer.update(this.clock.getDelta());
   }
