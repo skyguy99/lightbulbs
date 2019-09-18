@@ -31,19 +31,12 @@ this.testCube = new THREE.Mesh();
     this.movableLight = new THREE.PointLight();
     this.mixer = new THREE.AnimationMixer();
     this.clock = new THREE.Clock();
-    this.android = new THREE.Mesh();
+
+    this.animatedmesh = new THREE.Mesh();
 
     //logic
     this.loadingHasStarted = false;
 
-    this.animOffset       = 0;   // starting frame of animation
-      this.walking         = false;
-      this.duration        = 1000; // milliseconds to complete animation
-      this.keyframes       = 20;   // total number of animation frames
-      this.interpolation   = this.duration / this.keyframes; // milliseconds per frame
-      this.lastKeyframe    = 0;    // previous keyframe
-      this.currentKeyframe = 0;
-      this.time = 0;
   }
 
   createScene() {
@@ -102,7 +95,7 @@ this.testCube = new THREE.Mesh();
   }
 
   addPointLight(color, position) {
-    this.movableLight = new THREE.PointLight(color, 0.2, 1000, 1); //2nd num is intensity
+    this.movableLight = new THREE.PointLight(color, 1, 1000, 1); //2nd num is intensity
 
     this.movableLight.position.set(position.x, position.y, position.z);
 
@@ -169,7 +162,7 @@ this.testCube = new THREE.Mesh();
 		}
   }
 
-  addModelToScene(position, string, materialName)
+  addModelToScene(position, string)
   {
     //var loader = new THREE.ObjectLoader();
     var localThis = this;
@@ -192,22 +185,6 @@ this.testCube = new THREE.Mesh();
     normalScale: new THREE.Vector2( 1, -1 )
 });
 
-    switch(materialName)
-    {
-      case 'globalMat':
-      material = new THREE.MeshPhysicalMaterial({
-          color: '#00ff00',
-          metalness: .58,
-          emissive: '#000000',
-          roughness: .05,
-        });
-        model.material.needsUpdate = true;
-
-        break;
-      default:
-      console.log("no material for custom model");
-        break;
-    }
 //---------------------------------
 
     // loader.load(
@@ -252,40 +229,35 @@ this.testCube = new THREE.Mesh();
 //     );
 
 //FBX LOADER
-// var geoFromScene = new THREE.Geometry();
-// var FBXLoader = require('three-fbx-loader');
-// var loader = new FBXLoader();
-// loader.load( string, function ( object ) {
-// 					localThis.mixer = new THREE.AnimationMixer( object );
-// 					var action = localThis.mixer.clipAction( object.animations[ 0 ] );
-// 					action.play();
-//
-// 					object.traverse( function ( child ) {
-// 						if ( child.isMesh ) {
-// 							child.castShadow = true;
-// 							child.receiveShadow = true;
-// 						}
-// 					} );
-//
-//           object.position.set(5,5,-8)
-//           object.scale.set(0.1, 0.1, 0.1);
-// 					localThis.scene.add( object );
-//
-//
-// 				} );
-var jsonLoader = new THREE.LegacyJSONLoader();
-// jsonLoader.load( "./src/scripts/elements/android-animations.js", this.addModelJson);
+var geoFromScene = new THREE.Geometry();
+var FBXLoader = require('three-fbx-loader');
+var loader = new FBXLoader();
+loader.load( string, function ( object ) {
 
-jsonLoader.load( "./src/scripts/elements/android-animations.js", function (geometry, materials) {
+  object.position.set(0,0,0);
+  object.scale.set(0.1, 0.1, 0.1);
+  localThis.scene.add( object );
 
-          for (var i = 0; i < materials.length; i++)
-        		materials[i].morphTargets = true;
+					localThis.mixer = new THREE.AnimationMixer( object );
+          var clips = object.animations;
+          console.log(clips);
 
-        	var material = new THREE.MeshFaceMaterial( materials );
-        	localThis.android = new THREE.Mesh( geometry, material );
-        	localThis.android.scale.set(1,1,1);
+          //play all
+          clips.forEach( function ( clip ) {
+	             localThis.mixer.clipAction( clip ).play();
+              } );
 
-        	localThis.scene.add( localThis.android );
+          // Play a specific animation
+            // var clip = THREE.AnimationClip.findByName( clips, 'dance' );
+            // var action = mixer.clipAction( clip );
+            // action.play();
+
+					// object.traverse( function ( child ) {
+					// 	if ( child.isMesh ) {
+					// 		child.castShadow = true;
+					// 		child.receiveShadow = true;
+					// 	}
+					// } );
 
 				} );
 
@@ -809,14 +781,15 @@ animatedTexturePngs()
     }
 
     //track to mouse
-  var vector = new THREE.Vector3(this.mouse3D.x, this.mouse3D.y, 0.5);
+  var vector = new THREE.Vector3(this.mouse3D.x, this.mouse3D.y, 0.5); //0.5
 	vector.unproject( this.camera );
 	var dir = vector.sub( this.camera.position ).normalize();
 	var distance = - this.camera.position.z / dir.z;
-	var pos = this.camera.position.clone().add( dir.multiplyScalar( distance ) );
+console.log(distance);
+
+	var pos = this.camera.position.clone().add( dir.multiplyScalar( 14.8) ); //distance = z distance
 
 	this.movableLight.position.copy(pos);
-  //this.testCube.position.copy(pos);
 
   }
 onKeyDown(event)
@@ -859,25 +832,7 @@ onKeyDown(event)
     //-------------------------
 
 //--ANIMATE MODEL------------------------------
-    if ( this.android )
-  	{
 
-  		// Alternate morph targets
-  		this.time = new Date().getTime() % this.duration;
-  		var keyframe = Math.floor( this.time / this.interpolation ) + this.animOffset;
-  		if ( keyframe != this.currentKeyframe )
-  		{
-  			this.android.morphTargetInfluences[ this.lastKeyframe ] = 0;
-  			this.android.morphTargetInfluences[ this.currentKeyframe ] = 1;
-  			this.android.morphTargetInfluences[ this.keyframe ] = 0;
-  			this.lastKeyframe = this.currentKeyframe;
-  			this.currentKeyframe = this.keyframe;
-  		}
-  		this.android.morphTargetInfluences[ this.keyframe ] =
-  			( this.time % this.interpolation ) / this.interpolation;
-  		this.android.morphTargetInfluences[ this.lastKeyframe ] =
-  			1 - this.android.morphTargetInfluences[ this.keyframe ];
-  	}
 //-------------------
 
     this.renderer.render(this.scene, this.camera);
