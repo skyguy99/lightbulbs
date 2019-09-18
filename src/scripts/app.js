@@ -229,7 +229,8 @@ this.testCube = new THREE.Mesh();
 //     );
 
 //FBX LOADER
-var geoFromScene = new THREE.Geometry();
+//https://github.com/mrdoob/three.js/blob/master/examples/webgl_loader_fbx.html
+
 var FBXLoader = require('three-fbx-loader');
 var loader = new FBXLoader();
 loader.load( string, function ( object ) {
@@ -238,34 +239,49 @@ loader.load( string, function ( object ) {
   object.scale.set(0.1, 0.1, 0.1);
   localThis.scene.add( object );
 
-					localThis.mixer = new THREE.AnimationMixer( object );
-          var clips = object.animations;
-          console.log(clips);
+					// localThis.mixer = new THREE.AnimationMixer( object );
+          // var clips = object.animations;
+          // console.log(clips);
 
           //play all
-          clips.forEach( function ( clip ) {
-	             localThis.mixer.clipAction( clip ).play();
-              } );
+          // clips.forEach( function ( clip ) {
+	        //      localThis.mixer.clipAction( clip ).play();
+          //     } );
 
           // Play a specific animation
             // var clip = THREE.AnimationClip.findByName( clips, 'dance' );
             // var action = mixer.clipAction( clip );
             // action.play();
 
-					// object.traverse( function ( child ) {
-					// 	if ( child.isMesh ) {
-					// 		child.castShadow = true;
-					// 		child.receiveShadow = true;
-					// 	}
-					// } );
+					object.traverse( function ( child ) {
+						if ( child.isMesh ) {
+							child.castShadow = true;
+							child.receiveShadow = true;
+						}
+					} );
 
-				} );
+				},
+        function ( xhr ) {
+            		console.log( (xhr.loaded / xhr.total * 100) + '% of model loaded' );
+            	},
+
+            	// onError callback
+            	function ( err ) {
+            		console.error( 'FBX Error'+err );
+            	}
+       );
 
   }
 
-  switchToFullScreenVideo()
+  toggleVideo()
   {
+    $("canvas").toggle();
+    $("#myVideo").toggle();
+  }
 
+  barProgress(percent, $element) {
+    var progressBarWidth = percent * $element.width() / 100;
+    $element.find('div').animate({ width: progressBarWidth }, 500).html(percent + "% ");
   }
 
   makeIntoShape()
@@ -785,7 +801,6 @@ animatedTexturePngs()
 	vector.unproject( this.camera );
 	var dir = vector.sub( this.camera.position ).normalize();
 	var distance = - this.camera.position.z / dir.z;
-console.log(distance);
 
 	var pos = this.camera.position.clone().add( dir.multiplyScalar( 14.8) ); //distance = z distance
 
@@ -799,6 +814,7 @@ onKeyDown(event)
   {
     this.videoTex.play();
   }
+  this.toggleVideo();
 }
 
   onResize() {
@@ -834,12 +850,12 @@ onKeyDown(event)
 //--ANIMATE MODEL------------------------------
 
 //-------------------
+      this.mixer.update(this.clock.getDelta());
 
     this.renderer.render(this.scene, this.camera);
 
     requestAnimationFrame(this.animate.bind(this));
 
     //console.log(this.mixer);
-    this.mixer.update(this.clock.getDelta());
   }
 }
