@@ -38,8 +38,16 @@ canvas {
 	display: block;
 }
 
-#progressBar {
-	display: none;
+.prg {
+    height: 9px;
+    background: white;
+    width: 100; //temp
+    text-align: center;
+}
+
+.hoverMe {
+	position: absolute;
+bottom: 0px;
 }
 
 a {

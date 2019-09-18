@@ -12,7 +12,7 @@ console.log("SKY");
 
 //constantss
     this.gutter = { size: 4 };
-    this.meshes = [];
+    this.meshes = []; //objects we need to worry about for interaction
     this.grid = { rows: 5, cols: 5 };
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -33,6 +33,8 @@ this.testCube = new THREE.Mesh();
     this.clock = new THREE.Clock();
 
     this.animatedmesh = new THREE.Mesh();
+
+    //this.objectsInScene = [];
 
     //logic
     this.loadingHasStarted = false;
@@ -102,14 +104,42 @@ this.testCube = new THREE.Mesh();
     this.scene.add(this.movableLight);
   }
 
-  startLoading()
+  startLoading(load)
   {
-    if(!this.loadingHasStarted)
-    {
-      this.loadingHasStarted = true;
-      console.log("Starting load to back");
-      //wait 3 seconds, then go
-    }
+    // if(!this.loadingHasStarted)
+    // {
+    //   this.loadingHasStarted = true;
+    //   console.log("Starting load to back");
+    //   //wait 3 seconds, then go
+    // }
+
+    const bar = document.querySelector('.prg');
+    const hoverMe = document.querySelector('.hoverMe');
+    var interval;
+    var prg = 0;
+
+  //   if(load)
+  //   {
+  //     interval = setInterval(() => {
+  //     prg++;
+  //     bar.style.width = prg + '%';
+  //   //  bar.innerText = prg + '%';
+  //     if(prg >= 100) {
+  //       clearInterval(interval);
+  //     }
+  //   }, 50);
+  // } else {
+  //   clearInterval(interval);
+  //   interval = setInterval(() => {
+  //     prg--;
+  //     bar.style.width = prg + '%';
+  //   //  bar.innerText = prg + '%';
+  //     if(prg <= 0) {
+  //       clearInterval(interval);
+  //     }
+  //   }, 50);
+  // }
+
   }
 
   addFloor() {
@@ -279,11 +309,35 @@ loader.load( string, function ( object ) {
     $("#myVideo").toggle();
   }
 
-  barProgress(percent, $element) {
-    var progressBarWidth = percent * $element.width() / 100;
-    $element.find('div').animate({ width: progressBarWidth }, 500).html(percent + "% ");
-  }
+  checkToUpdateProgBar()
+  {
+      const bar = document.querySelector('.prg');
+      const hoverMe = document.querySelector('.hoverMe');
+      let intrval;
+      let prg = 0;
+      hoverMe.onmouseenter = (e) => {
+          interval = setInterval(() => {
+        	prg++;
+          bar.style.width = prg + '%';
+        //  bar.innerText = prg + '%';
+          if(prg >= 100) {
+          	clearInterval(interval);
+          }
+        }, 50);
+      }
 
+      hoverMe.onmouseleave = () => {
+      	clearInterval(interval);
+      	interval = setInterval(() => {
+        	prg--;
+          bar.style.width = prg + '%';
+        //  bar.innerText = prg + '%';
+          if(prg <= 0) {
+          	clearInterval(interval);
+          }
+        }, 50);
+      }
+  }
   makeIntoShape()
   {
 
@@ -454,7 +508,7 @@ loader.load( string, function ( object ) {
 this.testCube.geometry = geometry;
 this.testCube.material = material;
 // Finally, set the pivot's position as well, so that it follows the camera.
-this.testCube.scale.set(15,15,15);
+//this.testCube.scale.set(15,15,15);
 this.testCube.position.set(0,5,-10);
 this.scene.add(this.testCube);
 
@@ -625,6 +679,7 @@ animatedTexturePngs()
   	this.refractSphereCamera.position.set(this.sphere.position);
   }
 
+//ADDS MESHES
   createGrid() {
     this.groupMesh = new THREE.Object3D();
 
@@ -653,11 +708,14 @@ animatedTexturePngs()
           mesh.rotation.y = geometry.rotationY;
           mesh.rotation.z = geometry.rotationZ;
 
+//Store vars for use later
           mesh.initialRotation = {
             x: mesh.rotation.x,
             y: mesh.rotation.y,
             z: mesh.rotation.z,
           };
+
+          mesh.name = "Mesh num"+col.toString();
 
           this.groupMesh.add(mesh);
 
@@ -709,6 +767,12 @@ animatedTexturePngs()
             const y = map(mouseDistance, 7, 0, 0, 6);
             TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
 
+            //check for interaction -----------
+            if(y<1)
+            {
+              this.mouseIsCloseTo(mesh);
+            }
+
             const scaleFactor = mesh.position.y / 1.2;
             const scale = scaleFactor < 1 ? 1 : scaleFactor;
             TweenMax.to(mesh.scale, .3, {
@@ -728,6 +792,11 @@ animatedTexturePngs()
         }
       }
     }
+  }
+
+  mouseIsCloseTo(object)
+  {
+    //console.log("Mouse is close to "+object.name);
   }
 
   init() {
@@ -791,8 +860,9 @@ animatedTexturePngs()
 
     if(this.mouse.y > this.height * 0.088)
     {
-      this.startLoading();
+      this.startLoading(true);
     } else {
+      this.startLoading(false);
       this.loadingHasStarted = false;
     }
 
@@ -817,6 +887,11 @@ onKeyDown(event)
   this.toggleVideo();
 }
 
+// isCloseTo(target)
+// {
+//   return (new THREE.Vector3(this.mouse.x, this.mouse.y, target.position.z).distanceTo(target.position)) <= 100;
+// }
+
   onResize() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -832,6 +907,8 @@ onKeyDown(event)
 
     this.draw();
 
+    this.checkToUpdateProgBar();
+
     const resistance = 0.002;
     this.target.x = ( 1 - this.mouse.x ) * resistance;
     this.target.y = ( 1 - this.mouse.y ) * resistance;
@@ -846,6 +923,7 @@ onKeyDown(event)
       //this.refractSphereCamera.update();
       this.sphere.visible = true;
     //-------------------------
+
 
 //--ANIMATE MODEL------------------------------
 
