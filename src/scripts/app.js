@@ -31,9 +31,19 @@ this.testCube = new THREE.Mesh();
     this.movableLight = new THREE.PointLight();
     this.mixer = new THREE.AnimationMixer();
     this.clock = new THREE.Clock();
+    this.android = new THREE.Mesh();
 
     //logic
     this.loadingHasStarted = false;
+
+    this.animOffset       = 0;   // starting frame of animation
+      this.walking         = false;
+      this.duration        = 1000; // milliseconds to complete animation
+      this.keyframes       = 20;   // total number of animation frames
+      this.interpolation   = this.duration / this.keyframes; // milliseconds per frame
+      this.lastKeyframe    = 0;    // previous keyframe
+      this.currentKeyframe = 0;
+      this.time = 0;
   }
 
   createScene() {
@@ -242,60 +252,48 @@ this.testCube = new THREE.Mesh();
 //     );
 
 //FBX LOADER
-var geoFromScene = new THREE.Geometry();
-var FBXLoader = require('three-fbx-loader');
-var loader = new FBXLoader();
-loader.load( string, function ( object ) {
-					localThis.mixer = new THREE.AnimationMixer( object );
-					var action = localThis.mixer.clipAction( object.animations[ 0 ] );
-					action.play();
+// var geoFromScene = new THREE.Geometry();
+// var FBXLoader = require('three-fbx-loader');
+// var loader = new FBXLoader();
+// loader.load( string, function ( object ) {
+// 					localThis.mixer = new THREE.AnimationMixer( object );
+// 					var action = localThis.mixer.clipAction( object.animations[ 0 ] );
+// 					action.play();
+//
+// 					object.traverse( function ( child ) {
+// 						if ( child.isMesh ) {
+// 							child.castShadow = true;
+// 							child.receiveShadow = true;
+// 						}
+// 					} );
+//
+//           object.position.set(5,5,-8)
+//           object.scale.set(0.1, 0.1, 0.1);
+// 					localThis.scene.add( object );
+//
+//
+// 				} );
+var jsonLoader = new THREE.LegacyJSONLoader();
+// jsonLoader.load( "./src/scripts/elements/android-animations.js", this.addModelJson);
 
-					object.traverse( function ( child ) {
-						if ( child.isMesh ) {
-							child.castShadow = true;
-							child.receiveShadow = true;
-						}
-					} );
+jsonLoader.load( "./src/scripts/elements/android-animations.js", function (geometry, materials) {
 
-          object.position.set(5,5,-8)
-          object.scale.set(0.1, 0.1, 0.1);
-					localThis.scene.add( object );
+          for (var i = 0; i < materials.length; i++)
+        		materials[i].morphTargets = true;
 
+        	var material = new THREE.MeshFaceMaterial( materials );
+        	localThis.android = new THREE.Mesh( geometry, material );
+        	localThis.android.scale.set(1,1,1);
+
+        	localThis.scene.add( localThis.android );
 
 				} );
-				// loader.load(string, function ( object ) {
-        //
-				// 	object.traverse( function ( child ) {
-				// 		if ( child.isMesh ) {
-				// 			child.castShadow = true;
-				// 			child.receiveShadow = true;
-        //
-        //       geoFromScene = (new THREE.Geometry()).fromBufferGeometry(child.geometry);
-        //
-				// 		}
-        //
-        //
-				// 	} );
-        //
-        //   var theModel = new THREE.Mesh();
-        //   theModel.geometry = geoFromScene;
-        //   theModel.material = material;
-        //   theModel.position.set(5,5,-8);
-        //   //theModel.rotation.set(new THREE.Vector3( 0, MATH.pi/2, 0));
-        //   theModel.scale.set(0.1, 0.1, 0.1);
-				// 	localThis.scene.add(theModel);
-        //
-        //   localThis.mixer = new THREE.AnimationMixer(theModel);
-        //
-        //   if(theModel.animations[0])
-        //   {
-        //     var action = localThis.mixer.clipAction(theModel.animations[0]);
-  			// 		action.play();
-        //   } else {
-        //     console.log("No animations");
-        //   }
-        //
-				// } );
+
+  }
+
+  switchToFullScreenVideo()
+  {
+
   }
 
   makeIntoShape()
@@ -859,6 +857,28 @@ onKeyDown(event)
       //this.refractSphereCamera.update();
       this.sphere.visible = true;
     //-------------------------
+
+//--ANIMATE MODEL------------------------------
+    if ( this.android )
+  	{
+
+  		// Alternate morph targets
+  		this.time = new Date().getTime() % this.duration;
+  		var keyframe = Math.floor( this.time / this.interpolation ) + this.animOffset;
+  		if ( keyframe != this.currentKeyframe )
+  		{
+  			this.android.morphTargetInfluences[ this.lastKeyframe ] = 0;
+  			this.android.morphTargetInfluences[ this.currentKeyframe ] = 1;
+  			this.android.morphTargetInfluences[ this.keyframe ] = 0;
+  			this.lastKeyframe = this.currentKeyframe;
+  			this.currentKeyframe = this.keyframe;
+  		}
+  		this.android.morphTargetInfluences[ this.keyframe ] =
+  			( this.time % this.interpolation ) / this.interpolation;
+  		this.android.morphTargetInfluences[ this.lastKeyframe ] =
+  			1 - this.android.morphTargetInfluences[ this.keyframe ];
+  	}
+//-------------------
 
     this.renderer.render(this.scene, this.camera);
 
