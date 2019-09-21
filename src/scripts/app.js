@@ -34,8 +34,6 @@ this.testCube = new THREE.Mesh();
 
     this.animatedmesh = new THREE.Mesh();
 
-    //this.objectsInScene = [];
-
     //logic
     this.loadingHasStarted = false;
 
@@ -47,7 +45,7 @@ this.testCube = new THREE.Mesh();
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
-
+    this.renderer.setClearColor(new THREE.Color(0, 0, 0));
 
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -102,6 +100,52 @@ this.testCube = new THREE.Mesh();
     this.movableLight.position.set(position.x, position.y, position.z);
 
     this.scene.add(this.movableLight);
+  }
+
+  applyTVShader()
+  {
+    // Define the shader uniforms
+		this.uniforms = {
+			u_time : {
+				type : "f",
+				value : 0.0
+			},
+			u_frame : {
+				type : "f",
+				value : 0.0
+			},
+			u_resolution : {
+				type : "v2",
+				value : new THREE.Vector2(window.innerWidth, window.innerHeight)
+						.multiplyScalar(window.devicePixelRatio)
+			},
+			u_mouse : {
+				type : "v2",
+				value : new THREE.Vector2(0.5 * window.innerWidth, window.innerHeight)
+						.multiplyScalar(window.devicePixelRatio)
+			},
+			u_texture : {
+				type : "t",
+				value : null
+			}
+		};
+
+		// Create the shader material
+		var material = new THREE.ShaderMaterial({
+			uniforms : this.uniforms,
+			vertexShader : document.getElementById("vertexShader").textContent,
+			fragmentShader : document.getElementById("fragmentShader").textContent
+		});
+
+
+		// Initialize the effect composer
+		this.composer = new THREE.EffectComposer(this.renderer);
+		this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
+
+		// Add the post-processing effect
+		var effect = new THREE.ShaderPass(material, "u_texture");
+		effect.renderToScreen = true;
+		this.composer.addPass(effect);
   }
 
   startLoading(load)
@@ -794,6 +838,15 @@ animatedTexturePngs()
     }
   }
 
+//render shader
+  render()
+  {
+    this.uniforms.u_time.value = this.clock.getElapsedTime();
+		this.uniforms.u_frame.value += 1.0;
+		this.composer.render();
+
+  }
+
   mouseIsCloseTo(object)
   {
     //console.log("Mouse is close to "+object.name);
@@ -836,12 +889,14 @@ animatedTexturePngs()
 
     this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 });
 
+    this.applyTVShader();
+
     this.animate();
 
     //this.playAudio();
 
     window.addEventListener('resize', this.onResize.bind(this));
-
+window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
     window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
     window.addEventListener('keydown', this.onKeyDown.bind(this));
 
@@ -876,6 +931,19 @@ animatedTexturePngs()
 
 	this.movableLight.position.copy(pos);
 
+  //shader
+  this.uniforms.u_mouse.value.set(this.mouse.x, window.innerHeight - this.mouse.y).multiplyScalar(
+      window.devicePixelRatio);
+      //1860, 1234 = all
+      //this.uniforms.u_mouse.value.set(1860, 1234);
+
+  }
+
+  onTouchMove({ clientX, clientY }) {
+
+    // //shader
+    // this.uniforms.u_mouse.value.set(event.touches[0].pageX, window.innerHeight - event.touches[0].pageY).multiplyScalar(
+    //    window.devicePixelRatio);
   }
 onKeyDown(event)
 {
@@ -901,11 +969,16 @@ onKeyDown(event)
     this.camera.aspect = this.width / this.height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(this.width, this.height);
+
+    //shader
+    // Update the resolution uniform
+		this.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight).multiplyScalar(window.devicePixelRatio);
   }
 
   animate() {
 
     this.draw();
+    this.render();
 
     this.checkToUpdateProgBar();
 
