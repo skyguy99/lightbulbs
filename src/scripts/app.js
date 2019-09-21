@@ -104,48 +104,46 @@ this.testCube = new THREE.Mesh();
 
   applyTVShader()
   {
-    // Define the shader uniforms
-		this.uniforms = {
-			u_time : {
-				type : "f",
-				value : 0.0
-			},
-			u_frame : {
-				type : "f",
-				value : 0.0
-			},
-			u_resolution : {
-				type : "v2",
-				value : new THREE.Vector2(window.innerWidth, window.innerHeight)
-						.multiplyScalar(window.devicePixelRatio)
-			},
-			u_mouse : {
-				type : "v2",
-				value : new THREE.Vector2(0.5 * window.innerWidth, window.innerHeight)
-						.multiplyScalar(window.devicePixelRatio)
-			},
-			u_texture : {
-				type : "t",
-				value : null
-			}
-		};
+    // postprocessing
 
-		// Create the shader material
-		var material = new THREE.ShaderMaterial({
-			uniforms : this.uniforms,
-			vertexShader : document.getElementById("vertexShader").textContent,
-			fragmentShader : document.getElementById("fragmentShader").textContent
-		});
+	this.composer = new THREE.EffectComposer(this.renderer); //THREE.whatever is different
+	var renderPass = new THREE.RenderPass(this.scene, this.camera);
+	this.composer.addPass(renderPass);
 
+	// badtv pass
 
-		// Initialize the effect composer
-		this.composer = new THREE.EffectComposer(this.renderer);
-		this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
+	this.uniforms = {
+		u_time: {
+			value: 0.0
+		},
+		u_frame: {
+			value: 0.0
+		},
+		u_resolution: {
+			value: new THREE.Vector2(
+				window.innerWidth,
+				window.innerHeight
+			).multiplyScalar(window.devicePixelRatio)
+		},
+		u_mouse: {
+			value: new THREE.Vector2(
+				0.5 * window.innerWidth,
+				window.innerHeight
+			).multiplyScalar(window.devicePixelRatio)
+		},
+		u_texture: {
+			value: null
+		}
+	};
 
-		// Add the post-processing effect
-		var effect = new THREE.ShaderPass(material, "u_texture");
-		effect.renderToScreen = true;
-		this.composer.addPass(effect);
+	var shaderMaterial = new THREE.ShaderMaterial({
+		uniforms: this.uniforms,
+		vertexShader: document.getElementById("vertexShader").textContent,
+		fragmentShader: document.getElementById("fragmentShader").textContent
+	});
+
+	var effectBadTV = new THREE.ShaderPass(shaderMaterial, "u_texture");
+	this.composer.addPass(effectBadTV);
   }
 
   startLoading(load)
@@ -838,14 +836,6 @@ animatedTexturePngs()
     }
   }
 
-//render shader
-  render()
-  {
-    this.uniforms.u_time.value = this.clock.getElapsedTime();
-		this.uniforms.u_frame.value += 1.0;
-		this.composer.render();
-
-  }
 
   mouseIsCloseTo(object)
   {
@@ -858,6 +848,8 @@ animatedTexturePngs()
     this.createScene();
 
     this.createCamera();
+
+    this.applyTVShader();
 
     this.createGrid();
 
@@ -888,8 +880,6 @@ animatedTexturePngs()
     //this.addRectLight();
 
     this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 });
-
-    this.applyTVShader();
 
     this.animate();
 
@@ -978,7 +968,6 @@ onKeyDown(event)
   animate() {
 
     this.draw();
-    this.render();
 
     this.checkToUpdateProgBar();
 
@@ -1001,6 +990,12 @@ onKeyDown(event)
 //--ANIMATE MODEL------------------------------
 
 //-------------------
+
+//render shader
+this.uniforms.u_time.value = this.clock.getElapsedTime();
+this.uniforms.u_frame.value += 1.0;
+this.composer.render();
+
       this.mixer.update(this.clock.getDelta());
 
     this.renderer.render(this.scene, this.camera);
