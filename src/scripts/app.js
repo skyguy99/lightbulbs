@@ -345,6 +345,17 @@ loader.load( string, function ( object ) {
 
   }
 
+  doneLoading()
+  {
+    //load experience
+    setTimeout( function(){
+
+    $(".frame").show();
+    $(".loadingScreen").hide();
+  }  , 2000 );
+
+  }
+
   toggleVideo()
   {
     $("canvas").toggle();
@@ -357,28 +368,28 @@ loader.load( string, function ( object ) {
       const hoverMe = document.querySelector('.hoverMe');
       let intrval;
       let prg = 0;
-      hoverMe.onmouseenter = (e) => {
-          interval = setInterval(() => {
-        	prg++;
-          bar.style.width = prg + '%';
-        //  bar.innerText = prg + '%';
-          if(prg >= 100) {
-          	clearInterval(interval);
-          }
-        }, 50);
-      }
-
-      hoverMe.onmouseleave = () => {
-      	clearInterval(interval);
-      	interval = setInterval(() => {
-        	prg--;
-          bar.style.width = prg + '%';
-        //  bar.innerText = prg + '%';
-          if(prg <= 0) {
-          	clearInterval(interval);
-          }
-        }, 50);
-      }
+      // hoverMe.onmouseenter = (e) => {
+      //     interval = setInterval(() => {
+      //   	prg++;
+      //     bar.style.width = prg + '%';
+      //   //  bar.innerText = prg + '%';
+      //     if(prg >= 100) {
+      //     	clearInterval(interval);
+      //     }
+      //   }, 50);
+      // }
+      //
+      // hoverMe.onmouseleave = () => {
+      // 	clearInterval(interval);
+      // 	interval = setInterval(() => {
+      //   	prg--;
+      //     bar.style.width = prg + '%';
+      //   //  bar.innerText = prg + '%';
+      //     if(prg <= 0) {
+      //     	clearInterval(interval);
+      //     }
+      //   }, 50);
+      // }
   }
   makeIntoShape()
   {
@@ -507,9 +518,10 @@ loader.load( string, function ( object ) {
 
     var video = document.createElement( 'video' );
     //video.src = './src/images/sintel.mp4';
-    video.src = './src/images/dancer1.webm';
+    video.src = './src/images/firetest.webm';
     video.load(); // must call after setting/changing source
     video.preload = 'auto';
+    video.loop = true;
     video.autoload = true;
     // video.play();
 
@@ -845,6 +857,8 @@ animatedTexturePngs()
   init() {
     this.setup();
 
+    this.doneLoading();
+
     this.createScene();
 
     this.createCamera();
@@ -927,6 +941,11 @@ window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
       //1860, 1234 = all
       //this.uniforms.u_mouse.value.set(1860, 1234);
 
+      if(this.videoTex)
+      {
+        this.videoTex.play();
+      }
+
   }
 
   onTouchMove({ clientX, clientY }) {
@@ -942,7 +961,7 @@ onKeyDown(event)
   {
     this.videoTex.play();
   }
-  this.toggleVideo();
+
 }
 
 // isCloseTo(target)

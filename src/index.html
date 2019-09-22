@@ -29,26 +29,29 @@
 	</head>
 	<body>
 		<main>
-			<div class="frame">
-				<video autoplay muted loop id="myVideo">
-  			<source src="../src/images/glitch.mp4" type="video/mp4">
+			<div class = "loadingScreen">
+				<video autoplay muted loop>
+				<source src="../src/images/glitch.mp4" type="video/mp4">
 				</video>
-				<!-- <div class="frame__demos">
-					<a href="index.html" class="frame__demo frame__demo--current">demo 1</a>
-					<a href="index2.html" class="frame__demo">demo 2</a>
-				</div> -->
-
-				<div class="hoverMe">
-						<div class="prg"></div>
-					</div>
-
-				<div class = "bottomright">
-	    <a href="https://soundcloud.com/heartbeats-music" target="_blank" class="bt-artist" data-value="GoToSoundCloud">Audio via <b>Heartbeats.</b></a>
-
-	      <span><img src="../src/images/equalizer.gif" alt=""></span>
 			</div>
+			<div class="frame" style = "display: none;">
+				<!-- <video autoplay muted loop id="myVideo">
+  			<source src="../src/images/glitch.mp4" type="video/mp4">
+				</video> -->
+				<div class = "topmenu">
 
+					<div class = audioBtn>
+	    <a href="https://soundcloud.com/heartbeats-music" target="_blank" class="bt-artist" data-value="GoToSoundCloud">Audio via <b>Heartbeats </b> </a>
 
+	      <span><img class = "audiogif" src="../src/images/equalizer.gif" alt=""></span>
+					</div>
+			</div>
+			<div class = "middleMenu">
+
+			</div>
+			<div class = "bottomTitle">
+
+			</div>
 			</div>
 			<script type="x-shader/x-vertex" id="vertexShader">
 #define GLSLIFY 1
@@ -148,8 +151,6 @@ void main() {
 }
 
 		</script>
-
-		<!-- <script type="text/javascript" src="./src/scripts/vendor/shaders/shader-example-postprocessing.js"></script> -->
 		</main>
 	</body>
 </html>
