@@ -150,6 +150,43 @@ a:hover {
 	margin-bottom: -30;
 }
 
+.middleMenu .menuText {
+	// clip-path: inset(10px 20px 30px 40px);
+	line-height: 25px;
+	-webkit-transition: all 0.2s ease;
+	transition: all 0.2s ease;
+}
+
+//social links
+.middleMenu .menuText li:nth-child(3) a:nth-child(1):hover
+{
+	//color: blue;
+	font-weight: bold;
+}
+
+.middleMenu .menuText li:nth-child(3) a:nth-child(1):hover:after
+{
+	content: 'INSTAGRAM';
+}
+.middleMenu .menuText li:nth-child(3) a:nth-child(1):after
+{
+	content: 'IG';
+}
+
+
+.middleMenu .menuText li:nth-child(3) a:nth-child(2):hover
+{
+	font-weight: bold;
+}
+.middleMenu .menuText li:nth-child(3) a:nth-child(3):hover
+{
+	font-weight: bold;
+}
+
+.menuText a:hover {
+	opacity: var(--opacity-link-hover);
+}
+
 .bottomTitle .table {
 	transform: scale(0.22, 0.14);
    margin: 0px;
@@ -169,6 +206,15 @@ a:hover {
   vertical-align: middle;
   margin: auto;
   text-align: center;
+}
+
+ul {
+	position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  cursor: default;
 }
 .dots{
   position: relative;
