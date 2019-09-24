@@ -10,7 +10,7 @@ export default class App {
 
 console.log("SKY");
 
-//constantss
+  //3D STUFF
     this.gutter = { size: 4 };
     this.meshes = []; //objects we need to worry about for interaction
     this.grid = { rows: 5, cols: 5 };
@@ -31,12 +31,27 @@ this.testCube = new THREE.Mesh();
     this.movableLight = new THREE.PointLight();
     this.mixer = new THREE.AnimationMixer();
     this.clock = new THREE.Clock();
-
     this.animatedmesh = new THREE.Mesh();
 
-    //logic
+    //LOGIC
     this.loadingHasStarted = false;
+    this.middleMenuIsUp = true;
+    this.midMenuIndex = 0;
 
+    //UI
+    // $('.dots li').click(function(){
+    //   this.midMenuIndex = $(this).index();
+    //   $(this).addClass('active');
+    //
+    //   $('.dots li').each(function(){
+    //     if($(this).index() <= this.midMenuIndex)
+    //     {
+    //       $(this).addClass('active');
+    //     } else {
+    //       $('.active').removeClass('active');
+    //     }
+    //   });
+    // });
   }
 
   createScene() {
@@ -352,7 +367,7 @@ loader.load( string, function ( object ) {
 
     $(".frame").show();
     $(".loadingScreen").hide();
-  }  , 2000 );
+  }  , 20 );
 
   }
 
@@ -900,11 +915,22 @@ animatedTexturePngs()
     //this.playAudio();
 
     window.addEventListener('resize', this.onResize.bind(this));
-window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
+    window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
     window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
     window.addEventListener('keydown', this.onKeyDown.bind(this));
+    window.addEventListener('click', this.onClick.bind(this));
 
     this.onMouseMove({ clientX: 0, clientY: 0 });
+  }
+
+  onClick({ clientX, clientY })
+  {
+    //console.log("click");
+
+    if(this.videoTex)
+    {
+      this.videoTex.play();
+    }
   }
 
   onMouseMove({ clientX, clientY }) {
@@ -941,11 +967,6 @@ window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
       //1860, 1234 = all
       //this.uniforms.u_mouse.value.set(1860, 1234);
 
-      if(this.videoTex)
-      {
-        this.videoTex.play();
-      }
-
   }
 
   onTouchMove({ clientX, clientY }) {
@@ -956,11 +977,39 @@ window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
   }
 onKeyDown(event)
 {
-  //console.log("keydown "+event.keycode);
+  // console.log("keydown "+event.key);
   if(this.videoTex)
   {
     this.videoTex.play();
   }
+
+if(this.middleMenuIsUp)
+{
+    if(event.key == "ArrowRight")
+    {
+      if(this.midMenuIndex < 2)
+      {
+        this.midMenuIndex++;
+      }
+    } else if (event.key == "ArrowLeft")
+    {
+      if(this.midMenuIndex > 0)
+      {
+        this.midMenuIndex--;
+      }
+    }
+
+    console.log(this.midMenuIndex);
+
+      $('.dots li').each(function(){
+        if($(this).index() <= this.midMenuIndex)
+        {
+          $(this).addClass('active');
+        } else {
+          $('.active').removeClass('active');
+        }
+      });
+}
 
 }
 

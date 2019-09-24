@@ -110,17 +110,111 @@ a:hover {
 	height: 18px;
 }
 .middleMenu {
-
+	position: absolute;
+	top: 50%;
+	text-align: center;
+	//This absolute centers horz
+	left: 50%;
+	-webkit-transform: translateX(-50%);
+	transform: translateX(-50%)
 }
+.middleMenu p a:hover {
+		opacity: var(--opacity-link-hover);
+}
+
 .bottomTitle {
-
+	text-align: center;
+	position: absolute;
+	top: 68%;
+    font-size: 50px;
+	//This absolute centers horz
+	left: 50%;
+	-webkit-transform: translateX(-50%);
+	transform: translateX(-50%)
 }
-// .frame {
-// 	padding: 3rem 5vw;
-// 	text-align: center;
-// 	position: relative;
-// 	z-index: 1000;
-// }
+
+.table{
+	transform: scale(0.2, 0.2); //overall
+   margin: 0px;
+  padding: 0px;
+  height: 100%;
+  color: #fff;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  transition: all 0.3s ease-in-out;
+  width: 100%;
+  height: 100%;
+  display: table;
+}
+
+.cell{
+  display: table-cell;
+  vertical-align: middle;
+  margin: auto;
+  text-align: center;
+}
+.dots{
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  cursor: default;
+
+  .active{
+    a{
+       // -webkit-transform: scale3d(1.3, 1.3, 1.3);
+       //    transform: scale3d(1.3, 1.3, 1.3);
+
+      &:after{
+      width: 100%;
+      }
+    }
+  }
+
+  li{
+    position: relative;
+    display: block;
+    float: left;
+    margin: 0 8px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+
+    a{
+      top: 0;
+      left: 0;
+      width: 100%;
+    height: 590%;
+      outline: none;
+      border-radius: 0%;
+      text-indent: -999em;
+      cursor: pointer;
+      position: absolute;
+      overflow: hidden;
+      background-color: transparent;
+      box-shadow: inset 0 0 0 2px white;
+      -webkit-transition: all 0.3s ease;
+      transition: all 0.3s ease;
+      // -webkit-transform: scale3d(1, 1, 1);
+      // transform: scale3d(1, 1, 1);
+
+      &:after{
+        content: '';
+        position: absolute;
+        bottom: 0;
+        height: 100%;
+        left: 0;
+        width: 0;
+        background-color: #fff;
+        box-shadow: 0 0 1px #fff;
+        -webkit-transition: width 0.3s ease;
+        transition: width 0.3s ease;
+      }
+    }
+  }
+}
+
 #myVideo {
   position: fixed;
   right: 0;
@@ -151,11 +245,6 @@ display: none;
 
 .frame__demo--current {
 	color: var(--color-text);
-}
-
-.github {
-	text-transform: lowercase;
-	margin-left: 1rem;
 }
 
 .bottomright {
