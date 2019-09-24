@@ -249,9 +249,9 @@ this.testCube = new THREE.Mesh();
   texture.encoding = THREE.sRGBEncoding;
 
   var material = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
+    color: 0xffff00,
     roughness: 0.5,
-    metalness: 0.5,
+    metalness: 0.9,
     refractionRatio: 0.98,
     envMapIntensity: 1.0,
     map: texture,
@@ -308,34 +308,43 @@ this.testCube = new THREE.Mesh();
 //FBX LOADER
 //https://github.com/mrdoob/three.js/blob/master/examples/webgl_loader_fbx.html
 
-var FBXLoader = require('three-fbx-loader');
+var FBXLoader = require('wge-three-fbx-loader'); //https://www.npmjs.com/package/wge-three-fbx-loader
 var loader = new FBXLoader();
 loader.load( string, function ( object ) {
 
   object.position.set(0,0,0);
-  object.scale.set(0.1, 0.1, 0.1);
+  //object.scale.set(0.1, 0.1, 0.1);
+  //object.scale.set(0.01, 0.01, 0.01);
   localThis.scene.add( object );
 
-					// localThis.mixer = new THREE.AnimationMixer( object );
-          // var clips = object.animations;
-          // console.log(clips);
+					localThis.mixer = new THREE.AnimationMixer( object );
 
-          //play all
-          // clips.forEach( function ( clip ) {
-	        //      localThis.mixer.clipAction( clip ).play();
-          //     } );
+          //Play all
+          if(object.animations)
+          {
+            var clips = object.animations;
+            //console.log(clips);
 
-          // Play a specific animation
-            // var clip = THREE.AnimationClip.findByName( clips, 'dance' );
-            // var action = mixer.clipAction( clip );
-            // action.play();
+            clips.forEach( function ( clip ) {
+  	             localThis.mixer.clipAction( clip ).play();
+                } );
 
-					object.traverse( function ( child ) {
-						if ( child.isMesh ) {
-							child.castShadow = true;
-							child.receiveShadow = true;
-						}
-					} );
+
+          //  Play a specific animation
+              // var clip = THREE.AnimationClip.findByName( clips, "mixamo.com" );
+              // var action = localThis.mixer.clipAction( clip );
+              // action.play();
+
+              //action.loop = THREE.LoopOnce;
+          }
+
+					// object.traverse( function ( child ) {
+					// 	if ( child.isMesh ) {
+					// 		child.castShadow = true;
+					// 		child.receiveShadow = true;
+          //     //child.material = material; //weird
+					// 	}
+					// } );
 
 				},
         function ( xhr ) {
@@ -731,7 +740,7 @@ animatedTexturePngs()
   	this.sphere = new THREE.Mesh( sphereGeometry, customMaterial);
 
   	//this.sphere.position.set(0,9,-10);
-    this.sphere.position.set(0,9,0);
+    this.sphere.position.set(0,20,0);
 
   	this.scene.add(this.sphere);
 
@@ -896,7 +905,7 @@ animatedTexturePngs()
 
     //this.addSpotLight();
 
-    //this.addRectLight();
+    this.addRectLight();
 
     this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 });
 

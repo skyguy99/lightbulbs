@@ -132,6 +132,10 @@ a:hover {
 	transform: translateX(-50%)
 }
 
+.middleMenu {
+	display: none; //temp
+}
+
 .middleMenu .table{
 	transform: scale(0.2, 0.2); //overall
    margin: 0px;
