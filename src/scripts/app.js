@@ -37,9 +37,11 @@ this.testCube = new THREE.Mesh();
     this.loadingHasStarted = false;
     this.middleMenuIsUp = true;
     this.midMenuIndex = 0;
+    this.currentRoom = 0;
 
     //UI
     $('.dots li').first().addClass('active');
+    $('.bottomTitle .dots li').first().addClass('active');
   }
 
   createScene() {
@@ -970,6 +972,13 @@ onKeyDown(event)
   {
     this.videoTex.play();
   }
+  if(event.key == 0)
+  {
+    if(this.currentRoom < $('.bottomTitle .dots li').length)
+    {
+        this.currentRoom++;
+    }
+  }
 
 if(this.middleMenuIsUp)
 {
@@ -987,8 +996,7 @@ if(this.middleMenuIsUp)
       }
     }
     var self = this;
-    console.log(this.midMenuIndex);
-      $('.dots li').each(function(){
+      $('.middleMenu .dots li').each(function(){
 
         if($(this).index() <= self.midMenuIndex)
         {
@@ -1021,6 +1029,7 @@ if(this.middleMenuIsUp)
 		this.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight).multiplyScalar(window.devicePixelRatio);
   }
 
+//UPDATE
   animate() {
 
     this.draw();
@@ -1058,6 +1067,16 @@ this.composer.render();
 
     requestAnimationFrame(this.animate.bind(this));
 
-    //console.log(this.mixer);
+//UI
+    var self = this;
+      $('.bottomTitle .dots li').each(function(){
+
+        if($(this).index() == self.currentRoom)
+        {
+          $(this).addClass('active');
+        } else {
+          $(this).removeClass('active');
+        }
+      });
   }
 }
