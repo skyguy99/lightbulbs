@@ -39,19 +39,7 @@ this.testCube = new THREE.Mesh();
     this.midMenuIndex = 0;
 
     //UI
-    // $('.dots li').click(function(){
-    //   this.midMenuIndex = $(this).index();
-    //   $(this).addClass('active');
-    //
-    //   $('.dots li').each(function(){
-    //     if($(this).index() <= this.midMenuIndex)
-    //     {
-    //       $(this).addClass('active');
-    //     } else {
-    //       $('.active').removeClass('active');
-    //     }
-    //   });
-    // });
+    $('.dots li').first().addClass('active');
   }
 
   createScene() {
@@ -998,15 +986,15 @@ if(this.middleMenuIsUp)
         this.midMenuIndex--;
       }
     }
-
+    var self = this;
     console.log(this.midMenuIndex);
-
       $('.dots li').each(function(){
-        if($(this).index() <= this.midMenuIndex)
+
+        if($(this).index() <= self.midMenuIndex)
         {
           $(this).addClass('active');
         } else {
-          $('.active').removeClass('active');
+          $(this).removeClass('active');
         }
       });
 }
