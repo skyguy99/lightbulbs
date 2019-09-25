@@ -60,7 +60,6 @@
   "dependencies": {
     "grunt": "^1.0.4",
     "three": "^0.96.0",
-    "three-fbx-loader": "^1.0.3",
     "three-nebula": "^5.0.1",
     "threejs-controls": "^1.0.6",
     "wge-three-fbx-loader": "^1.0.3"

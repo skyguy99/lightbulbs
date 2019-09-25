@@ -38,6 +38,7 @@ this.testCube = new THREE.Mesh();
     this.middleMenuIsUp = true;
     this.midMenuIndex = 0;
     this.currentRoom = 0;
+    this.scl = 0;
 
     //UI
     $('.dots li').first().addClass('active');
@@ -312,39 +313,47 @@ var FBXLoader = require('wge-three-fbx-loader'); //https://www.npmjs.com/package
 var loader = new FBXLoader();
 loader.load( string, function ( object ) {
 
-  object.position.set(0,0,0);
-  //object.scale.set(0.1, 0.1, 0.1);
+  localThis.mixer = new THREE.AnimationMixer( object );
+
+  //Play all
+  if(object.animations)
+  {
+    var clips = object.animations;
+    //console.log(clips);
+
+    clips.forEach( function ( clip ) {
+         localThis.mixer.clipAction( clip ).play();
+        } );
+
+
+  //  Play a specific animation
+      // var clip = THREE.AnimationClip.findByName( clips, "mixamo.com" );
+      // var action = localThis.mixer.clipAction( clip );
+      // action.play();
+
+      //action.loop = THREE.LoopOnce;
+  }
+
   //object.scale.set(0.01, 0.01, 0.01);
-  localThis.scene.add( object );
+  object.traverse( function ( child ) {
 
-					localThis.mixer = new THREE.AnimationMixer( object );
-
-          //Play all
-          if(object.animations)
-          {
-            var clips = object.animations;
-            //console.log(clips);
-
-            clips.forEach( function ( clip ) {
-  	             localThis.mixer.clipAction( clip ).play();
-                } );
+    if ( child.isMesh ) {
+      child.castShadow = true;
+      child.receiveShadow = true;
+      child.material.needsUpdate = true;
+      console.log(child);
+      // if(child.material)
+      // {
+      //   child.material = material; //weird
+      // }
 
 
-          //  Play a specific animation
-              // var clip = THREE.AnimationClip.findByName( clips, "mixamo.com" );
-              // var action = localThis.mixer.clipAction( clip );
-              // action.play();
+    }
+  } );
 
-              //action.loop = THREE.LoopOnce;
-          }
-
-					// object.traverse( function ( child ) {
-					// 	if ( child.isMesh ) {
-					// 		child.castShadow = true;
-					// 		child.receiveShadow = true;
-          //     //child.material = material; //weird
-					// 	}
-					// } );
+          localThis.scene.add( object );
+          object.position.set(0,5,0);
+          object.scale.set(0.1, 0.1, 0.1);
 
 				},
         function ( xhr ) {
@@ -913,13 +922,48 @@ animatedTexturePngs()
 
     //this.playAudio();
 
+    //Interaction setup
     window.addEventListener('resize', this.onResize.bind(this));
     window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
     window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
     window.addEventListener('keydown', this.onKeyDown.bind(this));
     window.addEventListener('click', this.onClick.bind(this));
+    window.addEventListener('wheel', this.onScroll.bind(this), false);
 
     this.onMouseMove({ clientX: 0, clientY: 0 });
+
+  }
+  onScroll(event)
+  {
+    if(event.originalEvent.detail > 0 || event.originalEvent.wheelDelta < 0) {
+
+    while(this.scl==0) {
+
+        this.scl+=0.05;
+                this.camera.position.z+=this.scl;
+                //console.log("1."+" "+scl);
+    }
+
+} else {
+
+    while(this.scl==0) {
+
+
+        this.scl+=0.05;
+                this.camera.position.z-=this.scl;
+                //console.log("2."+" "+scl);
+    }
+
+}
+ this.scl=0;
+window.setInterval(function(){
+     this.scl=0;
+}, 10);
+
+    //console.log("scrolling");
+    //this.camera.position.set(this.camera.position.x, this.camera.position.y, 10);
+    //https://greensock.com/ease-visualizer/
+    //TweenMax.to(this.camera.position, .3, {ease: Expo.easeOut, x:0,y:0,z:0});
   }
 
   onClick({ clientX, clientY })
@@ -1061,7 +1105,8 @@ if(this.middleMenuIsUp)
     //-------------------------
 
 
-//--ANIMATE MODEL------------------------------
+//--ANIMATE MODELS------------------------------
+this.mixer.update(this.clock.getDelta());
 
 //-------------------
 
@@ -1069,8 +1114,6 @@ if(this.middleMenuIsUp)
 this.uniforms.u_time.value = this.clock.getElapsedTime();
 this.uniforms.u_frame.value += 1.0;
 this.composer.render();
-
-      this.mixer.update(this.clock.getDelta());
 
     this.renderer.render(this.scene, this.camera);
 
