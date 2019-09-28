@@ -252,14 +252,15 @@ this.testCube = new THREE.Mesh();
   var material = new THREE.MeshStandardMaterial({
     color: 0xffff00,
     roughness: 0.5,
-    metalness: 0.9,
-    refractionRatio: 0.98,
+    metalness: 0.0,
+    // refractionRatio: 0.98,
     envMapIntensity: 1.0,
     map: texture,
     //normalMap: materials.normalMap,
     //roughnessMap: materials.roughnessMap,
     //metalnessMap: materials.metalnessMap,
     //envMap: me.reflectionCube,
+    skinning: true,
     normalScale: new THREE.Vector2( 1, -1 )
 });
 
@@ -283,8 +284,17 @@ loader.load(
 
     gltf.scene.position.set(0,2,0);
     //gltf.scene.position.set(10,10,10);
-    
+
     gltf.scene.scale.set(0.1,0.1,0.1);
+
+    gltf.scene.traverse(function (node) {
+    if (node.isMesh)
+    {
+      node.material = material;
+      node.castShadow = true;
+      node.receiveShadow = true;
+    }
+  });
 
 //constants
 		// gltf.animations; // Array<THREE.AnimationClip>
