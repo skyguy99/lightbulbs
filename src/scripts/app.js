@@ -264,107 +264,128 @@ this.testCube = new THREE.Mesh();
 });
 
 //---------------------------------
+//GLTF LOADER
+var loader = new THREE.GLTFLoader();
 
-    // loader.load(
-    //     string,
+// Optional: Provide a DRACOLoader instance to decode compressed mesh data
+// var dracoLoader = new THREE.DRACOLoader();
+// dracoLoader.setDecoderPath( '/examples/js/libs/draco' );
+// loader.setDRACOLoader( dracoLoader );
 
-      //DEPLOY
-    	//"https://dojusticeandlettheskiesfall.firebaseapp.com/elements/Icosphere.json",
-//     	function ( obj ) {
-//
-//         var geoFromScene = new THREE.Geometry();
-//         obj.traverse( function (child){
-//           if(child.isMesh)
-//           {
-//
-//             geoFromScene = (new THREE.Geometry()).fromBufferGeometry(child.geometry);
-//           }
-//
-//           var theModel = new THREE.Mesh();
-//           theModel.geometry = geoFromScene;
-//           theModel.material = material;
-//           theModel.position.set(0,5,-10);
-//           theModel.scale.set(5, 5, 5);
-//
-//
-//             //assign materials and add to scene
-//           localThis.scene.add(theModel);
-//
-// });
-//
-//
-//     	},
-//
-//     	// onProgress callback -------------------------------
-//     	function ( xhr ) {
-//     		console.log( (xhr.loaded / xhr.total * 100) + '% of model loaded' );
-//     	},
-//
-//     	// onError callback
-//     	function ( err ) {
-//     		console.error( 'Sky - An error happened' );
-//     	}
-//     );
+//https://blackthread.io/gltf-converter/
+loader.load(
+	// resource URL
+	string,
+	// called when the resource is loaded
+	function ( gltf ) {
+
+		localThis.scene.add(gltf.scene);
+
+    gltf.scene.position.set(0,2,0);
+    //gltf.scene.position.set(10,10,10);
+    
+    gltf.scene.scale.set(0.1,0.1,0.1);
+
+//constants
+		// gltf.animations; // Array<THREE.AnimationClip>
+		// gltf.scene; // THREE.Scene
+		// gltf.scenes; // Array<THREE.Scene>
+		// gltf.cameras; // Array<THREE.Camera>
+		// gltf.asset; // Object
+
+    localThis.mixer = new THREE.AnimationMixer(gltf.scene);
+
+      //Play all
+      if(gltf.animations)
+      {
+        var clips = gltf.animations;
+        //console.log(clips);
+
+        clips.forEach( function ( clip ) {
+             localThis.mixer.clipAction( clip ).play();
+            } );
+      //  Play a specific animation
+          // var clip = THREE.AnimationClip.findByName( clips, "mixamo.com" );
+          // var action = localThis.mixer.clipAction( clip );
+          // action.play();
+
+          //action.loop = THREE.LoopOnce;
+      }
+
+	},
+	// called while loading is progressing
+	function ( xhr ) {
+
+		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+	},
+	// called when loading has errors
+	function ( error ) {
+
+		console.log( 'An error happened' +error);
+
+	}
+);
 
 //FBX LOADER
 //https://github.com/mrdoob/three.js/blob/master/examples/webgl_loader_fbx.html
 
-var FBXLoader = require('wge-three-fbx-loader'); //https://www.npmjs.com/package/wge-three-fbx-loader
-var loader = new FBXLoader();
-loader.load( string, function ( object ) {
-
-  localThis.mixer = new THREE.AnimationMixer( object );
-
-  //Play all
-  if(object.animations)
-  {
-    var clips = object.animations;
-    //console.log(clips);
-
-    clips.forEach( function ( clip ) {
-         localThis.mixer.clipAction( clip ).play();
-        } );
-
-
-  //  Play a specific animation
-      // var clip = THREE.AnimationClip.findByName( clips, "mixamo.com" );
-      // var action = localThis.mixer.clipAction( clip );
-      // action.play();
-
-      //action.loop = THREE.LoopOnce;
-  }
-
-  //object.scale.set(0.01, 0.01, 0.01);
-  object.traverse( function ( child ) {
-
-    if ( child.isMesh ) {
-      child.castShadow = true;
-      child.receiveShadow = true;
-      child.material.needsUpdate = true;
-      console.log(child);
-      // if(child.material)
-      // {
-      //   child.material = material; //weird
-      // }
-
-
-    }
-  } );
-
-          localThis.scene.add( object );
-          object.position.set(0,5,0);
-          object.scale.set(0.1, 0.1, 0.1);
-
-				},
-        function ( xhr ) {
-            		console.log( (xhr.loaded / xhr.total * 100) + '% of model loaded' );
-            	},
-
-            	// onError callback
-            	function ( err ) {
-            		console.error( 'FBX Error'+err );
-            	}
-       );
+//var FBXLoader = require('wge-three-fbx-loader'); //https://www.npmjs.com/package/wge-three-fbx-loader
+// var loader = new FBXLoader();
+// loader.load( string, function ( object ) {
+//
+//   localThis.mixer = new THREE.AnimationMixer( object );
+//
+//   //Play all
+//   if(object.animations)
+//   {
+//     var clips = object.animations;
+//     //console.log(clips);
+//
+//     clips.forEach( function ( clip ) {
+//          localThis.mixer.clipAction( clip ).play();
+//         } );
+//
+//
+//   //  Play a specific animation
+//       // var clip = THREE.AnimationClip.findByName( clips, "mixamo.com" );
+//       // var action = localThis.mixer.clipAction( clip );
+//       // action.play();
+//
+//       //action.loop = THREE.LoopOnce;
+//   }
+//
+//   //object.scale.set(0.01, 0.01, 0.01);
+//   object.traverse( function ( child ) {
+//
+//     if ( child.isMesh ) {
+//       child.castShadow = true;
+//       child.receiveShadow = true;
+//       child.material.needsUpdate = true;
+//       console.log(child);
+//       // if(child.material)
+//       // {
+//       //   child.material = material; //weird
+//       // }
+//
+//
+//     }
+//   } );
+//
+//           localThis.scene.add( object );
+//           object.position.set(0,5,0);
+//           object.scale.set(0.1, 0.1, 0.1);
+//
+// 				},
+//         function ( xhr ) {
+//             		console.log( (xhr.loaded / xhr.total * 100) + '% of model loaded' );
+//             	},
+//
+//             	// onError callback
+//             	function ( err ) {
+//             		console.error( 'FBX Error'+err );
+//             	}
+//        );
 
   }
 
@@ -910,7 +931,7 @@ animatedTexturePngs()
 
     //this.glowSphere();
 
-    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.fbx");
+    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/TiltWorld2.glb"); //**model string
 
     //this.addSpotLight();
 
