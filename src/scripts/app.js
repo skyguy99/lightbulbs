@@ -3,7 +3,7 @@ import Cone from './elements/cone';
 import Tourus from './elements/tourus';
 import Cylinder from './elements/cylinder';
 import { radians, map, distance } from './helpers';
-import System from 'three-nebula';
+
 
 export default class App {
   setup() {
@@ -939,7 +939,7 @@ animatedTexturePngs()
 
     //this.glowSphere();
 
-    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.glb"); //**model string
+    //this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.glb"); //**model string
 
     //this.addSpotLight();
 

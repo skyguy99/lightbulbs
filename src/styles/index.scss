@@ -373,4 +373,46 @@ z-index: 300;
 		height: 100vh;
 		justify-content: center;
 	}
+
+	//Cursor ------
+
+
+	.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+.cursor--small {
+  width: 5px;
+  height: 5px;
+  left: -2.5px;
+  top: -2.5px;
+  border-radius: 50%;
+  z-index: 11000;
+  background: var(--color-text);
+	
+}
+.cursor--canvas {
+  width: 100vw;
+  height: 100vh;
+  z-index: 15000;
+}
+.page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.page__inner {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+html, a {
+ cursor: none;
+}
 //}
