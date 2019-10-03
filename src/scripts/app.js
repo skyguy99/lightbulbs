@@ -267,11 +267,9 @@ this.testCube = new THREE.Mesh();
 //---------------------------------
 //GLTF LOADER
 var loader = new THREE.GLTFLoader();
+// const decoder = require('draco3dgltf').createDecoderModule();
 
-// Optional: Provide a DRACOLoader instance to decode compressed mesh data
-// var dracoLoader = new THREE.DRACOLoader();
-// dracoLoader.setDecoderPath( '/examples/js/libs/draco' );
-// loader.setDRACOLoader( dracoLoader );
+// loader.setDRACOLoader(decoder);
 
 //https://blackthread.io/gltf-converter/
 loader.load(
@@ -941,7 +939,7 @@ animatedTexturePngs()
 
     //this.glowSphere();
 
-    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/TiltWorld2.glb"); //**model string
+    this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.glb"); //**model string
 
     //this.addSpotLight();
 
@@ -962,6 +960,8 @@ animatedTexturePngs()
     window.addEventListener('wheel', this.onScroll.bind(this), false);
 
     this.onMouseMove({ clientX: 0, clientY: 0 });
+
+    (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
 
   }
   onScroll(event)
