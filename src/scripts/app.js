@@ -35,6 +35,7 @@ this.testCube = new THREE.Mesh();
     this.mixers = [];
     this.animatedMeshes = [];
     this.roomModels = [];
+    this.interactiveMeshes = [];
 
     //LOGIC
     this.loadingHasStarted = false;
@@ -567,14 +568,6 @@ loader.load(
   	runner.position.set(0,5,-10);
   	this.scene.add(runner);
 
-    var self = this;
-    setTimeout( function(){
-      if(self.videoTex)
-      {
-        self.videoTex.play();
-      }
-    }  , 20);
-
   }
 
   addTestObject()
@@ -681,8 +674,8 @@ getMaterial(string)
 {
   var material = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    roughness: 0.5,
-    metalness: 0.5,
+    roughness: 0.8,
+    metalness: 0.7,
     //normalMap: materials.normalMap,
     //roughnessMap: materials.roughnessMap,
     //metalnessMap: materials.metalnessMap,
@@ -704,11 +697,11 @@ getMaterial(string)
           skinning: true
         });
 
-        case "palette.005".toLowerCase():
+        case "repeller".toLowerCase():
             material = new THREE.MeshStandardMaterial({
               color: 0xff0000,
-              roughness: 0.5,
-              metalness: 0.0,
+              roughness: 0.8,
+              metalness: 0.5,
               //normalMap: materials.normalMap,
               //roughnessMap: materials.roughnessMap,
               //metalnessMap: materials.metalnessMap,
@@ -763,10 +756,7 @@ addRoomToScene(i, string)
       gltf.scene.index = i;
       localThis.roomModels[i] = gltf.scene;
 
-      //console.log(gltf.scene.index);
-      //*****************
-
-      //gltf.scene.visible = true;
+      console.log(gltf.scene);
       gltf.scene.position.set(0,2,0);
       gltf.scene.scale.set(0.1,0.1,0.1);
 
@@ -779,14 +769,23 @@ addRoomToScene(i, string)
         //node.material = material;
         node.castShadow = true;
         node.receiveShadow = true;
+
+        //**ADD TO INTERACTIVES
+        if(node.name.includes('(repel)'))
+        {
+
+          localThis.interactiveMeshes[localThis.interactiveMeshes.length] = node;
+          node.initialPosition = node.position;
+          node.initialRotation = node.rotation;
+          node.material = localThis.getMaterial('repeller');
+
+        }
       }
     });
 
       var myMixer = new THREE.AnimationMixer(gltf.scene);
       localThis.mixers[i] = myMixer;
       myMixer.hasClips = (gltf.animations.length > 0);
-
-
         //->PLAY ALL
         // console.log(string+" | "+myMixer.hasClips);
         // if(gltf.animations)
@@ -822,10 +821,11 @@ addRoomToScene(i, string)
 
 loadRoomModels()
 {
+
+  //**When export to glb, make sure no missing images in material
   var paths = [
-  "./src/scripts/elements/dancing.glb",
-  "./src/scripts/elements/TiltWorld2.glb",
-  "./src/scripts/elements/cube2.glb"
+  // "./src/scripts/elements/dancing.glb",
+  "./src/scripts/elements/shapestest.glb"
 ];
 
   for(var i = 0; i<paths.length;i++)
@@ -975,7 +975,7 @@ animatedTexturePngs()
             z: mesh.rotation.z,
           };
 
-          mesh.name = "Mesh num"+col.toString();
+          // mesh.name = "Mesh num"+col.toString();
 
           this.groupMesh.add(mesh);
 
@@ -1008,6 +1008,8 @@ animatedTexturePngs()
   draw() {
     this.raycaster.setFromCamera(this.mouse3D, this.camera);
 
+
+//GRID OF OBJECTS ANIMATE
     const intersects = this.raycaster.intersectObjects([this.floor]);
 
     if (intersects.length) {
@@ -1052,6 +1054,46 @@ animatedTexturePngs()
         }
       }
     }
+
+//MY OBJECTS ANIMATE -------------------------------
+  var localThis = this;
+  this.interactiveMeshes.forEach(function(mesh)
+  {
+
+  //     const mouseDistance = distance
+  //       (localThis.mouse3D.x,
+  //       localThis.mouse3D.z,
+  //       mesh.position.x,
+  //       mesh.position.z);
+  //
+  //     const y = map(mouseDistance, 7, 0, 0, 6);
+  //     TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+  //
+  //     //check for interaction -----------
+  //     // if(y<1)
+  //     // {
+  //     //   this.mouseIsCloseTo(mesh);
+  //     // }
+  //
+  //     const scaleFactor = mesh.position.y / 1.2;
+  //     const scale = scaleFactor < 1 ? 1 : scaleFactor;
+  //     TweenMax.to(mesh.scale, .3, {
+  //       ease: Expo.easeOut,
+  //       x: scale,
+  //       y: scale,
+  //       z: scale,
+  //     });
+  //
+  //     TweenMax.to(mesh.rotation, .7, {
+  //       ease: Expo.easeOut,
+  //       x: map(mesh.position.y, -1, 1, radians(270), mesh.initialRotation.x),
+  //       z: map(mesh.position.y, -1, 1, radians(-90), mesh.initialRotation.z),
+  //       y: map(mesh.position.y, -1, 1, radians(45), mesh.initialRotation.y),
+  //     });
+  //
+  }); //-----
+
+
   }
 
 
@@ -1190,7 +1232,7 @@ window.setInterval(function(){
   this.uniforms.u_mouse.value.set(this.mouse.x, window.innerHeight - this.mouse.y).multiplyScalar(
       window.devicePixelRatio);
       //1860, 1234 = all
-      //this.uniforms.u_mouse.value.set(1860, 1234);
+      //this.uniforms.u_mouse.value.set(1860, 1234)
 
   }
 
@@ -1202,6 +1244,14 @@ window.setInterval(function(){
   }
 onKeyDown(event)
 {
+
+  //do this when come in from loading
+
+        if(this.videoTex)
+        {
+          this.videoTex.play();
+        }
+
   // console.log("keydown "+event.key);
   if(event.key == 0)
   {
@@ -1296,7 +1346,7 @@ if(this.mixers.length > 0)
 }
 //-------------------
 
-this.updateCurrentRoom(); //shows only one
+//this.updateCurrentRoom(); //shows only one
 
 //render shader
 this.uniforms.u_time.value = this.clock.getElapsedTime();
