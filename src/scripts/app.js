@@ -549,7 +549,8 @@ loader.load(
     video.preload = 'auto';
     video.loop = true;
     video.autoload = true;
-    // video.play();
+    video.transparent = true;
+    video.playbackRate = 1.06;
 
     this.videoTex = video;
 
@@ -565,6 +566,15 @@ loader.load(
   	var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
   	runner.position.set(0,5,-10);
   	this.scene.add(runner);
+
+    var self = this;
+    setTimeout( function(){
+      if(self.videoTex)
+      {
+        self.videoTex.play();
+      }
+    }  , 20);
+
   }
 
   addTestObject()
@@ -1146,11 +1156,6 @@ window.setInterval(function(){
   onClick({ clientX, clientY })
   {
     //console.log("click");
-
-    if(this.videoTex)
-    {
-      this.videoTex.play();
-    }
   }
 
   onMouseMove({ clientX, clientY }) {
@@ -1198,10 +1203,6 @@ window.setInterval(function(){
 onKeyDown(event)
 {
   // console.log("keydown "+event.key);
-  if(this.videoTex)
-  {
-    this.videoTex.play();
-  }
   if(event.key == 0)
   {
     if(this.currentRoom < $('.bottomTitle .dots li').length)
@@ -1295,7 +1296,7 @@ if(this.mixers.length > 0)
 }
 //-------------------
 
-//this.updateCurrentRoom(); //shows only one
+this.updateCurrentRoom(); //shows only one
 
 //render shader
 this.uniforms.u_time.value = this.clock.getElapsedTime();
