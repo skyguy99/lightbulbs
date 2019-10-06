@@ -756,9 +756,10 @@ addRoomToScene(i, string)
       gltf.scene.index = i;
       localThis.roomModels[i] = gltf.scene;
 
-      console.log(gltf.scene);
-      gltf.scene.position.set(0,2,0);
+      gltf.scene.position.set(0,4,0);
       gltf.scene.scale.set(0.1,0.1,0.1);
+
+        gltf.scene.updateMatrixWorld(true);
 
       gltf.scene.traverse(function (node) {
 
@@ -1005,6 +1006,28 @@ animatedTexturePngs()
     return mesh;
   }
 
+  getMouseDistance(mesh)
+  {
+    //mesh world pos
+    var meshWorldPos = new THREE.Vector3();
+    mesh.getWorldPosition(meshWorldPos);
+
+    //mouse world pos
+    var vector = new THREE.Vector3(this.mouse3D.x, this.mouse3D.y, 0.5); //0.5
+    vector.unproject(this.camera );
+    var dir = vector.sub(this.camera.position ).normalize();
+
+    var pos = this.camera.position.clone().add( dir.multiplyScalar( 14.8) );
+
+    const mouseDistance = distance
+      (pos.x,
+      pos.y,
+      meshWorldPos.x,
+      meshWorldPos.y);
+
+    return mouseDistance;
+  }
+
   draw() {
     this.raycaster.setFromCamera(this.mouse3D, this.camera);
 
@@ -1060,11 +1083,10 @@ animatedTexturePngs()
   this.interactiveMeshes.forEach(function(mesh)
   {
 
-  //     const mouseDistance = distance
-  //       (localThis.mouse3D.x,
-  //       localThis.mouse3D.z,
-  //       mesh.position.x,
-  //       mesh.position.z);
+      if(mesh.name.includes('Sphere'))
+      {
+
+          console.log(localThis.getMouseDistance(mesh));
   //
   //     const y = map(mouseDistance, 7, 0, 0, 6);
   //     TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
@@ -1090,6 +1112,8 @@ animatedTexturePngs()
   //       z: map(mesh.position.y, -1, 1, radians(-90), mesh.initialRotation.z),
   //       y: map(mesh.position.y, -1, 1, radians(45), mesh.initialRotation.y),
   //     });
+
+        }
   //
   }); //-----
 
@@ -1203,6 +1227,7 @@ window.setInterval(function(){
   onMouseMove({ clientX, clientY }) {
     this.mouse3D.x = (clientX / this.width) * 2 - 1;
     this.mouse3D.y = -(clientY / this.height) * 2 + 1;
+    //this.mouse3D.updateMatrixWorld(true);
 
     this.mouse.x = (clientX - this.windowHalf.x );
     this.mouse.y = (clientY - this.windowHalf.x );
