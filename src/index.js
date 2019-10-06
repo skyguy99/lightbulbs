@@ -1,4 +1,4 @@
 import App from './scripts/app';
 
 
-new App().init();
+//new App().init();
