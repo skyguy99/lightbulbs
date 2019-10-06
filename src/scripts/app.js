@@ -43,6 +43,7 @@ this.testCube = new THREE.Mesh();
     this.midMenuIndex = 0;
     this.currentRoom = 0;
     this.scl = 0;
+    this.hasTransitioned = false;
 
     //UI
     $('.dots li').first().addClass('active');
@@ -65,16 +66,132 @@ this.testCube = new THREE.Mesh();
     //this.scene.background = new THREE.Color( 0x424242 );
   }
 
+  addModelToScene(position, string, isCam)
+  {
+    var localThis = this;
+
+  var material = new THREE.MeshStandardMaterial({
+    color: 0xffff00,
+    roughness: 0.5,
+    metalness: 0.0
+});
+
+//---------------------------------
+//GLTF LOADER
+var loader = new THREE.GLTFLoader();
+// const decoder = require('draco3dgltf').createDecoderModule();
+
+// loader.setDRACOLoader(decoder);
+
+//https://blackthread.io/gltf-converter/
+loader.load(
+  // resource URL
+  string,
+  // called when the resource is loaded
+  function ( gltf ) {
+
+    localThis.scene.add(gltf.scene);
+
+    //gltf.scene.visible = true;
+
+    gltf.scene.position.set(position);
+    //gltf.scene.position.set(10,10,10);
+
+    //gltf.scene.scale.set(0.1,0.1,0.1);
+
+    gltf.scene.traverse(function (node) {
+    if (node.isMesh)
+    {
+      node.material = material;
+      node.castShadow = true;
+      node.receiveShadow = true;
+
+      // if(isCam)
+      // {
+      //   localThis.camera.
+      // }
+    }
+  });
+
+
+//constants
+    // gltf.animations; // Array<THREE.AnimationClip>
+    // gltf.scene; // THREE.Scene
+    // gltf.scenes; // Array<THREE.Scene>
+    // gltf.cameras; // Array<THREE.Camera>
+    // gltf.asset; // Object
+
+//Camera mixer
+    localThis.mixer = new THREE.AnimationMixer(gltf.scene);
+
+      //Play all
+      if(gltf.animations)
+      {
+        var clips = gltf.animations;
+        //console.log(clips);
+
+        // clips.forEach( function ( clip ) {
+        //      localThis.mixer.clipAction( clip ).play();
+        //     } );
+      //  Play a specific animation
+          var clip = THREE.AnimationClip.findByName( clips, "camMove" );
+          var action = localThis.mixer.clipAction( clip );
+          action.loop = THREE.LoopOnce;
+          action.play();
+      }
+
+  },
+  // called while loading is progressing
+  function ( xhr ) {
+
+    console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+  },
+  // called when loading has errors
+  function ( error ) {
+
+    console.log( 'An error happened' +error);
+
+  }
+);
+
+  }
+
   createCamera() {
 
 
     var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
   	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
   	this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
-    this.camera.position.set(0, 5, 9);
-    //this.camera.rotation.x = -1.57;
+    this.camera.position.set(0, 4, 9);
 
     this.scene.add(this.camera);
+  }
+
+  roomTransition()
+  {
+    // if(!this.hasTransitioned)
+    // {
+    //   this.hasTransitioned = true;
+    // }
+
+    //https://greensock.com/ease-visualizer/
+    var animation = new TimelineLite()
+    animation.to(this.camera.position, .4, {
+      ease: Expo.easeOut,
+      x: this.camera.position.x,
+      y: this.camera.position.y,
+      z: this.camera.position.z - 3,
+    }).to(this.camera.position, 1.5, {
+      ease: Elastic.easeOut.config(1, 0.5),
+      x: this.camera.position.x,
+      y: this.camera.position.y,
+      z: 9,
+    });
+
+  //   setTimeout( function(){
+  //     this.hasTransitioned = false;
+  // }  , 2000);
   }
 
   addAmbientLight() {
@@ -265,165 +382,6 @@ this.testCube = new THREE.Mesh();
       this.scene.add( object );
 
 		}
-  }
-
-  addModelToScene(position, string)
-  {
-    //var loader = new THREE.ObjectLoader();
-    var localThis = this;
-
-  //const texture = new THREE.TextureLoader().load( "./src/images/cartdiff.jpg");
-  const texture = new THREE.TextureLoader().load( "./src/images/DeadEnds_globalmaterial.png");
-  texture.encoding = THREE.sRGBEncoding;
-
-  var material = new THREE.MeshStandardMaterial({
-    color: 0xffff00,
-    roughness: 0.5,
-    metalness: 0.0,
-    // refractionRatio: 0.98,
-    envMapIntensity: 1.0,
-    map: texture,
-    //normalMap: materials.normalMap,
-    //roughnessMap: materials.roughnessMap,
-    //metalnessMap: materials.metalnessMap,
-    //envMap: me.reflectionCube,
-    skinning: true,
-    normalScale: new THREE.Vector2( 1, -1 )
-});
-
-//---------------------------------
-//GLTF LOADER
-var loader = new THREE.GLTFLoader();
-// const decoder = require('draco3dgltf').createDecoderModule();
-
-// loader.setDRACOLoader(decoder);
-
-//https://blackthread.io/gltf-converter/
-loader.load(
-	// resource URL
-	string,
-	// called when the resource is loaded
-	function ( gltf ) {
-
-		localThis.scene.add(gltf.scene);
-
-    //gltf.scene.visible = true;
-
-    gltf.scene.position.set(0,2,0);
-    //gltf.scene.position.set(10,10,10);
-
-    gltf.scene.scale.set(0.1,0.1,0.1);
-
-    gltf.scene.traverse(function (node) {
-    if (node.isMesh)
-    {
-      node.material = material;
-      node.castShadow = true;
-      node.receiveShadow = true;
-    }
-  });
-
-//constants
-		// gltf.animations; // Array<THREE.AnimationClip>
-		// gltf.scene; // THREE.Scene
-		// gltf.scenes; // Array<THREE.Scene>
-		// gltf.cameras; // Array<THREE.Camera>
-		// gltf.asset; // Object
-
-    localThis.mixer = new THREE.AnimationMixer(gltf.scene);
-
-      //Play all
-      if(gltf.animations)
-      {
-        var clips = gltf.animations;
-        //console.log(clips);
-
-        clips.forEach( function ( clip ) {
-             localThis.mixer.clipAction( clip ).play();
-            } );
-      //  Play a specific animation
-          // var clip = THREE.AnimationClip.findByName( clips, "mixamo.com" );
-          // var action = localThis.mixer.clipAction( clip );
-          // action.play();
-
-          //action.loop = THREE.LoopOnce;
-      }
-
-	},
-	// called while loading is progressing
-	function ( xhr ) {
-
-		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-	},
-	// called when loading has errors
-	function ( error ) {
-
-		console.log( 'An error happened' +error);
-
-	}
-);
-
-//FBX LOADER
-//https://github.com/mrdoob/three.js/blob/master/examples/webgl_loader_fbx.html
-
-//var FBXLoader = require('wge-three-fbx-loader'); //https://www.npmjs.com/package/wge-three-fbx-loader
-// var loader = new FBXLoader();
-// loader.load( string, function ( object ) {
-//
-//   localThis.mixer = new THREE.AnimationMixer( object );
-//
-//   //Play all
-//   if(object.animations)
-//   {
-//     var clips = object.animations;
-//     //console.log(clips);
-//
-//     clips.forEach( function ( clip ) {
-//          localThis.mixer.clipAction( clip ).play();
-//         } );
-//
-//
-//   //  Play a specific animation
-//       // var clip = THREE.AnimationClip.findByName( clips, "mixamo.com" );
-//       // var action = localThis.mixer.clipAction( clip );
-//       // action.play();
-//
-//       //action.loop = THREE.LoopOnce;
-//   }
-//
-//   //object.scale.set(0.01, 0.01, 0.01);
-//   object.traverse( function ( child ) {
-//
-//     if ( child.isMesh ) {
-//       child.castShadow = true;
-//       child.receiveShadow = true;
-//       child.material.needsUpdate = true;
-//       console.log(child);
-//       // if(child.material)
-//       // {
-//       //   child.material = material; //weird
-//       // }
-//
-//
-//     }
-//   } );
-//
-//           localThis.scene.add( object );
-//           object.position.set(0,5,0);
-//           object.scale.set(0.1, 0.1, 0.1);
-//
-// 				},
-//         function ( xhr ) {
-//             		console.log( (xhr.loaded / xhr.total * 100) + '% of model loaded' );
-//             	},
-//
-//             	// onError callback
-//             	function ( err ) {
-//             		console.error( 'FBX Error'+err );
-//             	}
-//        );
-
   }
 
   doneLoading()
@@ -1346,6 +1304,7 @@ onKeyDown(event)
     if(this.currentRoom < $('.bottomTitle .dots li').length)
     {
         this.currentRoom++;
+        this.roomTransition();
     }
   }
 
