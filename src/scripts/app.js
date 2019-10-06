@@ -58,7 +58,8 @@ this.testCube = new THREE.Mesh();
     this.renderer.setClearColor(new THREE.Color(0, 0, 0));
 
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    //this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
     document.body.appendChild(this.renderer.domElement);
     //this.scene.background = new THREE.Color( 0x424242 );
@@ -70,9 +71,7 @@ this.testCube = new THREE.Mesh();
     var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
   	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
   	this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
-    this.camera.position.set(0, 5, 15);
-    //this.camera.position.set(0, 5, 0);
-
+    this.camera.position.set(0, 5, 9);
     //this.camera.rotation.x = -1.57;
 
     this.scene.add(this.camera);
@@ -86,13 +85,28 @@ this.testCube = new THREE.Mesh();
 
   addOtherPointLights()
   {
-    const light = new THREE.PointLight('#ffff00', 0.5, 2000, 1); //2nd num is intensity
+    var light = new THREE.PointLight(0xffffff, 0.5);
+    light.castShadow = true;
+    light.shadow.radius = 10;
 
-    light.position.set(0, 2, 2);
+    light.position.set(0, 4, 2);
     this.scene.add(light);
 
     var helper = new THREE.PointLightHelper(light, 1);
     light.add( helper );
+  }
+
+  addDirectionalLight()
+  {
+    const light = new THREE.DirectionalLight('#ffffff', 0.5);
+    light.castShadow = true;
+    var helper = new THREE.DirectionalLightHelper( light );
+
+    light.add( helper );
+    light.position.set(0, 4, -2);
+    //light.lookAt(0, 0, 0);
+
+    this.scene.add(light);
   }
 
   addRectLight() {
@@ -819,6 +833,7 @@ addRoomToScene(i, string)
             z: node.rotation.z,
           };
          node.material = localThis.getMaterial('repeller');
+         //node.material = localThis.getMaterial('glass-real');
 
         }
       }
@@ -1124,7 +1139,7 @@ animatedTexturePngs()
   {
           //console.log(localThis.getMouseDistance(mesh));
           var mouseDistance = localThis.getMouseDistance(mesh);
-          const y = map(mouseDistance, 2, 0, 0, 20); //2nd val- higher = more sensitive, last val is the max height it goes to
+          const y = map(mouseDistance, 3.3, 0, 0, 22); //2nd val- higher = more sensitive, last val is the max height it goes to
 
           //const y = map(mouseDistance, 7, 0, 0, 6);
 
@@ -1196,7 +1211,9 @@ animatedTexturePngs()
 
     //this.addRectLight();
 
-    this.addOtherPointLights();
+    //this.addOtherPointLights();
+
+    this.addDirectionalLight();
 
     this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
 
@@ -1219,35 +1236,49 @@ animatedTexturePngs()
   }
   onScroll(event)
   {
-    if(event.originalEvent.detail > 0 || event.originalEvent.wheelDelta < 0) {
+              if(event.deltaY > 0) { //up
 
-    while(this.scl==0) {
+              while(this.scl==0) {
 
-        this.scl+=0.05;
-                this.camera.position.z+=this.scl;
-                //console.log("1."+" "+scl);
-    }
+                this.scl+=2.5;
+                if(this.camera.position.z <= 9)
+                {
+                  //this.camera.position.z+=this.scl;
 
-} else {
+                  TweenMax.to(this.camera.position, .7, {
+                        ease: Expo.easeOut,
+                        x: this.camera.position.x,
+                        y: this.camera.position.y,
+                        z: this.camera.position.z+this.scl,
+                      });
+                }
+              }
 
-    while(this.scl==0) {
+            } else { //down
 
+              while(this.scl==0) {
 
-        this.scl+=0.05;
-                this.camera.position.z-=this.scl;
-                //console.log("2."+" "+scl);
-    }
+                this.scl+=2.5;
+                if(this.camera.position.z >= 7)
+                {
+                  TweenMax.to(this.camera.position, .7, {
+                        ease: Expo.easeOut,
+                        x: this.camera.position.x,
+                        y: this.camera.position.y,
+                        z: this.camera.position.z-this.scl,
+                      });
+                }
+              }
 
-}
- this.scl=0;
-window.setInterval(function(){
-     this.scl=0;
-}, 10);
-
-    //console.log("scrolling");
+            }
+            this.scl=0;
+      window.setInterval(function(){
+         this.scl=0;
+      }, 10);
+    // console.log(this.camera.position.z);
     //this.camera.position.set(this.camera.position.x, this.camera.position.y, 10);
     //https://greensock.com/ease-visualizer/
-    //TweenMax.to(this.camera.position, .3, {ease: Expo.easeOut, x:0,y:0,z:0});
+
   }
 
   onClick({ clientX, clientY })
