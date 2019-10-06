@@ -84,32 +84,41 @@ this.testCube = new THREE.Mesh();
     this.scene.add(light);
   }
 
-//follows mouse
-  addSpotLight() {
-    const spotlight = new THREE.SpotLight('#7bccd7', 1, 1000);
-    //const spotlight = new THREE.SpotLight('#7bccd7', 1, 1000);
+  addOtherPointLights()
+  {
+    const light = new THREE.PointLight('#ffff00', 0.5, 2000, 1); //2nd num is intensity
 
-    spotlight.position.set(0, 27, 0);
-    spotlight.castShadow = true;
+    light.position.set(0, 2, 2);
+    this.scene.add(light);
 
-    //this.scene.add(spotlight);
+    var helper = new THREE.PointLightHelper(light, 1);
+    light.add( helper );
   }
 
   addRectLight() {
     const light = new THREE.RectAreaLight('#ffffff', 1, 2000, 2000);
 
-    light.position.set(5, 50, 50);
+    var helper = new THREE.RectAreaLightHelper( light );
+
+    light.add( helper );
+
+    light.position.set(0, 10, 0);
     light.lookAt(0, 0, 0);
 
-    this.scene.add(light);
+    //this.scene.add(light);
   }
 
+//FOLLOWS MOUSE
   addPointLight(color, position) {
-    this.movableLight = new THREE.PointLight(color, 1, 1000, 1); //2nd num is intensity
+    this.movableLight = new THREE.PointLight('#ffffff', 0.5, 1000, 1); //2nd num is intensity
 
     this.movableLight.position.set(position.x, position.y, position.z);
 
     this.scene.add(this.movableLight);
+
+    var helper = new THREE.PointLightHelper(this.movableLight, 1);
+
+    //this.movableLight.add( helper );
   }
 
   applyTVShader()
@@ -672,6 +681,8 @@ addParticleEngine(parameters)
 }
 getMaterial(string)
 {
+
+  //DEFAULT
   var material = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     roughness: 0.8,
@@ -683,35 +694,60 @@ getMaterial(string)
     skinning: true
   });
 
-  switch(string.toLowerCase()){
+  if(string.toLowerCase() == "glass-REAL".toLowerCase())
+  {
+    var imagePrefix = "./src/images/dawnmountain-";
+    var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+    var imageSuffix = ".png";
+    var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
 
-    case "glass-REAL".toLowerCase():
-        material = new THREE.MeshStandardMaterial({
-          color: 0xff00ff,
-          roughness: 0.5,
-          metalness: 0.0,
-          //normalMap: materials.normalMap,
-          //roughnessMap: materials.roughnessMap,
-          //metalnessMap: materials.metalnessMap,
-          //envMap: me.reflectionCube,
-          skinning: true
-        });
+    this.urls = [];
+    for (var i = 0; i < 6; i++)
+      this.urls.push( imagePrefix + directions[i] + imageSuffix );
 
-        case "repeller".toLowerCase():
-            material = new THREE.MeshStandardMaterial({
-              color: 0xff0000,
-              roughness: 0.8,
-              metalness: 0.5,
-              //normalMap: materials.normalMap,
-              //roughnessMap: materials.roughnessMap,
-              //metalnessMap: materials.metalnessMap,
-              //envMap: me.reflectionCube,
-              skinning: true
-            });
+    var materialArray = [];
+    for (var i = 0; i < 6; i++)
+      materialArray.push( new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load( imagePrefix + directions[i] + imageSuffix ),
+        side: THREE.BackSide
+      }));
 
-    default:
-      break;
+    var textureCube = new THREE.CubeTextureLoader().load(this.urls);
+    textureCube.mapping = THREE.CubeRefractionMapping;
+
+      var fShader = THREE.FresnelShader;
+
+      var fresnelUniforms =
+      {
+        "mRefractionRatio": { type: "f", value: 1.02 },
+        "mFresnelBias": 	{ type: "f", value: 0.1 },
+        "mFresnelPower": 	{ type: "f", value: 2.0 },
+        "mFresnelScale": 	{ type: "f", value: 1.0 },
+        "tCube": 			{ type: "t", value: textureCube} //textureCube
+      };
+
+      // create custom material for the shader
+      material = new THREE.ShaderMaterial(
+      {
+          uniforms: 		fresnelUniforms,
+        vertexShader:   fShader.vertexShader,
+        fragmentShader: fShader.fragmentShader,
+        skinning: true
+      }   );
+  } else if(string.toLowerCase() == "repeller".toLowerCase())
+  {
+      material = new THREE.MeshStandardMaterial({
+        color: 0xff0000,
+        roughness: 0.8,
+        metalness: 0.5,
+        //normalMap: materials.normalMap,
+        //roughnessMap: materials.roughnessMap,
+        //metalnessMap: materials.metalnessMap,
+        //envMap: me.reflectionCube,
+        skinning: true
+      });
   }
+
   return material;
 }
 
@@ -777,8 +813,12 @@ addRoomToScene(i, string)
 
           localThis.interactiveMeshes[localThis.interactiveMeshes.length] = node;
           node.initialPosition = node.position;
-          node.initialRotation = node.rotation;
-          node.material = localThis.getMaterial('repeller');
+          node.initialRotation = {
+            x: node.rotation.x,
+            y: node.rotation.y,
+            z: node.rotation.z,
+          };
+         node.material = localThis.getMaterial('repeller');
 
         }
       }
@@ -890,7 +930,7 @@ animatedTexturePngs()
           map: new THREE.TextureLoader().load( imagePrefix + directions[i] + imageSuffix ),
           side: THREE.BackSide
         }));
-    var textureCube = new THREE.CubeTextureLoader().load(this.urls);
+          var textureCube = new THREE.CubeTextureLoader().load(this.urls);
   				textureCube.mapping = THREE.CubeRefractionMapping;
 
 
@@ -935,9 +975,9 @@ animatedTexturePngs()
   	//this.sphere.position.set(0,9,-10);
     this.sphere.position.set(0,20,0);
 
-  	this.scene.add(this.sphere);
-
-  	this.refractSphereCamera.position.set(this.sphere.position);
+  	//this.scene.add(this.sphere);
+    this.refractSphereCamera.position.set(new THREE.Vector3(0,0,0));
+  	//this.refractSphereCamera.position.set(this.sphere.position);
   }
 
 //ADDS MESHES
@@ -1033,93 +1073,84 @@ animatedTexturePngs()
 
 
 //GRID OF OBJECTS ANIMATE
-    const intersects = this.raycaster.intersectObjects([this.floor]);
-
-    if (intersects.length) {
-      const { x, z } = intersects[0].point;
-
-      for (let row = 0; row < this.grid.rows; row++) {
-        for (let index = 0; index < 1; index++) {
-          const totalCols = this.getTotalRows(row);
-
-          for (let col = 0; col < totalCols; col++) {
-            const mesh = this.meshes[row][col];
-
-            const mouseDistance = distance(x, z,
-              mesh.position.x + this.groupMesh.position.x,
-              mesh.position.z + this.groupMesh.position.z);
-
-            const y = map(mouseDistance, 7, 0, 0, 6);
-            TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
-
-            //check for interaction -----------
-            if(y<1)
-            {
-              this.mouseIsCloseTo(mesh);
-            }
-
-            const scaleFactor = mesh.position.y / 1.2;
-            const scale = scaleFactor < 1 ? 1 : scaleFactor;
-            TweenMax.to(mesh.scale, .3, {
-              ease: Expo.easeOut,
-              x: scale,
-              y: scale,
-              z: scale,
-            });
-
-            TweenMax.to(mesh.rotation, .7, {
-              ease: Expo.easeOut,
-              x: map(mesh.position.y, -1, 1, radians(270), mesh.initialRotation.x),
-              z: map(mesh.position.y, -1, 1, radians(-90), mesh.initialRotation.z),
-              y: map(mesh.position.y, -1, 1, radians(45), mesh.initialRotation.y),
-            });
-          }
-        }
-      }
-    }
+    // const intersects = this.raycaster.intersectObjects([this.floor]);
+    //
+    // if (intersects.length) {
+    //   const { x, z } = intersects[0].point;
+    //
+    //   for (let row = 0; row < this.grid.rows; row++) {
+    //     for (let index = 0; index < 1; index++) {
+    //       const totalCols = this.getTotalRows(row);
+    //
+    //       for (let col = 0; col < totalCols; col++) {
+    //         const mesh = this.meshes[row][col];
+    //
+    //         const mouseDistance = distance(x, z,
+    //           mesh.position.x + this.groupMesh.position.x,
+    //           mesh.position.z + this.groupMesh.position.z);
+    //
+    //         const y = map(mouseDistance, 7, 0, 0, 6);
+    //         TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+    //
+    //         //check for interaction -----------
+    //         if(y<1)
+    //         {
+    //           this.mouseIsCloseTo(mesh);
+    //         }
+    //
+    //         const scaleFactor = mesh.position.y / 1.2;
+    //         const scale = scaleFactor < 1 ? 1 : scaleFactor;
+    //         TweenMax.to(mesh.scale, .3, {
+    //           ease: Expo.easeOut,
+    //           x: scale,
+    //           y: scale,
+    //           z: scale,
+    //         });
+    //
+    //         TweenMax.to(mesh.rotation, .7, {
+    //           ease: Expo.easeOut,
+    //           x: map(mesh.position.y, -1, 1, radians(270), mesh.initialRotation.x),
+    //           z: map(mesh.position.y, -1, 1, radians(-90), mesh.initialRotation.z),
+    //           y: map(mesh.position.y, -1, 1, radians(45), mesh.initialRotation.y),
+    //         });
+    //       }
+    //     }
+    //   }
+    // }
 
 //MY OBJECTS ANIMATE -------------------------------
   var localThis = this;
   this.interactiveMeshes.forEach(function(mesh)
   {
+          //console.log(localThis.getMouseDistance(mesh));
+          var mouseDistance = localThis.getMouseDistance(mesh);
+          const y = map(mouseDistance, 2, 0, 0, 20); //2nd val- higher = more sensitive, last val is the max height it goes to
 
-      if(mesh.name.includes('Sphere'))
-      {
+          //const y = map(mouseDistance, 7, 0, 0, 6);
 
-          console.log(localThis.getMouseDistance(mesh));
-  //
-  //     const y = map(mouseDistance, 7, 0, 0, 6);
-  //     TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
-  //
-  //     //check for interaction -----------
-  //     // if(y<1)
-  //     // {
-  //     //   this.mouseIsCloseTo(mesh);
-  //     // }
-  //
-  //     const scaleFactor = mesh.position.y / 1.2;
-  //     const scale = scaleFactor < 1 ? 1 : scaleFactor;
-  //     TweenMax.to(mesh.scale, .3, {
-  //       ease: Expo.easeOut,
-  //       x: scale,
-  //       y: scale,
-  //       z: scale,
-  //     });
-  //
-  //     TweenMax.to(mesh.rotation, .7, {
-  //       ease: Expo.easeOut,
-  //       x: map(mesh.position.y, -1, 1, radians(270), mesh.initialRotation.x),
-  //       z: map(mesh.position.y, -1, 1, radians(-90), mesh.initialRotation.z),
-  //       y: map(mesh.position.y, -1, 1, radians(45), mesh.initialRotation.y),
-  //     });
+          TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+          //TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
 
-        }
+          const scaleFactor = mesh.position.y / 1.2;
+          const scale = scaleFactor < 1 ? 1 : scaleFactor;
+          // TweenMax.to(mesh.scale, .3, {
+          //   ease: Expo.easeOut,
+          //   x: scale,
+          //   y: scale,
+          //   z: scale,
+          // });
+
+          TweenMax.to(mesh.rotation, .9, {
+            ease: Expo.easeOut,
+            x: map(mesh.position.y, -1, 11, radians(270), mesh.initialRotation.x),
+            z: map(mesh.position.y, -1, 11, radians(-90), mesh.initialRotation.z),
+            y: map(mesh.position.y, -1, 11, radians(45), mesh.initialRotation.y),
+          });
   //
   }); //-----
 
 
   }
-
 
   mouseIsCloseTo(object)
   {
@@ -1137,11 +1168,11 @@ animatedTexturePngs()
 
     this.applyTVShader();
 
-    this.createGrid();
+    //this.createGrid();
 
-    this.addFloor();
+    //this.addFloor();
 
-    this.addAmbientLight();
+    //this.addAmbientLight();
 
     //this.cubeCloud();
 
@@ -1163,11 +1194,11 @@ animatedTexturePngs()
 
     //this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.glb"); //**model string
 
-    //this.addSpotLight();
+    //this.addRectLight();
 
-    this.addRectLight();
+    this.addOtherPointLights();
 
-    this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 });
+    this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
 
     this.animate();
 
@@ -1251,6 +1282,7 @@ window.setInterval(function(){
 
 	var pos = this.camera.position.clone().add( dir.multiplyScalar( 14.8) ); //distance = z distance
 
+  //var lightPos = new THREE.Vector3(pos.x, pos.y, 6);
 	this.movableLight.position.copy(pos);
 
   //shader
