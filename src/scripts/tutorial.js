@@ -48,9 +48,13 @@ let group, stuckX, stuckY, fillOuterCursor;
 const initCanvas = () => {
 
   const canvas = document.querySelector(".cursor--canvas");
-  const shapeBounds = {
-    width: 75,
-    height: 75
+  // const shapeBounds = {
+  //   width: 75,
+  //   height: 75
+  // };
+  const shapeBounds = { //on scale
+    width: 135,
+    height: 135
   };
   paper.setup(canvas);
   const strokeColor = "rgba(255, 255, 255, 1)";

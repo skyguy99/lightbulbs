@@ -32,6 +32,9 @@ this.testCube = new THREE.Mesh();
     this.mixer = new THREE.AnimationMixer();
     this.clock = new THREE.Clock();
     this.animatedmesh = new THREE.Mesh();
+    this.mixers = [];
+    this.animatedMeshes = [];
+    this.roomModels = [];
 
     //LOGIC
     this.loadingHasStarted = false;
@@ -280,6 +283,8 @@ loader.load(
 
 		localThis.scene.add(gltf.scene);
 
+    //gltf.scene.visible = true;
+
     gltf.scene.position.set(0,2,0);
     //gltf.scene.position.set(10,10,10);
 
@@ -413,36 +418,6 @@ loader.load(
     $("canvas").toggle();
     $("#myVideo").toggle();
   }
-
-  checkToUpdateProgBar()
-  {
-      const bar = document.querySelector('.prg');
-      const hoverMe = document.querySelector('.hoverMe');
-      let intrval;
-      let prg = 0;
-      // hoverMe.onmouseenter = (e) => {
-      //     interval = setInterval(() => {
-      //   	prg++;
-      //     bar.style.width = prg + '%';
-      //   //  bar.innerText = prg + '%';
-      //     if(prg >= 100) {
-      //     	clearInterval(interval);
-      //     }
-      //   }, 50);
-      // }
-      //
-      // hoverMe.onmouseleave = () => {
-      // 	clearInterval(interval);
-      // 	interval = setInterval(() => {
-      //   	prg--;
-      //     bar.style.width = prg + '%';
-      //   //  bar.innerText = prg + '%';
-      //     if(prg <= 0) {
-      //     	clearInterval(interval);
-      //     }
-      //   }, 50);
-      // }
-  }
   makeIntoShape()
   {
 
@@ -569,8 +544,7 @@ loader.load(
   {
 
     var video = document.createElement( 'video' );
-    //video.src = './src/images/sintel.mp4';
-    video.src = './src/images/firetest.webm';
+    video.src = './src/images/firenoalpha.webm';
     video.load(); // must call after setting/changing source
     video.preload = 'auto';
     video.loop = true;
@@ -693,10 +667,180 @@ addParticleEngine(parameters)
   engine.initialize();
 
 }
-
-particleemitter() //test - doesnt work
+getMaterial(string)
 {
-  this.addParticleEngine(Examples.fireball);
+  var material = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.5,
+    metalness: 0.5,
+    //normalMap: materials.normalMap,
+    //roughnessMap: materials.roughnessMap,
+    //metalnessMap: materials.metalnessMap,
+    //envMap: me.reflectionCube,
+    skinning: true
+  });
+
+  switch(string.toLowerCase()){
+
+    case "glass-REAL".toLowerCase():
+        material = new THREE.MeshStandardMaterial({
+          color: 0xff00ff,
+          roughness: 0.5,
+          metalness: 0.0,
+          //normalMap: materials.normalMap,
+          //roughnessMap: materials.roughnessMap,
+          //metalnessMap: materials.metalnessMap,
+          //envMap: me.reflectionCube,
+          skinning: true
+        });
+
+        case "palette.005".toLowerCase():
+            material = new THREE.MeshStandardMaterial({
+              color: 0xff0000,
+              roughness: 0.5,
+              metalness: 0.0,
+              //normalMap: materials.normalMap,
+              //roughnessMap: materials.roughnessMap,
+              //metalnessMap: materials.metalnessMap,
+              //envMap: me.reflectionCube,
+              skinning: true
+            });
+
+    default:
+      break;
+  }
+  return material;
+}
+
+addRoomToScene(i, string)
+{
+      //ADD MODEL
+      var localThis = this;
+    const texture = new THREE.TextureLoader().load( "./src/images/DeadEnds_globalmaterial.png");
+    texture.encoding = THREE.sRGBEncoding;
+
+    var material = new THREE.MeshStandardMaterial({
+      color: 0xffff00,
+      roughness: 0.5,
+      metalness: 0.0,
+      // refractionRatio: 0.98,
+      envMapIntensity: 1.0,
+      map: texture,
+      //normalMap: materials.normalMap,
+      //roughnessMap: materials.roughnessMap,
+      //metalnessMap: materials.metalnessMap,
+      //envMap: me.reflectionCube,
+      skinning: true,
+      normalScale: new THREE.Vector2( 1, -1 )
+    });
+
+    //---------------------------------
+    //GLTF LOADER
+    var loader = new THREE.GLTFLoader();
+
+    //https://blackthread.io/gltf-converter/
+    loader.load(
+    // resource URL
+    string,
+    // called when the resource is loaded
+    function ( gltf ) {
+
+
+      localThis.scene.add(gltf.scene);
+
+      //ADD TO DICTIONARY***
+      gltf.scene.pathName = string;
+      gltf.scene.index = i;
+      localThis.roomModels[i] = gltf.scene;
+
+      //console.log(gltf.scene.index);
+      //*****************
+
+      //gltf.scene.visible = true;
+      gltf.scene.position.set(0,2,0);
+      gltf.scene.scale.set(0.1,0.1,0.1);
+
+      gltf.scene.traverse(function (node) {
+
+      if (node.isMesh)
+      {
+        // console.log(node.material.name);
+        node.material = localThis.getMaterial(node.material.name);
+        //node.material = material;
+        node.castShadow = true;
+        node.receiveShadow = true;
+      }
+    });
+
+      var myMixer = new THREE.AnimationMixer(gltf.scene);
+      localThis.mixers[i] = myMixer;
+      myMixer.hasClips = (gltf.animations.length > 0);
+
+
+        //->PLAY ALL
+        // console.log(string+" | "+myMixer.hasClips);
+        // if(gltf.animations)
+        if(gltf.animations.length > 0)
+        {
+          var clips = gltf.animations;
+          //console.log(clips);
+
+          clips.forEach( function ( clip ) {
+               myMixer.clipAction( clip ).play();
+              } );
+        // -> PLAY A SPECIFIC CLIP
+            // var clip = THREE.AnimationClip.findByName( clips, "mixamo.com" );
+            // var action = localThis.mixer.clipAction( clip );
+            // action.play();
+            //action.loop = THREE.LoopOnce;
+        }
+    },
+    // called while loading is progressing
+    function ( xhr ) {
+
+      //console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+    },
+    // called when loading has errors
+    function ( error ) {
+
+      console.log( 'An error happened' +error);
+
+    }
+    );
+}
+
+loadRoomModels()
+{
+  var paths = [
+  "./src/scripts/elements/dancing.glb",
+  "./src/scripts/elements/TiltWorld2.glb",
+  "./src/scripts/elements/cube2.glb"
+];
+
+  for(var i = 0; i<paths.length;i++)
+  {
+    this.addRoomToScene(i, paths[i]);
+  }
+
+  //verify
+
+var localThis = this;
+  setTimeout( function(){
+    console.log("Models length: "+localThis.roomModels.length);
+
+    localThis.roomModels.forEach(function(obj) {
+      //console.log(obj.pathName + " | "+obj.index); //this
+    });
+}  , 3000);
+}
+
+updateCurrentRoom()
+{
+  var localThis = this;
+  this.roomModels.forEach(function(obj) {
+    obj.visible = (obj.index == localThis.currentRoom);
+  });
 }
 
 animatedTexturePngs()
@@ -939,6 +1083,8 @@ animatedTexturePngs()
 
     //this.glowSphere();
 
+    this.loadRoomModels();
+
     //this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.glb"); //**model string
 
     //this.addSpotLight();
@@ -1118,8 +1264,6 @@ if(this.middleMenuIsUp)
 
     this.draw();
 
-    this.checkToUpdateProgBar();
-
     const resistance = 0.002;
     this.target.x = ( 1 - this.mouse.x ) * resistance;
     this.target.y = ( 1 - this.mouse.y ) * resistance;
@@ -1137,14 +1281,28 @@ if(this.middleMenuIsUp)
 
 
 //--ANIMATE MODELS------------------------------
-this.mixer.update(this.clock.getDelta());
+//this.mixer.update(this.clock.getDelta());
 
+if(this.mixers.length > 0)
+{
+  for(var i = 0; i< this.mixers.length;i++)
+  {
+    if(this.mixers[i])
+    {
+      this.mixers[i].update(this.clock.getDelta());
+    }
+  }
+}
 //-------------------
+
+//this.updateCurrentRoom(); //shows only one
 
 //render shader
 this.uniforms.u_time.value = this.clock.getElapsedTime();
 this.uniforms.u_frame.value += 1.0;
 this.composer.render();
+
+//console.log(this.uniforms.u_frame);
 
     this.renderer.render(this.scene, this.camera);
 
