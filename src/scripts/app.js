@@ -30,7 +30,7 @@ this.testCube = new THREE.Mesh();
     this.windowHalf = new THREE.Vector2( window.innerWidth / 2, window.innerHeight / 2 );
     this.movableLight = new THREE.PointLight();
     this.mixer = new THREE.AnimationMixer();
-    this.clock = new THREE.Clock();
+    this.clock = new THREE.Clock(true);
     this.animatedmesh = new THREE.Mesh();
     this.mixers = [];
     this.animatedMeshes = [];
@@ -254,46 +254,62 @@ loader.load(
 
   applyTVShader()
   {
+
+    this.uniforms = {
+      u_time : {
+        type : "f",
+        value : 0.0
+      },
+      u_frame : {
+        type : "f",
+        value : 0.0
+      },
+      u_resolution : {
+        type : "v2",
+        value : new THREE.Vector2(window.innerWidth, window.innerHeight)
+            .multiplyScalar(window.devicePixelRatio)
+      },
+      u_mouse : {
+        type : "v2",
+        value : new THREE.Vector2(0.5 * window.innerWidth, window.innerHeight)
+            .multiplyScalar(window.devicePixelRatio)
+      },
+      u_texture : {
+        type : "t",
+        value : null
+      }
+    };
+
     // postprocessing
+		var material = new THREE.ShaderMaterial({
+			uniforms : this.uniforms,
+			vertexShader : document.getElementById("vertexShader").textContent,
+			fragmentShader : document.getElementById("fragmentShader").textContent
+		}); 
 
-	this.composer = new THREE.EffectComposer(this.renderer); //THREE.whatever is different
-	var renderPass = new THREE.RenderPass(this.scene, this.camera);
-	this.composer.addPass(renderPass);
+		// Initialize the effect composer
+		this.composer = new THREE.EffectComposer(this.renderer);
+		this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
 
-	// badtv pass
+		// Add the post-processing effect
+		var effect = new THREE.ShaderPass(material, "u_texture");
+		effect.renderToScreen = true;
+		this.composer.addPass(effect);
 
-	this.uniforms = {
-		u_time: {
-			value: 0.0
-		},
-		u_frame: {
-			value: 0.0
-		},
-		u_resolution: {
-			value: new THREE.Vector2(
-				window.innerWidth,
-				window.innerHeight
-			).multiplyScalar(window.devicePixelRatio)
-		},
-		u_mouse: {
-			value: new THREE.Vector2(
-				0.5 * window.innerWidth,
-				window.innerHeight
-			).multiplyScalar(window.devicePixelRatio)
-		},
-		u_texture: {
-			value: null
-		}
-	};
-
-	var shaderMaterial = new THREE.ShaderMaterial({
-		uniforms: this.uniforms,
-		vertexShader: document.getElementById("vertexShader").textContent,
-		fragmentShader: document.getElementById("fragmentShader").textContent
-	});
-
-	var effectBadTV = new THREE.ShaderPass(shaderMaterial, "u_texture");
-	this.composer.addPass(effectBadTV);
+	// this.composer = new THREE.EffectComposer(this.renderer); //THREE.whatever is different
+	// var renderPass = new THREE.RenderPass(this.scene, this.camera);
+	// this.composer.addPass(renderPass);
+  //
+	// // badtv pass
+  //
+	// var shaderMaterial = new THREE.ShaderMaterial({
+	// 	uniforms: this.uniforms,
+	// 	vertexShader: document.getElementById("vertexShader").textContent,
+	// 	fragmentShader: document.getElementById("fragmentShader").textContent
+	// });
+  //
+	// var effectBadTV = new THREE.ShaderPass(shaderMaterial, "u_texture");
+	// this.composer.addPass(effectBadTV);
   }
 
   startLoading(load)
@@ -555,25 +571,17 @@ loader.load(
   {
 
     const geometry = new THREE.BoxBufferGeometry();
-    const material = new THREE.MeshStandardMaterial( {
-
-    color: 0xff0000,
-
-    roughness: 0.3,
-    metalness: 0.2
-    // roughnessMap: roughnessMap,
-    // metalnessMap: metalnessMap,
-    //onmous
-    // envMap: envMap, // important -- especially for metals!
-    // envMapIntensity: envMapIntensity
-
-} );
+    var material = new THREE.MeshPhongMaterial({
+			color : 0xffffff,
+			precision: "mediump"
+		});
 
 this.testCube.geometry = geometry;
+	geometry.computeVertexNormals();
 this.testCube.material = material;
-// Finally, set the pivot's position as well, so that it follows the camera.
+
 //this.testCube.scale.set(15,15,15);
-this.testCube.position.set(0,5,-10);
+this.testCube.position.set(0,5,0);
 this.scene.add(this.testCube);
 
   }
@@ -1139,17 +1147,15 @@ animatedTexturePngs()
 
     this.createCamera();
 
-    this.applyTVShader();
-
     //this.createGrid();
 
     //this.addFloor();
 
-    //this.addAmbientLight();
+    this.addAmbientLight();
 
     //this.cubeCloud();
 
-    //this.addTestObject();
+    this.addTestObject();
 
     this.addTextureAnimationObject();
 
@@ -1174,6 +1180,8 @@ animatedTexturePngs()
     this.addDirectionalLight();
 
     this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
+
+    this.applyTVShader();
 
     this.animate();
 
@@ -1350,12 +1358,20 @@ if(this.middleMenuIsUp)
 
     this.camera.aspect = this.width / this.height;
     this.camera.updateProjectionMatrix();
+
+    this.composer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setSize(this.width, this.height);
 
     //shader
     // Update the resolution uniform
 		this.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight).multiplyScalar(window.devicePixelRatio);
   }
+
+  render() {
+    this.uniforms.u_time.value = this.clock.getElapsedTime();
+    this.uniforms.u_frame.value += 1.0;
+    this.composer.render();
+	}
 
 //UPDATE
   animate() {
@@ -1395,16 +1411,14 @@ if(this.mixers.length > 0)
 
 //this.updateCurrentRoom(); //shows only one
 
-//render shader
-this.uniforms.u_time.value = this.clock.getElapsedTime();
-this.uniforms.u_frame.value += 1.0;
-this.composer.render();
-
 //console.log(this.uniforms.u_frame);
 
     this.renderer.render(this.scene, this.camera);
 
     requestAnimationFrame(this.animate.bind(this));
+
+    //render shader
+    this.render();
 
 //UI
     var self = this;
