@@ -86,6 +86,8 @@
 			</div>
 			<div class = "bottomTitle">
 				<h1>DEADENDS</h1>
+				<img src="../src/images/equalizer.gif" alt="">
+
 				<div class="table">
 				<div class="cell">
 					<ul class="dots">
@@ -194,7 +196,7 @@ void main() {
 						vec3 pixel_color = texture2D(u_texture, uv).rgb;
 
 						// Add some white noise
-						pixel_color += vec3(5.0 * strength * (random2d(v_uv + 1.133001 * vec2(u_time, 1.13)) - 0.5));
+						//pixel_color += vec3(5.0 * strength * (random2d(v_uv + 1.133001 * vec2(u_time, 1.13)) - 0.5));
 
 						// Fragment shader output
 						gl_FragColor = vec4(pixel_color, 1.0);

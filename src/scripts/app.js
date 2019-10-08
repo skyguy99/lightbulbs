@@ -59,8 +59,8 @@ this.testCube = new THREE.Mesh();
     this.renderer.setClearColor(new THREE.Color(0, 0, 0));
 
     this.renderer.shadowMap.enabled = true;
-    //this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    //this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
     document.body.appendChild(this.renderer.domElement);
     //this.scene.background = new THREE.Color( 0x424242 );
@@ -219,6 +219,9 @@ loader.load(
     light.castShadow = true;
     var helper = new THREE.DirectionalLightHelper( light );
 
+    light.shadow.mapSize.width = 1024;
+    light.shadow.mapSize.height = 1024;
+
     light.add( helper );
     light.position.set(0, 4, -2);
     //light.lookAt(0, 0, 0);
@@ -314,16 +317,34 @@ loader.load(
 
   startLoading(load)
   {
-    if(!this.loadingHasStarted)
+
+    var localThis = this;
+    if(load)
     {
-      this.loadingHasStarted = true;
-      console.log("Starting load to back");
-      //wait 3 seconds, then go
+      if(!this.loadingHasStarted)
+      {
+        this.loadingHasStarted = true;
+        console.log("Starting load to back");
+        //wait 3 seconds, then go
 
-      setTimeout( function(){
+        setTimeout( function(){
+          $('.bottomTitle img').show();
+          $('.bottomTitle h1').hide();
+          setTimeout(function() {
+            // NOW SWITCH
+            if(localThis.loadingHasStarted)
+            {
+              localThis.triggerRoomChange();
+            }
+        }, 4000);
 
-    }  , 800);
+      }  , 800);
 
+      }
+    } else {
+      //this.roomTransition(); //cam only
+      $('.bottomTitle img').hide();
+      $('.bottomTitle h1').show();
     }
 
   }
@@ -1241,7 +1262,7 @@ animatedTexturePngs()
     //this.movableLight.position.set(this.mouse.x, this.mouse.y, 0);
     //this.testCube.position.set(this.mouse.x, this.mouse.y, 0);
 
-    if(this.mouse.y > this.height * 0.088)
+    if(this.mouse.y > this.height * 0.092)
     {
       this.startLoading(true);
     } else {
@@ -1275,6 +1296,13 @@ animatedTexturePngs()
     // this.uniforms.u_mouse.value.set(event.touches[0].pageX, window.innerHeight - event.touches[0].pageY).multiplyScalar(
     //    window.devicePixelRatio);
   }
+
+  triggerRoomChange()
+  {
+    //TRIGGER ROOM CHANGE
+      this.currentRoom++;
+      this.roomTransition();
+  }
 onKeyDown(event)
 {
 
@@ -1290,8 +1318,7 @@ onKeyDown(event)
   {
     if(this.currentRoom < $('.bottomTitle .dots li').length)
     {
-        this.currentRoom++;
-        this.roomTransition();
+      this.triggerRoomChange();
     }
   }
 

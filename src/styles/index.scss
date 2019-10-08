@@ -132,6 +132,10 @@ a:hover {
 	transform: translateX(-50%)
 }
 
+.bottomTitle img {
+	display: none;
+}
+
 .middleMenu {
 	display: none; //temp
 }
@@ -391,7 +395,7 @@ z-index: 300;
   border-radius: 50%;
   z-index: 11000;
   background: var(--color-text);
-	
+
 }
 .cursor--canvas {
   width: 100vw;
