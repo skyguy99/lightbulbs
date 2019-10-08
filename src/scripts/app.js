@@ -285,7 +285,7 @@ loader.load(
 			uniforms : this.uniforms,
 			vertexShader : document.getElementById("vertexShader").textContent,
 			fragmentShader : document.getElementById("fragmentShader").textContent
-		}); 
+		});
 
 		// Initialize the effect composer
 		this.composer = new THREE.EffectComposer(this.renderer);
@@ -314,39 +314,17 @@ loader.load(
 
   startLoading(load)
   {
-    // if(!this.loadingHasStarted)
-    // {
-    //   this.loadingHasStarted = true;
-    //   console.log("Starting load to back");
-    //   //wait 3 seconds, then go
-    // }
+    if(!this.loadingHasStarted)
+    {
+      this.loadingHasStarted = true;
+      console.log("Starting load to back");
+      //wait 3 seconds, then go
 
-    const bar = document.querySelector('.prg');
-    const hoverMe = document.querySelector('.hoverMe');
-    var interval;
-    var prg = 0;
+      setTimeout( function(){
 
-  //   if(load)
-  //   {
-  //     interval = setInterval(() => {
-  //     prg++;
-  //     bar.style.width = prg + '%';
-  //   //  bar.innerText = prg + '%';
-  //     if(prg >= 100) {
-  //       clearInterval(interval);
-  //     }
-  //   }, 50);
-  // } else {
-  //   clearInterval(interval);
-  //   interval = setInterval(() => {
-  //     prg--;
-  //     bar.style.width = prg + '%';
-  //   //  bar.innerText = prg + '%';
-  //     if(prg <= 0) {
-  //       clearInterval(interval);
-  //     }
-  //   }, 50);
-  // }
+    }  , 800);
+
+    }
 
   }
 
@@ -1282,11 +1260,12 @@ animatedTexturePngs()
   //var lightPos = new THREE.Vector3(pos.x, pos.y, 6);
 	this.movableLight.position.copy(pos);
 
-  //shader
-  this.uniforms.u_mouse.value.set(this.mouse.x, window.innerHeight - this.mouse.y).multiplyScalar(
-      window.devicePixelRatio);
-      //1860, 1234 = all
-      //this.uniforms.u_mouse.value.set(1860, 1234)
+  //SHADER
+  // this.uniforms.u_mouse.value.set(this.mouse.x, window.innerHeight - this.mouse.y).multiplyScalar(
+  //     window.devicePixelRatio);
+
+    this.uniforms.u_mouse.value.set(clientX, clientY).multiplyScalar(
+		window.devicePixelRatio);
 
   }
 
