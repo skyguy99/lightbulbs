@@ -28,6 +28,7 @@
 		<script src="./src/scripts/vendor/GLTFLoader.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.0/paper-core.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
 
 	</head>
 	<body>
@@ -45,11 +46,19 @@
 				<path d="M 26.27,36.75 4.55,36.75 C 2.037,36.75 0,38.79 0,41.3 L 0,63.02 C 0,65.53 2.037,67.57 4.55,67.57 L 26.27,67.57 C 28.78,67.57 30.82,65.53 30.82,63.02 L 30.82,41.3 C 30.82,38.79 28.78,36.75 26.27,36.75 Z M 16.69,57.45 9.79,52.16 16.69,46.86 Z" />
 			</symbol> -->
 
-			<!-- <div class = "loadingScreen">
-				<video autoplay muted loop>
+			<div class = "loadingScreen">
+				<video poster = '../src/images/videoPoster.png' autoplay muted loop>
 				<source src="../src/images/glitch.mp4" type="video/mp4">
+				<!-- <source src="../src/images/glitch.mp4" type="video/webm"> -->
 				</video>
-			</div> -->
+				<div class = "parallax" data-relative-input="true">
+				<img data-depth="0.15" src="../src/images/skull.png" alt="">
+						<img data-depth="0.2" src="../src/images/eye1.png" alt="">
+						<img data-depth="0.2" src="../src/images/eye2.png" alt="">
+			</img>
+				<h1 data-depth="0.1">DEADENDS</h1>
+				</div>
+			</div>
 			<div class="sketch-container" id="sketch-container">
 			<div class="frame" style = "display: none;">
 				<!-- <video autoplay muted loop id="myVideo">

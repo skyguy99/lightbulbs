@@ -399,14 +399,23 @@ loader.load(
 		}
   }
 
+  runParallax()
+  {
+    var scene = document.getElementsByClassName('parallax')[0];
+    var parallaxInstance = new Parallax(scene);
+    parallaxInstance.friction(0.05, 0.05);
+    parallaxInstance.relativeInput = true;
+  }
+
+//initial loading
   doneLoading()
   {
     //load experience
-    setTimeout( function(){
-
-    $(".frame").show();
-    $(".loadingScreen").hide();
-  }  , 20 );
+  //   setTimeout( function(){
+  //
+  //   $(".frame").show();
+  //   $(".loadingScreen").hide();
+  // }  , 20000 );
 
   }
 
@@ -1138,6 +1147,8 @@ animatedTexturePngs()
   }
 
   init() {
+    this.runParallax();
+
     this.setup();
 
     this.doneLoading();

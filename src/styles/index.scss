@@ -10,6 +10,10 @@ article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,su
     letter-spacing: 0.8px;
 }
 
+html {
+	overflow: hidden;
+}
+
 // @font-face {
 //     font-family: BeeFour;
 //     src:url("./resources/BeeThreeT.ttf");
@@ -47,6 +51,11 @@ canvas {
 	display: block;
 }
 
+.parallax {
+	left: 47%;
+	top: 40%;
+}
+
 .loadingScreen {
 	background-color: blue;
 	width: 100%;
@@ -56,15 +65,45 @@ canvas {
 	left: 0;
 	display: block;
 	z-index: 10001;
+		cursor:  none;
+		left: 50%;
+		-webkit-transform: translateX(-50%);
+		transform: translateX(-50%);
 }
 
 .loadingScreen video { //transparent load video or gif
-	position: absolute;
-	width: 30%;
-	left: 0;
-	top: 35%;
-right: 0;
-margin: auto
+	position: fixed;
+   top: 0;
+   right: 0;
+   bottom: 0;
+   left: 0;
+   overflow: hidden;
+}
+
+.loadingScreen img { //skull
+	text-align: center;
+	width: 80px;
+	cursor:  none;
+    position: absolute;
+		//This absolute centers horz
+		left: 50%;
+		-webkit-transform: translateX(-50%);
+		transform: translateX(-50%)
+}
+
+.loadingScreen img:nth-child(1) {
+	bottom: 300px;
+}
+
+//skull eyes
+.loadingScreen img:nth-child(2) {
+	bottom: 340px;
+	width: 30px;
+}
+.loadingScreen img:nth-child(3) { //circle slash
+	bottom: 340px;
+	right: 400px;
+	width: 30px;
 }
 
 .prg {
@@ -134,6 +173,7 @@ a:hover {
 
 .bottomTitle img {
 	display: none;
+
 }
 
 .middleMenu {
@@ -154,7 +194,7 @@ a:hover {
   display: table;
 }
 
-.bottomTitle h1 {
+h1 {
 	margin-bottom: -30;
 }
 
