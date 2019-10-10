@@ -62,8 +62,10 @@ this.testCube = new THREE.Mesh();
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     //this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
-    document.body.appendChild(this.renderer.domElement);
-    //this.scene.background = new THREE.Color( 0x424242 );
+    var element = this.renderer.domElement;
+    document.body.appendChild(element);
+    element.className += " mainCanvas";
+
   }
 
   addModelToScene(position, string, isCam)
@@ -411,17 +413,25 @@ loader.load(
   doneLoading()
   {
     //load experience
-  //   setTimeout( function(){
-  //
-  //   $(".frame").show();
-  //   $(".loadingScreen").hide();
-  // }  , 20000 );
+    setTimeout( function(){
 
+    $(".frame").show();
+    $(".mainCanvas").show();
+    $(".loadingScreen").hide();
+  }  , 9000);
+
+  }
+
+  forceDoneLoading()
+  {
+    $(".frame").show();
+    $(".mainCanvas").show();
+    $(".loadingScreen").hide();
   }
 
   toggleVideo()
   {
-    $("canvas").toggle();
+    $(".mainCanvas").toggle();
     $("#myVideo").toggle();
   }
   makeIntoShape()
@@ -1318,7 +1328,7 @@ onKeyDown(event)
 {
 
   //do this when come in from loading
-
+this.forceDoneLoading();
         if(this.videoTex)
         {
           this.videoTex.play();

@@ -51,6 +51,10 @@ canvas {
 	display: block;
 }
 
+.mainCanvas {
+	display: none;
+}
+
 .parallax {
 	// left: 47%;
 	// top: 40%;
@@ -342,6 +346,7 @@ ul {
   min-width: 100%;
   min-height: 100%;
 display: none;
+z-index: 10002;
 }
 
 .frame__links {
