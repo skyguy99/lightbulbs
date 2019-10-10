@@ -52,13 +52,13 @@ const initCanvas = () => {
   //   width: 75,
   //   height: 75
   // };
-  const shapeBounds = { //on scale
-    width: 135,
-    height: 135
+  const shapeBounds = { //on scale - was 135
+    width: 95,
+    height: 95
   };
   paper.setup(canvas);
   const strokeColor = "rgba(255, 255, 255, 1)";
-  const strokeWidth = 2.2;
+  const strokeWidth = 2.3;
   const segments = 8;
   const radius = 13;
 
@@ -103,13 +103,13 @@ const initCanvas = () => {
     // coordinates per Frame
     if (!isStuck) {
       // move circle around normally
-      lastX = lerp(lastX, clientX, 0.2);
-      lastY = lerp(lastY, clientY, 0.2);
+      lastX = lerp(lastX, clientX, 0.09);
+      lastY = lerp(lastY, clientY, 0.09);
       group.position = new paper.Point(lastX, lastY);
     } else if (isStuck) {
       // fixed position on a nav item
-      lastX = lerp(lastX, stuckX, 0.2);
-      lastY = lerp(lastY, stuckY, 0.2);
+      lastX = lerp(lastX, stuckX, 0.09);
+      lastY = lerp(lastY, stuckY, 0.09);
       group.position = new paper.Point(lastX, lastY);
     }
 
