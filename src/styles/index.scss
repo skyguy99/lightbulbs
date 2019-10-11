@@ -12,6 +12,7 @@ article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,su
 
 html {
 	overflow: hidden;
+	background-color: #000000;
 }
 
 // @font-face {
@@ -33,7 +34,7 @@ body {
 	color: #ffffff;
 	text-transform: uppercase;
 	color: var(--color-text);
-	background-color: var(--color-bg);
+	background-color: #000000;
 	font-family: BeeTwo, Arial, sans-serif;
 	overflow: hidden;
 	-webkit-font-smoothing: antialiased;
@@ -74,7 +75,7 @@ canvas {
 	top: 0;
 	left: 0;
 	display: block;
-	z-index: 10001;
+	z-index: 10010;
 		cursor:  none;
 		left: 50%;
 		-webkit-transform: translateX(-50%);
@@ -129,13 +130,26 @@ canvas {
 .topmenu
 {
 	position: absolute;
-	top: 32px;
+	top: 30px;
 
 	//This absolute centers horz
 	left: 50%;
 	-webkit-transform: translateX(-50%);
-	transform: translateX(-50%)
+	transform: translateX(-50%);
+		z-index: 10006;
 }
+
+.topmenu img:nth-of-type(1):not(.audiogif) {
+	left: 50%;
+	-webkit-transform: translateX(-50%);
+	transform: translateX(-50%);
+	width: 45px;
+    margin-bottom: 3px;
+		margin-left: 47%;
+}
+// .topmenu img:nth-of-type(1):not(.audiogif):hover {
+// 	opacity: var(--opacity-link-hover);
+// }
 
 a {
 	text-decoration: none;
@@ -168,6 +182,7 @@ a:hover {
 	left: 50%;
 	-webkit-transform: translateX(-50%);
 	transform: translateX(-50%);
+		z-index: 10006;
 }
 .middleMenu p a:hover {
 		opacity: var(--opacity-link-hover);
@@ -181,7 +196,8 @@ a:hover {
 	//This absolute centers horz
 	left: 50%;
 	-webkit-transform: translateX(-50%);
-	transform: translateX(-50%)
+	transform: translateX(-50%);
+	z-index: 10006;
 }
 
 .bottomTitle img {
@@ -345,7 +361,6 @@ ul {
   bottom: 0;
   min-width: 100%;
   min-height: 100%;
-display: none;
 z-index: 10002;
 }
 

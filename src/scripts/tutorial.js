@@ -189,5 +189,32 @@ const initHovers = () => {
   });
 };
 
+//TRANSITION - change opacity of big video
+$(function(){
+       var $win = $(window),
+       w = 0,h = 0,
+       opacity = 0,
+       getWidth = function() {
+           w = $win.width();
+           h = $win.height();
+       };
+
+       $win.mousemove(function(e) {
+           getWidth();
+           //opacity = (e.pageX/w * 0.5) + (e.pageY/h * 0.5);
+
+           //ONLY BOTTOM HALF
+           if(e.pageY > h*0.8)
+           {
+             opacity = (e.pageY-(h*0.78))/(h*0.16);
+           } else {
+             opacity = 0;
+           }
+
+           $('#myVideo').css('opacity',opacity);
+
+       });
+   });
+
 initHovers();
 setTimeout(function() {initCanvas()}, 50); //IMPORTANT

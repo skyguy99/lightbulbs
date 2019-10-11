@@ -407,6 +407,11 @@ loader.load(
     var parallaxInstance = new Parallax(scene);
     parallaxInstance.friction(0.05, 0.05);
     parallaxInstance.relativeInput = true;
+
+    // var scene2 = document.getElementsByClassName('topmenu')[0];
+    // var parallaxInstance2 = new Parallax(scene);
+    // parallaxInstance2.friction(0.05, 0.05);
+    // parallaxInstance2.relativeInput = true;
   }
 
 //initial loading
