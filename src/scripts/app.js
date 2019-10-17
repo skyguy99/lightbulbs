@@ -408,22 +408,65 @@ loader.load(
     parallaxInstance.friction(0.05, 0.05);
     parallaxInstance.relativeInput = true;
 
-    // var scene2 = document.getElementsByClassName('topmenu')[0];
-    // var parallaxInstance2 = new Parallax(scene);
-    // parallaxInstance2.friction(0.05, 0.05);
-    // parallaxInstance2.relativeInput = true;
+  }
+
+  switchSiteVideo(stage)
+  {
+
+    if(stage == 0) //Go intro to loop
+    {
+
+      // var videoElement = $('')
+      $('.parallax').children('img').each((index, element) => {
+        console.log(index);
+        if(index == 0) //skull
+        {
+          //replace with video 0
+        } else if(index == 1) //eye1
+        {
+
+        } else if(index == 2) //eye2
+        {
+
+        }
+        else if(index == 3) //title
+        {
+
+        }
+        else if(index == 4) //percent
+        {
+
+        }
+        // videoElement.pause();
+        // videoElement.removeAttribute('src'); // empty source
+        //videoElement.src = '';
+        // videoElement.load();
+      });
+
+    } else if(stage == 1) //loop to button temp
+    {
+
+    }
+    else if(stage == 2) //loop to exit
+    {
+
+    }
   }
 
 //initial loading
   doneLoading()
   {
     //load experience
-    setTimeout( function(){
-
-    $(".frame").show();
-    $(".mainCanvas").show();
-    $(".loadingScreen").hide();
-  }  , 9000);
+  //   setTimeout( function(){
+  //
+  //   $(".frame").show();
+  //   $(".mainCanvas").show();
+  //   $(".loadingScreen").hide();
+  // }  , 9000);
+  var localThis = this;
+  setTimeout( function(){
+    localThis.switchSiteVideo(0);
+  }  , 4000);
 
   }
 
