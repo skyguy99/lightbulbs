@@ -48,6 +48,9 @@ this.testCube = new THREE.Mesh();
     //UI
     $('.dots li').first().addClass('active');
     $('.bottomTitle .dots li').first().addClass('active');
+    $('.parallax img').each(function() {
+      $(this).hide();
+    });
   }
 
   createScene() {
@@ -410,47 +413,23 @@ loader.load(
 
   }
 
-  switchSiteVideo(stage)
+//FOR INTRO
+  switchSiteVideo()
   {
+    //switch opening video > images
 
-    if(stage == 0) //Go intro to loop
-    {
+    $('.parallax video source').each(function(){
+        $(this).attr('src', '')
+    });
+    $('.parallax video').remove();
 
-      // var videoElement = $('')
-      $('.parallax').children('img').each((index, element) => {
-        console.log(index);
-        if(index == 0) //skull
-        {
-          //replace with video 0
-        } else if(index == 1) //eye1
-        {
+    $('#bgVideo').each(function(){
+        $(this).attr('src', './src/images/glitchbg.mp4')
+    });
 
-        } else if(index == 2) //eye2
-        {
-
-        }
-        else if(index == 3) //title
-        {
-
-        }
-        else if(index == 4) //percent
-        {
-
-        }
-        // videoElement.pause();
-        // videoElement.removeAttribute('src'); // empty source
-        //videoElement.src = '';
-        // videoElement.load();
-      });
-
-    } else if(stage == 1) //loop to button temp
-    {
-
-    }
-    else if(stage == 2) //loop to exit
-    {
-
-    }
+    $('.parallax img').each(function() {
+      $(this).show();
+    });
   }
 
 //initial loading
@@ -465,22 +444,32 @@ loader.load(
   // }  , 9000);
   var localThis = this;
   setTimeout( function(){
-    localThis.switchSiteVideo(0);
+    localThis.switchSiteVideo();
   }  , 4000);
 
   }
 
+//To actual experience
   forceDoneLoading()
   {
     $(".frame").show();
     $(".mainCanvas").show();
     $(".loadingScreen").hide();
+
+    $('#bgVideo').each(function(){
+        $(this).attr('src', '')
+    });
+    $('#bgVideo').remove();
+
+    $('#myVideo').each(function(){
+        $(this).attr('src', '../src/images/glitchbg.mp4')
+    });
   }
 
   toggleVideo()
   {
     $(".mainCanvas").toggle();
-    $("#myVideo").toggle();
+    //$("#myVideo").toggle();
   }
   makeIntoShape()
   {
@@ -1262,9 +1251,20 @@ animatedTexturePngs()
     window.addEventListener('keydown', this.onKeyDown.bind(this));
     window.addEventListener('click', this.onClick.bind(this));
     window.addEventListener('wheel', this.onScroll.bind(this), false);
-
     this.onMouseMove({ clientX: 0, clientY: 0 });
 
+
+    //bind other divs
+      var localThis = this;
+      $('.endLoading').click(function(){
+          localThis.forceDoneLoading();
+      });
+      $('.endLoading').hover(function(){
+          //localThis.switchSiteVideo(2);
+          //console.log('he');
+      });
+
+    //stats
     (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
 
   }
@@ -1376,13 +1376,17 @@ onKeyDown(event)
 {
 
   //do this when come in from loading
-this.forceDoneLoading();
+  if(event.key == "Enter")
+  {
+      this.forceDoneLoading();
+  }
+
         if(this.videoTex)
         {
           this.videoTex.play();
         }
 
-  // console.log("keydown "+event.key);
+  //console.log("keydown "+event.key);
   if(event.key == 0)
   {
     if(this.currentRoom < $('.bottomTitle .dots li').length)

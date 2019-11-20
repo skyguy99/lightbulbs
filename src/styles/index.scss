@@ -100,6 +100,19 @@ canvas {
 			width: 6%;
     height: 8%;
 }
+.endLoading {
+	//background-color: blue;
+	position: absolute;
+	left: 50%;
+	-webkit-transform: translateX(-50%);
+	transform: translateX(-50%);
+
+	bottom: 50%;
+	width: 6%;
+height: 8%;
+z-index: 1010;
+
+}
 
 .loadingScreen img { //skull
 	position: fixed;
@@ -143,7 +156,7 @@ canvas {
 	left: 50%;
 	-webkit-transform: translateX(-50%);
 	transform: translateX(-50%);
-	width: 45px;
+	width: 65px;
     margin-bottom: 3px;
 		margin-left: 47%;
 }
@@ -359,9 +372,24 @@ ul {
   position: fixed;
   right: 0;
   bottom: 0;
-  min-width: 100%;
-  min-height: 100%;
+  width: 100%;
 z-index: 10002;
+}
+
+#bgVideo{
+	position: fixed;
+  right: 0;
+  bottom: 0;
+  // min-width: 100%; //before it was min-width
+  // max-height: 100%;
+	width: 100%;
+z-index: -10000;
+}
+.parallax video {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	width: 100%;
 }
 
 .frame__links {
