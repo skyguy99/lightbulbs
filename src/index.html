@@ -39,15 +39,11 @@
 		      <!-- The cursor elements -->
         <div class="cursor cursor--small"></div>
         <canvas class="cursor cursor--canvas" resize></canvas>
-          <!-- you can add more links here -->
 
-						<!-- <symbol id="icon-keyboard" viewBox="0 0 100 70">
-				<title>keyboard</title> -->
-				<!-- <path d="M 60.94,1.83 39.22,1.83 C 36.71,1.83 34.67,3.86 34.67,6.376 L 34.67,28.1 C 34.67,30.61 36.71,32.65 39.22,32.65 L 60.94,32.65 C 63.45,32.65 65.5,30.61 65.5,28.1 L 65.5,6.376 C 65.5,3.86 63.45,1.83 60.94,1.83 Z M 44.79,18.63 50.08,11.74 55.37,18.63 Z" opacity="0.2"/>
-				<path d="M 60.86,36.75 39.14,36.75 C 36.63,36.75 34.59,38.79 34.59,41.3 L 34.59,63.02 C 34.59,65.53 36.63,67.57 39.14,67.57 L 60.86,67.57 C 63.38,67.57 65.41,65.53 65.41,63.02 L 65.41,41.3 C 65.42,38.79 63.38,36.75 60.86,36.75 Z M 50.08,57.45 44.79,50.55 55.37,50.55 Z" opacity="0.2" />
-				<path d="M 95.45,36.75 73.73,36.75 C 71.22,36.75 69.18,38.79 69.18,41.3 L 69.18,63.02 C 69.18,65.53 71.22,67.57 73.73,67.57 L 95.45,67.57 C 97.97,67.57 100,65.53 100,63.02 L 100,41.3 C 100,38.79 97.97,36.75 95.45,36.75 Z M 83.4,57.45 83.4,46.86 90.3,52.16 Z" />
-				<path d="M 26.27,36.75 4.55,36.75 C 2.037,36.75 0,38.79 0,41.3 L 0,63.02 C 0,65.53 2.037,67.57 4.55,67.57 L 26.27,67.57 C 28.78,67.57 30.82,65.53 30.82,63.02 L 30.82,41.3 C 30.82,38.79 28.78,36.75 26.27,36.75 Z M 16.69,57.45 9.79,52.16 16.69,46.86 Z" />
-			</symbol> -->
+			<iframe src="../src/resources/silence.mp3" allow="autoplay" style="display:none"></iframe>
+			<audio id="audioplayer" autoplay muted loop>
+    		<source src="../src/resources/test.mp3" type="audio/mp3">
+			</audio>
 
 			<div class = "loadingScreen">
 				<div data-depth="0.15" class="link" id = "parallaxBuffer"></div>
@@ -59,7 +55,9 @@
 						<img data-depth="0.21" src="../src/images/eye2-new.png" alt="">
 			</img>
 				<img data-depth="0.26" src="../src/images/title-new.png" alt="">
-				<img data-depth="0.12" src="../src/images/percent-new.png" alt="">
+
+					<!-- <img class = "introslide1" data-depth="0.12" src="../src/images/enterbox-new.png" alt=""> -->
+					<img class = "introslide2" data-depth="0.12" src="../src/images/percent-new.png" alt="">
 
 				<video preload = 'true' data-depth="0.16" autoplay muted>
 						<source src="../src/images/intro2.mp4" type="video/mp4">

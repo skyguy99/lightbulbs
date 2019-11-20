@@ -371,10 +371,17 @@ loader.load(
   }
 
   playAudio(){
-    this.audio = new Audio("./src/resources/test.mp3");
-    this.audio.loop = true;
-    this.audio.autoplay = true;
-    //this.audio.play();
+    // this.audio = new Audio("./src/resources/test.mp3");
+    // this.audio.loop = true;
+    // this.audio.autoplay = true;
+
+    this.audio = $('#audioplayer')[0];
+  //
+    var localThis = this;
+  setTimeout( function(){
+    $('#audioplayer')[0].play();
+    $('#audioplayer')[0].muted = false;
+  }  , 500);
   }
 
   cubeCloud()
@@ -1343,10 +1350,14 @@ animatedTexturePngs()
 
   onClick({ clientX, clientY })
   {
-
+    // console.log($('#audioplayer')[0]);
+    $('#audioplayer')[0].play();
+    $('#audioplayer')[0].muted = false;
   }
 
   onMouseMove({ clientX, clientY }) {
+
+
     this.mouse3D.x = (clientX / this.width) * 2 - 1;
     this.mouse3D.y = -(clientY / this.height) * 2 + 1;
     //this.mouse3D.updateMatrixWorld(true);
@@ -1354,10 +1365,7 @@ animatedTexturePngs()
     this.mouse.x = (clientX - this.windowHalf.x );
     this.mouse.y = (clientY - this.windowHalf.x );
 
-    //this.movableLight.position.set(this.mouse.x, this.mouse.y, 0);
-    //this.testCube.position.set(this.mouse.x, this.mouse.y, 0);
-
-    if(this.mouse.y > this.height * 0.092)
+    if(this.mouse.y > this.height * 0.092 && this.mouseDown)
     {
       this.startLoading(true);
     } else {
