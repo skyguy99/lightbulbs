@@ -37,6 +37,8 @@ this.testCube = new THREE.Mesh();
     this.animatedMeshes = [];
     this.roomModels = [];
     this.interactiveMeshes = [];
+    this.audio = new Audio();
+    this.audioVolume = 0.7;
 
     //LOGIC
     this.loadingHasStarted = false;
@@ -369,9 +371,10 @@ loader.load(
   }
 
   playAudio(){
-    var a = new Audio("./src/resources/test.mp3");
-    a.loop = true;
-    a.play();
+    this.audio = new Audio("./src/resources/test.mp3");
+    this.audio.loop = true;
+    this.audio.autoplay = true;
+    //this.audio.play();
   }
 
   cubeCloud()
@@ -442,7 +445,7 @@ loader.load(
   var localThis = this;
   setTimeout( function(){
     localThis.switchSiteVideo();
-  }  , 5500);
+  }  , 6500);
 
   }
 
@@ -1239,7 +1242,7 @@ animatedTexturePngs()
 
     this.animate();
 
-    //this.playAudio();
+    this.playAudio();
 
     //Interaction setup
     window.addEventListener('resize', this.onResize.bind(this));
@@ -1495,7 +1498,10 @@ if(this.middleMenuIsUp)
       this.sphere.visible = true;
     //-------------------------
 
+
+//other logic
 this.effect.renderToScreen = this.mouseDown;
+this.audio.volume = this.loadingHasStarted ? 0.2 : this.audioVolume;
 
 //--ANIMATE MODELS------------------------------
 //this.mixer.update(this.clock.getDelta());
