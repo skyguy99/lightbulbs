@@ -17,6 +17,7 @@ console.log("SKY");
     this.width = window.innerWidth;
     this.height = window.innerHeight;
     this.mouse3D = new THREE.Vector2();
+    this.effect = new THREE.ShaderPass();
     this.geometries = [
       new Cone(),
       new Tourus(),
@@ -44,6 +45,7 @@ this.testCube = new THREE.Mesh();
     this.currentRoom = 0;
     this.scl = 0;
     this.hasTransitioned = false;
+    this.mouseDown = false;
 
     //UI
     $('.dots li').first().addClass('active');
@@ -300,9 +302,9 @@ loader.load(
 		this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
 
 		// Add the post-processing effect
-		var effect = new THREE.ShaderPass(material, "u_texture");
-		effect.renderToScreen = true;
-		this.composer.addPass(effect);
+		this.effect = new THREE.ShaderPass(material, "u_texture");
+		this.effect.renderToScreen = true;
+		this.composer.addPass(this.effect);
 
 	// this.composer = new THREE.EffectComposer(this.renderer); //THREE.whatever is different
 	// var renderPass = new THREE.RenderPass(this.scene, this.camera);
@@ -421,7 +423,7 @@ loader.load(
     $('.parallax video source').each(function(){
         $(this).attr('src', '')
     });
-    $('.parallax video').remove();
+  $('.parallax video').remove();
 
     $('#bgVideo').each(function(){
         $(this).attr('src', './src/images/glitchbg.mp4')
@@ -436,16 +438,11 @@ loader.load(
   doneLoading()
   {
     //load experience
-  //   setTimeout( function(){
-  //
-  //   $(".frame").show();
-  //   $(".mainCanvas").show();
-  //   $(".loadingScreen").hide();
-  // }  , 9000);
+
   var localThis = this;
   setTimeout( function(){
     localThis.switchSiteVideo();
-  }  , 4000);
+  }  , 5500);
 
   }
 
@@ -1249,6 +1246,8 @@ animatedTexturePngs()
     window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
     window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
     window.addEventListener('keydown', this.onKeyDown.bind(this));
+ window.addEventListener('mousedown', this.onMouseDown.bind(this));
+ window.addEventListener('mouseup', this.onMouseUp.bind(this));
     window.addEventListener('click', this.onClick.bind(this));
     window.addEventListener('wheel', this.onScroll.bind(this), false);
     this.onMouseMove({ clientX: 0, clientY: 0 });
@@ -1330,9 +1329,18 @@ animatedTexturePngs()
 
   }
 
+  onMouseDown()
+  {
+    this.mouseDown++;
+  }
+  onMouseUp()
+  {
+    this.mouseDown--;
+  }
+
   onClick({ clientX, clientY })
   {
-    //console.log("click");
+
   }
 
   onMouseMove({ clientX, clientY }) {
@@ -1487,6 +1495,7 @@ if(this.middleMenuIsUp)
       this.sphere.visible = true;
     //-------------------------
 
+this.effect.renderToScreen = this.mouseDown;
 
 //--ANIMATE MODELS------------------------------
 //this.mixer.update(this.clock.getDelta());
