@@ -189,6 +189,14 @@ const initHovers = () => {
   });
 };
 
+var mouseDown = 0;
+document.body.onmousedown = function() {
+  ++mouseDown;
+}
+document.body.onmouseup = function() {
+  --mouseDown;
+}
+
 //TRANSITION - change opacity of big video
 $(function(){
        var $win = $(window),
@@ -211,8 +219,12 @@ $(function(){
              opacity = 0;
            }
 
-           $('#myVideo').css('opacity',opacity);
-
+           if(mouseDown)
+           {
+              $('#myVideo').css('opacity',opacity);
+           } else {
+             $('#myVideo').css('opacity',0);
+           }
        });
    });
 

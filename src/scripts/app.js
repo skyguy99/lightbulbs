@@ -1259,9 +1259,24 @@ animatedTexturePngs()
       $('.endLoading').click(function(){
           localThis.forceDoneLoading();
       });
+
       $('.endLoading').hover(function(){
-          //localThis.switchSiteVideo(2);
-          //console.log('he');
+          $('.parallax img').each(function(num)
+        {
+          if(num == 4)
+          {
+            $(this).attr({ "src": "../src/images/enterbox-new.png" });
+          }
+        })
+      });
+      $('.endLoading').mouseleave(function() {
+        $('.parallax img').each(function(num)
+      {
+        if(num == 4)
+        {
+          $(this).attr({ "src": "../src/images/percent-new.png" });
+        }
+      })
       });
 
     //stats
