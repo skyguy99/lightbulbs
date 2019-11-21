@@ -4,6 +4,7 @@ import Tourus from './elements/tourus';
 import Cylinder from './elements/cylinder';
 import { radians, map, distance } from './helpers';
 
+const glslify = require('glslify');
 
 export default class App {
   setup() {
@@ -164,7 +165,72 @@ loader.load(
   }
 );
 
-  }
+}
+
+particlesTest()
+{
+
+  const uniforms = {
+    uTime: { value: 0 },
+    uRandom: { value: 1.0 },
+    uDepth: { value: 2.0 },
+    uSize: { value: 0.0 },
+    uTextureSize: { value: new THREE.Vector2(this.width, this.height) },
+    uTexture: { value: this.texture },
+    uTouch: { value: null },
+  };
+//
+//   const material = new THREE.MeshStandardMaterial( {
+//
+//   color: 0x00ffff,
+//
+//   roughness: 0.3,
+//   metalness: 0.2
+// });
+
+  // const material = new THREE.RawShaderMaterial({
+  //   uniforms,
+  //   vertexShader: glslify(require('./vendor/shaders/particle.vert')),
+  //   fragmentShader: glslify(require('./vendor/shaders/particle.frag')),
+  //   depthTest: false, //change later?
+  //   transparent: true,
+  //   // blending: THREE.AdditiveBlending
+  // });
+
+  // vertexShader: glslify(require('./vendor/shaders/particle.vert')),
+  // fragmentShader: glslify(require('./vendor/shaders/particle.frag')),
+
+  // vertexShader: glslify(document.getElementById("vertexShader2").textContent),
+  // fragmentShader: glslify(document.getElementById("fragShader2").textContent),
+
+  const geometry = new THREE.InstancedBufferGeometry();
+
+// positions
+const positions = new THREE.BufferAttribute(new Float32Array(4 * 3), 3);
+positions.setXYZ(0, -0.5, 0.5, 0.0);
+positions.setXYZ(1, 0.5, 0.5, 0.0);
+positions.setXYZ(2, -0.5, -0.5, 0.0);
+positions.setXYZ(3, 0.5, -0.5, 0.0);
+geometry.addAttribute('position', positions);
+
+// uvs
+const uvs = new THREE.BufferAttribute(new Float32Array(4 * 2), 2);
+uvs.setXYZ(0, 0.0, 0.0);
+uvs.setXYZ(1, 1.0, 0.0);
+uvs.setXYZ(2, 0.0, 1.0);
+uvs.setXYZ(3, 1.0, 1.0);
+geometry.addAttribute('uv', uvs);
+
+// index
+geometry.setIndex(new THREE.BufferAttribute(new Uint16Array([ 0, 2, 1, 2, 3, 1 ]), 1));
+
+this.object3D = new THREE.Mesh(geometry, material);
+this.scene.add(this.object3D);
+this.object3D.position.set(0,5,2);
+this.object3D.scale.set(3,3,3);
+var box = new THREE.BoxHelper( this.object3D, 0xffff00 );
+	this.scene.add( box );
+}
 
   createCamera() {
 
@@ -1250,6 +1316,8 @@ animatedTexturePngs()
     this.animate();
 
     this.playAudio();
+
+    //this.particlesTest();
 
     //Interaction setup
     window.addEventListener('resize', this.onResize.bind(this));
