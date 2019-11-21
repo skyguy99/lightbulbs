@@ -3,6 +3,7 @@ import Cone from './elements/cone';
 import Tourus from './elements/tourus';
 import Cylinder from './elements/cylinder';
 import { radians, map, distance } from './helpers';
+import TouchTexture from './vendor/TouchTexture';
 
 const glslify = require('glslify');
 
@@ -167,14 +168,16 @@ loader.load(
 
 }
 
+//PARTICLES --------------------------------------
+
 particlesTest()
 {
 
   const uniforms = {
-    uTime: { value: 0 },
+    uTime: { value: 0.2 },
     uRandom: { value: 1.0 },
     uDepth: { value: 2.0 },
-    uSize: { value: 0.0 },
+    uSize: { value: 1.0 },
     uTextureSize: { value: new THREE.Vector2(this.width, this.height) },
     uTexture: { value: this.texture },
     uTouch: { value: null },
@@ -232,6 +235,7 @@ var box = new THREE.BoxHelper( this.object3D, 0xffff00 );
 	this.scene.add( box );
 }
 
+//-------------------------------------------------------- 
   createCamera() {
 
 
@@ -1419,7 +1423,7 @@ animatedTexturePngs()
   onClick({ clientX, clientY })
   {
     // console.log($('#audioplayer')[0]);
-    $('#audioplayer')[0].play();
+    //$('#audioplayer')[0].play(); //this will FUCK UP REST OF APP SKYLAR
     $('#audioplayer')[0].muted = false;
   }
 
