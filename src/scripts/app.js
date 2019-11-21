@@ -188,14 +188,14 @@ particlesTest()
 //   metalness: 0.2
 // });
 
-  // const material = new THREE.RawShaderMaterial({
-  //   uniforms,
-  //   vertexShader: glslify(require('./vendor/shaders/particle.vert')),
-  //   fragmentShader: glslify(require('./vendor/shaders/particle.frag')),
-  //   depthTest: false, //change later?
-  //   transparent: true,
-  //   // blending: THREE.AdditiveBlending
-  // });
+  const material = new THREE.RawShaderMaterial({
+    uniforms,
+    vertexShader: glslify(require('./vendor/shaders/particle.vert')),
+    fragmentShader: glslify(require('./vendor/shaders/particle.frag')),
+    depthTest: false, //change later?
+    transparent: true,
+    // blending: THREE.AdditiveBlending
+  });
 
   // vertexShader: glslify(require('./vendor/shaders/particle.vert')),
   // fragmentShader: glslify(require('./vendor/shaders/particle.frag')),
@@ -1317,7 +1317,7 @@ animatedTexturePngs()
 
     this.playAudio();
 
-    //this.particlesTest();
+    this.particlesTest();
 
     //Interaction setup
     window.addEventListener('resize', this.onResize.bind(this));
