@@ -3,7 +3,10 @@ import Cone from './elements/cone';
 import Tourus from './elements/tourus';
 import Cylinder from './elements/cylinder';
 import { radians, map, distance } from './helpers';
-import TouchTexture from './vendor/TouchTexture';
+
+import { TweenLite } from 'gsap/TweenMax';
+import InteractiveControls from './vendor/InteractiveControls';
+import Particles from './vendor/Particles';
 
 const glslify = require('glslify');
 
@@ -41,6 +44,9 @@ this.testCube = new THREE.Mesh();
     this.interactiveMeshes = [];
     this.audio = new Audio();
     this.audioVolume = 0.7;
+
+    this.interactive = new InteractiveControls();
+    this.particles = new Particles();
 
     //LOGIC
     this.loadingHasStarted = false;
@@ -173,69 +179,31 @@ loader.load(
 particlesTest()
 {
 
-  const uniforms = {
-    uTime: { value: 0.2 },
-    uRandom: { value: 1.0 },
-    uDepth: { value: 2.0 },
-    uSize: { value: 1.0 },
-    uTextureSize: { value: new THREE.Vector2(this.width, this.height) },
-    uTexture: { value: this.texture },
-    uTouch: { value: null },
-  };
-//
-//   const material = new THREE.MeshStandardMaterial( {
-//
-//   color: 0x00ffff,
-//
-//   roughness: 0.3,
-//   metalness: 0.2
-// });
+this.interactive = new InteractiveControls(this.camera, this.renderer.domElement);
+  this.particles = new Particles(this);
+  		this.scene.add(this.particles.container);
+  		this.particles.container.position.set(0,4,0);
+  // const uniforms = {
+  //   uTime: { value: 0.2 },
+  //   uRandom: { value: 1.0 },
+  //   uDepth: { value: 2.0 },
+  //   uSize: { value: 1.0 },
+  //   uTextureSize: { value: new THREE.Vector2(this.width, this.height) },
+  //   uTexture: { value: this.texture },
+  //   uTouch: { value: null },
+  // };
+  // const material = new THREE.RawShaderMaterial({
+  //   uniforms,
+  //   vertexShader: glslify(require('./vendor/shaders/particle.vert')),
+  //   fragmentShader: glslify(require('./vendor/shaders/particle.frag')),
+  //   depthTest: false, //change later?
+  //   transparent: true,
+  //   // blending: THREE.AdditiveBlending
+  // });
 
-  const material = new THREE.RawShaderMaterial({
-    uniforms,
-    vertexShader: glslify(require('./vendor/shaders/particle.vert')),
-    fragmentShader: glslify(require('./vendor/shaders/particle.frag')),
-    depthTest: false, //change later?
-    transparent: true,
-    // blending: THREE.AdditiveBlending
-  });
-
-  // vertexShader: glslify(require('./vendor/shaders/particle.vert')),
-  // fragmentShader: glslify(require('./vendor/shaders/particle.frag')),
-
-  // vertexShader: glslify(document.getElementById("vertexShader2").textContent),
-  // fragmentShader: glslify(document.getElementById("fragShader2").textContent),
-
-  const geometry = new THREE.InstancedBufferGeometry();
-
-// positions
-const positions = new THREE.BufferAttribute(new Float32Array(4 * 3), 3);
-positions.setXYZ(0, -0.5, 0.5, 0.0);
-positions.setXYZ(1, 0.5, 0.5, 0.0);
-positions.setXYZ(2, -0.5, -0.5, 0.0);
-positions.setXYZ(3, 0.5, -0.5, 0.0);
-geometry.addAttribute('position', positions);
-
-// uvs
-const uvs = new THREE.BufferAttribute(new Float32Array(4 * 2), 2);
-uvs.setXYZ(0, 0.0, 0.0);
-uvs.setXYZ(1, 1.0, 0.0);
-uvs.setXYZ(2, 0.0, 1.0);
-uvs.setXYZ(3, 1.0, 1.0);
-geometry.addAttribute('uv', uvs);
-
-// index
-geometry.setIndex(new THREE.BufferAttribute(new Uint16Array([ 0, 2, 1, 2, 3, 1 ]), 1));
-
-this.object3D = new THREE.Mesh(geometry, material);
-this.scene.add(this.object3D);
-this.object3D.position.set(0,5,2);
-this.object3D.scale.set(3,3,3);
-var box = new THREE.BoxHelper( this.object3D, 0xffff00 );
-	this.scene.add( box );
 }
 
-//-------------------------------------------------------- 
+//--------------------------------------------------------
   createCamera() {
 
 
@@ -449,7 +417,7 @@ var box = new THREE.BoxHelper( this.object3D, 0xffff00 );
   //
     var localThis = this;
   setTimeout( function(){
-    $('#audioplayer')[0].play();
+    //$('#audioplayer')[0].play();
     $('#audioplayer')[0].muted = false;
   }  , 500);
   }
@@ -1547,6 +1515,9 @@ if(this.middleMenuIsUp)
     this.composer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setSize(this.width, this.height);
 
+    if (this.interactive) this.interactive.resize();
+		if (this.particles) this.particles.resize();
+
     //shader
     // Update the resolution uniform
 		this.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight).multiplyScalar(window.devicePixelRatio);
@@ -1582,6 +1553,8 @@ if(this.middleMenuIsUp)
 //other logic
 this.effect.renderToScreen = this.mouseDown;
 this.audio.volume = this.loadingHasStarted ? 0.2 : this.audioVolume;
+
+if (this.particles) this.particles.update(this.clock.getDelta());
 
 //--ANIMATE MODELS------------------------------
 //this.mixer.update(this.clock.getDelta());

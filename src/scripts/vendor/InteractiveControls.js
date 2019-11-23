@@ -90,6 +90,8 @@ export default class InteractiveControls extends EventEmitter {
 	}
 
 	onMove(e) {
+
+		console.log(this.mouse);
 		const t = (e.touches) ? e.touches[0] : e;
 		const touch = { x: t.clientX, y: t.clientY };
 
@@ -136,6 +138,7 @@ export default class InteractiveControls extends EventEmitter {
 	}
 
 	onDown(e) {
+
 		this.isDown = true;
 		this.onMove(e);
 
