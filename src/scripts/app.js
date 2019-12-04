@@ -1388,12 +1388,13 @@ animatedTexturePngs()
   onMouseDown()
   {
 
-    this.mousedownTimeout = setTimeout(this.clearRoomChange, 5000);
+    this.mousedownTimeout = setTimeout(this.clearRoomChange.bind(this), 2900);
     this.mouseDown++;
   }
   onMouseUp()
   {
     clearTimeout(this.mousedownTimeout);
+
 
     console.log(this.readyToChangeRooms);
     if(this.readyToChangeRooms)
