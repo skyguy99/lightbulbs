@@ -56,6 +56,8 @@ this.testCube = new THREE.Mesh();
     this.scl = 0;
     this.hasTransitioned = false;
     this.mouseDown = false;
+    this.readyToChangeRooms = false;
+    this.mousedownTimeout = null;
 
     //UI
     $('.dots li').first().addClass('active');
@@ -362,40 +364,6 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
 	// this.composer.addPass(effectBadTV);
   }
 
-  startLoading(load)
-  {
-
-    var localThis = this;
-    if(load)
-    {
-      if(!this.loadingHasStarted)
-      {
-        this.loadingHasStarted = true;
-        console.log("Starting load to back");
-        //wait 3 seconds, then go
-
-        setTimeout( function(){
-          $('.bottomTitle img').show();
-          $('.bottomTitle h1').hide();
-          setTimeout(function() {
-            // NOW SWITCH
-            if(localThis.loadingHasStarted)
-            {
-              localThis.triggerRoomChange();
-            }
-        }, 4000);
-
-      }  , 800);
-
-      }
-    } else {
-      //this.roomTransition(); //cam only
-      $('.bottomTitle img').hide();
-      $('.bottomTitle h1').show();
-    }
-
-  }
-
   addFloor() {
     const geometry = new THREE.PlaneGeometry(100, 100);
     const material = new THREE.ShadowMaterial({ opacity: .3 });
@@ -409,17 +377,17 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
   }
 
   playAudio(){
-    // this.audio = new Audio("./src/resources/test.mp3");
-    // this.audio.loop = true;
-    // this.audio.autoplay = true;
+    this.audio = new Audio("./src/resources/test.mp3");
+    this.audio.loop = true;
+    this.audio.autoplay = true;
 
-    this.audio = $('#audioplayer')[0];
-  //
-    var localThis = this;
-  setTimeout( function(){
-    //$('#audioplayer')[0].play();
-    $('#audioplayer')[0].muted = false;
-  }  , 500);
+  //   this.audio = $('#audioplayer')[0];
+  // //
+  //   var localThis = this;
+  // setTimeout( function(){
+  //   //$('#audioplayer')[0].play();
+  //   $('#audioplayer')[0].muted = false;
+  // }  , 500);
   }
 
   cubeCloud()
@@ -485,12 +453,16 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
 //initial loading
   doneLoading()
   {
-    //load experience
 
   var localThis = this;
   setTimeout( function(){
     localThis.switchSiteVideo();
   }  , 6500);
+
+  setTimeout( function(){
+    localThis.forceDoneLoading(); //end w song
+
+  }  , 13000);
 
   }
 
@@ -507,7 +479,7 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
     $('#bgVideo').remove();
 
     $('#myVideo').each(function(){
-        $(this).attr('src', '../src/images/glitchbg.mp4')
+        $(this).attr('src', '../src/images/interstit.webm')
     });
   }
 
@@ -641,8 +613,35 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
   addTextureAnimationObject()
   {
 
+//FIRE
+    // var video = document.createElement( 'video' );
+    // video.src = './src/images/firenoalpha.webm';
+    // video.load(); // must call after setting/changing source
+    // video.preload = 'auto';
+    // video.loop = true;
+    // video.autoload = true;
+    // video.transparent = true;
+    // video.playbackRate = 1.06;
+    //
+    // this.videoTex = video;
+    //
+    //
+    // var texture = new THREE.VideoTexture( video );
+    // texture.minFilter = THREE.LinearFilter;
+    // texture.magFilter = THREE.LinearFilter;
+    // texture.format = THREE.RGBAFormat;
+    //
+  	// var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0.5 } );
+  	// var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
+    // runnerMaterial.transparent = true;
+  	// var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
+  	// runner.position.set(0,5,1);
+    // runner.scale.set(0.5, 0.5, 0.5);
+  	// this.scene.add(runner);
+
+    //SCREEN
     var video = document.createElement( 'video' );
-    video.src = './src/images/firenoalpha.webm';
+    video.src = './src/images/computerscreen.webm';
     video.load(); // must call after setting/changing source
     video.preload = 'auto';
     video.loop = true;
@@ -662,7 +661,8 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
   	var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
     runnerMaterial.transparent = true;
   	var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
-  	runner.position.set(0,5,-10);
+    runner.position.set(0,5,1);
+    runner.scale.set(0.5, 0.5, 0.5);
   	this.scene.add(runner);
 
   }
@@ -1289,7 +1289,7 @@ animatedTexturePngs()
 
     this.playAudio();
 
-    this.particlesTest();
+    //this.particlesTest();
 
     //Interaction setup
     window.addEventListener('resize', this.onResize.bind(this));
@@ -1379,12 +1379,28 @@ animatedTexturePngs()
 
   }
 
+  clearRoomChange(){
+
+    this.readyToChangeRooms = true;
+    console.log('READY');
+  };
+
   onMouseDown()
   {
+
+    this.mousedownTimeout = setTimeout(this.clearRoomChange, 5000);
     this.mouseDown++;
   }
   onMouseUp()
   {
+    clearTimeout(this.mousedownTimeout);
+
+    console.log(this.readyToChangeRooms);
+    if(this.readyToChangeRooms)
+    {
+      this.triggerRoomChange();
+      this.readyToChangeRooms = false;
+    }
     this.mouseDown--;
   }
 
@@ -1405,13 +1421,10 @@ animatedTexturePngs()
     this.mouse.x = (clientX - this.windowHalf.x );
     this.mouse.y = (clientY - this.windowHalf.x );
 
-    if(this.mouse.y > this.height * 0.092 && this.mouseDown)
-    {
-      this.startLoading(true);
-    } else {
-      this.startLoading(false);
-      this.loadingHasStarted = false;
-    }
+    // if(this.mouseDown && $('#myVideo').get(0).paused)
+    // {
+    //   this.readyToChangeRooms = true; //set flag
+    // }
 
     //track to mouse
   var vector = new THREE.Vector3(this.mouse3D.x, this.mouse3D.y, 0.5); //0.5
@@ -1450,10 +1463,7 @@ onKeyDown(event)
 {
 
   //do this when come in from loading
-  if(event.key == "Enter")
-  {
-      this.forceDoneLoading();
-  }
+  this.playAudio();
 
         if(this.videoTex)
         {
@@ -1465,7 +1475,7 @@ onKeyDown(event)
   {
     if(this.currentRoom < $('.bottomTitle .dots li').length)
     {
-      this.triggerRoomChange();
+      //this.triggerRoomChange();
     }
   }
 

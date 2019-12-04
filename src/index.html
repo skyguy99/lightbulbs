@@ -65,13 +65,13 @@
 
 				</div>
 
-				<video preload = 'auto' autoplay muted loop id = "bgVideo">
+				<video preload = 'auto' autoplay muted false id = "bgVideo">
 				<source src="" type="video/mp4">
 				 </video>
 			</div>
 			<div class="sketch-container" id="sketch-container">
 			<div class="frame" style = "">
-				<video autoplay muted loop id="myVideo">
+				<video autoplay muted id="myVideo">
   			<source src="" type="video/mp4">
 				</video>
 				<div class = "topmenu">
@@ -103,11 +103,11 @@
 				  </div>
 				</div>
 			</div>
-			<div class = "bottomTitle">
+			<!-- <div class = "bottomTitle">
 				<h1>DEADENDS</h1>
 				<img src="../src/images/equalizer.gif" alt="">
 
-				<div class="table">
+				<!-- <div class="table">
 				<div class="cell">
 					<ul class="dots">
 						<li><a href="#"></a></li>
@@ -116,8 +116,8 @@
 						<li><a href="#"></a></li>
 					</ul>
 				</div>
-			</div>
-			</div>
+			</div> -->
+			</div> -->
 			</div>
 			<script type="x-shader/x-vertex" id="vertexShader">
 #define GLSLIFY 1
@@ -215,7 +215,8 @@ void main() {
 						vec3 pixel_color = texture2D(u_texture, uv).rgb;
 
 						// Add some white noise
-						//pixel_color += vec3(5.0 * strength * (random2d(v_uv + 1.133001 * vec2(u_time, 1.13)) - 0.5));
+						strength = 0.08;
+						pixel_color += vec3(5.0 * strength * (random2d(v_uv + 1.133001 * vec2(u_time, 1.13)) - 0.5)); //change strength here for opacity
 
 						// Fragment shader output
 						gl_FragColor = vec4(pixel_color, 1.0);

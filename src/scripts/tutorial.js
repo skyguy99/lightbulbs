@@ -189,12 +189,15 @@ const initHovers = () => {
   });
 };
 
+var notAlreadyUp = true;
 var mouseDown = 0;
 document.body.onmousedown = function() {
+  //$('#myVideo').currentTime = 0;
   ++mouseDown;
 }
 document.body.onmouseup = function() {
   --mouseDown;
+  notAlreadyUp = true;
 }
 
 //TRANSITION - change opacity of big video
@@ -219,12 +222,31 @@ $(function(){
              opacity = 0;
            }
 
-           if(mouseDown)
+           opacity = ((e.pageY > h*0.6) && mouseDown) ? 1 : 0;
+           $('#myVideo').css('opacity',opacity);
+
+           var perc = Math.floor((($('#myVideo').get(0).currentTime/$('#myVideo').get(0).duration) * 100).toFixed(2));
+           // console.log(perc);
+
+           if(perc >= 71)
            {
-              $('#myVideo').css('opacity',opacity);
-           } else {
-             $('#myVideo').css('opacity',0);
+             $('#myVideo').get(0).pause();
            }
+
+           if((e.pageY > h*0.6) && mouseDown && notAlreadyUp)
+           {
+             //console.log('restart vid');
+             $('#myVideo').get(0).currentTime = 0;
+             $('#myVideo').get(0).play();
+             notAlreadyUp = false;
+           }
+           //
+           // if(mouseDown)
+           // {
+           //    $('#myVideo').css('opacity',opacity);
+           // } else {
+           //   $('#myVideo').css('opacity',0);
+           // }
        });
    });
 

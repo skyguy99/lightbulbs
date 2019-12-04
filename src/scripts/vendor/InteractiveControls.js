@@ -89,52 +89,52 @@ export default class InteractiveControls extends EventEmitter {
 		}
 	}
 
-	onMove(e) {
+	onMove(e) { //UNCOMMENT THIS LATER
 
-		console.log(this.mouse);
-		const t = (e.touches) ? e.touches[0] : e;
-		const touch = { x: t.clientX, y: t.clientY };
-
-		this.mouse.x = ((touch.x + this.rect.x) / this.rect.width) * 2 - 1;
-		this.mouse.y = -((touch.y + this.rect.y) / this.rect.height) * 2 + 1;
-
-		this.raycaster.setFromCamera(this.mouse, this.camera);
-
-		/*
-		// is dragging
-		if (this.selected && this.isDown) {
-			if (this.raycaster.ray.intersectPlane(this.plane, this.intersection)) {
-				this.emit('interactive-drag', { object: this.selected, position: this.intersection.sub(this.offset) });
-			}
-			return;
-		}
-		*/
-
-		const intersects = this.raycaster.intersectObjects(this.objects);
-
-		if (intersects.length > 0) {
-			const object = intersects[0].object;
-			this.intersectionData = intersects[0];
-
-			this.plane.setFromNormalAndCoplanarPoint(this.camera.getWorldDirection(this.plane.normal), object.position);
-
-			if (this.hovered !== object) {
-				this.emit('interactive-out', { object: this.hovered });
-				this.emit('interactive-over', { object });
-				this.hovered = object;
-			}
-			else {
-				this.emit('interactive-move', { object, intersectionData: this.intersectionData });
-			}
-		}
-		else {
-			this.intersectionData = null;
-
-			if (this.hovered !== null) {
-				this.emit('interactive-out', { object: this.hovered });
-				this.hovered = null;
-			}
-		}
+		//console.log(this.mouse);
+		// const t = (e.touches) ? e.touches[0] : e;
+		// const touch = { x: t.clientX, y: t.clientY };
+		//
+		// this.mouse.x = ((touch.x + this.rect.x) / this.rect.width) * 2 - 1;
+		// this.mouse.y = -((touch.y + this.rect.y) / this.rect.height) * 2 + 1;
+		//
+		// this.raycaster.setFromCamera(this.mouse, this.camera);
+		//
+		// /*
+		// // is dragging
+		// if (this.selected && this.isDown) {
+		// 	if (this.raycaster.ray.intersectPlane(this.plane, this.intersection)) {
+		// 		this.emit('interactive-drag', { object: this.selected, position: this.intersection.sub(this.offset) });
+		// 	}
+		// 	return;
+		// }
+		// */
+		//
+		// const intersects = this.raycaster.intersectObjects(this.objects);
+		//
+		// if (intersects.length > 0) {
+		// 	const object = intersects[0].object;
+		// 	this.intersectionData = intersects[0];
+		//
+		// 	this.plane.setFromNormalAndCoplanarPoint(this.camera.getWorldDirection(this.plane.normal), object.position);
+		//
+		// 	if (this.hovered !== object) {
+		// 		this.emit('interactive-out', { object: this.hovered });
+		// 		this.emit('interactive-over', { object });
+		// 		this.hovered = object;
+		// 	}
+		// 	else {
+		// 		this.emit('interactive-move', { object, intersectionData: this.intersectionData });
+		// 	}
+		// }
+		// else {
+		// 	this.intersectionData = null;
+		//
+		// 	if (this.hovered !== null) {
+		// 		this.emit('interactive-out', { object: this.hovered });
+		// 		this.hovered = null;
+		// 	}
+		// }
 	}
 
 	onDown(e) {
