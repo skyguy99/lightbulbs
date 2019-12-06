@@ -44,6 +44,8 @@ this.testCube = new THREE.Mesh();
     this.interactiveMeshes = [];
     this.audio = new Audio();
     this.audioVolume = 0.7;
+    this.textureCube = null;
+    this.videoTexs = [];
 
     this.interactive = new InteractiveControls();
     this.particles = new Particles();
@@ -219,11 +221,6 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
 
   roomTransition()
   {
-    // if(!this.hasTransitioned)
-    // {
-    //   this.hasTransitioned = true;
-    // }
-
     //https://greensock.com/ease-visualizer/
     var animation = new TimelineLite()
     animation.to(this.camera.position, .4, {
@@ -238,9 +235,10 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
       z: 9,
     });
 
-  //   setTimeout( function(){
-  //     this.hasTransitioned = false;
-  // }  , 2000);
+    console.log("GOING TO ROOM "+this.currentRoom);
+    this.updateCurrentRoom();
+    //this.roomModels[0].position.set(0, 8, 0);
+
   }
 
   addAmbientLight() {
@@ -262,9 +260,9 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
     light.add( helper );
   }
 
-  addDirectionalLight()
+  addLightsRoom1(parent)
   {
-    const light = new THREE.DirectionalLight('#ffffff', 0.5);
+    const light = new THREE.DirectionalLight('#7C8D8D', 0.5);
     light.castShadow = true;
     var helper = new THREE.DirectionalLightHelper( light );
 
@@ -272,10 +270,23 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
     light.shadow.mapSize.height = 1024;
 
     light.add( helper );
-    light.position.set(0, 4, -2);
-    //light.lookAt(0, 0, 0);
+    light.position.set(-1, 4, 4);
+    light.lookAt(0, 0, 0);
 
-    this.scene.add(light);
+    parent.add(light);
+
+    const light2 = new THREE.DirectionalLight('#8D805C', 0.2);
+    light2.castShadow = true;
+    var helper2 = new THREE.DirectionalLightHelper( light2 );
+
+    light2.shadow.mapSize.width = 1024;
+    light2.shadow.mapSize.height = 1024;
+
+    light2.add( helper2 );
+    light2.position.set(1, 4, 5);
+    light2.lookAt(0, 0, 0);
+
+    parent.add(light2);
   }
 
   addRectLight() {
@@ -639,31 +650,31 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
     // runner.scale.set(0.5, 0.5, 0.5);
   	// this.scene.add(runner);
 
-    //SCREEN
-    var video = document.createElement( 'video' );
-    video.src = './src/images/computerscreen.webm';
-    video.load(); // must call after setting/changing source
-    video.preload = 'auto';
-    video.loop = true;
-    video.autoload = true;
-    video.transparent = true;
-    video.playbackRate = 1.06;
-
-    this.videoTex = video;
-
-
-    var texture = new THREE.VideoTexture( video );
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    texture.format = THREE.RGBAFormat;
-
-  	var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0.5 } );
-  	var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
-    runnerMaterial.transparent = true;
-  	var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
-    runner.position.set(0,5,1);
-    runner.scale.set(0.5, 0.5, 0.5);
-  	this.scene.add(runner);
+    // //SCREEN
+    // var video = document.createElement( 'video' );
+    // video.src = './src/images/computerscreen.webm';
+    // video.load(); // must call after setting/changing source
+    // video.preload = 'auto';
+    // video.loop = true;
+    // video.autoload = true;
+    // video.transparent = true;
+    // video.playbackRate = 1.06;
+    //
+    // this.videoTex = video;
+    //
+    //
+    // var texture = new THREE.VideoTexture( video );
+    // texture.minFilter = THREE.LinearFilter;
+    // texture.magFilter = THREE.LinearFilter;
+    // texture.format = THREE.RGBAFormat;
+    //
+  	// var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0.5 } );
+  	// var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
+    // runnerMaterial.transparent = true;
+  	// var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
+    // runner.position.set(0,5,0);
+    // runner.scale.set(0.1, 0.1, 0.1);
+  	// this.scene.add(runner);
 
   }
 
@@ -764,9 +775,9 @@ getMaterial(string)
 
   //DEFAULT
   var material = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
+    color: 0x424242,
     roughness: 0.8,
-    metalness: 0.7,
+    metalness: 0,
     //normalMap: materials.normalMap,
     //roughnessMap: materials.roughnessMap,
     //metalnessMap: materials.metalnessMap,
@@ -774,7 +785,7 @@ getMaterial(string)
     skinning: true
   });
 
-  if(string.toLowerCase() == "glass-REAL".toLowerCase())
+  if(string.toLowerCase() == "glass".toLowerCase())
   {
     var imagePrefix = "./src/images/dawnmountain-";
     var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
@@ -792,8 +803,8 @@ getMaterial(string)
         side: THREE.BackSide
       }));
 
-    var textureCube = new THREE.CubeTextureLoader().load(this.urls);
-    textureCube.mapping = THREE.CubeRefractionMapping;
+    this.textureCube = new THREE.CubeTextureLoader().load(this.urls);
+    this.textureCube.mapping = THREE.CubeRefractionMapping;
 
       var fShader = THREE.FresnelShader;
 
@@ -803,7 +814,7 @@ getMaterial(string)
         "mFresnelBias": 	{ type: "f", value: 0.1 },
         "mFresnelPower": 	{ type: "f", value: 2.0 },
         "mFresnelScale": 	{ type: "f", value: 1.0 },
-        "tCube": 			{ type: "t", value: textureCube} //textureCube
+        "tCube": 			{ type: "t", value: this.textureCube} //textureCube
       };
 
       // create custom material for the shader
@@ -814,7 +825,20 @@ getMaterial(string)
         fragmentShader: fShader.fragmentShader,
         skinning: true
       }   );
-  } else if(string.toLowerCase() == "repeller".toLowerCase())
+  } else if(string.toLowerCase() == "mirror".toLowerCase())
+  {
+      material = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0,
+        metalness: 1,
+        //normalMap: materials.normalMap,
+        //roughnessMap: materials.roughnessMap,
+        //metalnessMap: materials.metalnessMap,
+        envMap: this.textureCube,
+        skinning: true
+      });
+  }
+  else if(string.toLowerCase() == "repeller".toLowerCase())
   {
       material = new THREE.MeshStandardMaterial({
         color: 0xff0000,
@@ -827,6 +851,36 @@ getMaterial(string)
         skinning: true
       });
   }
+  else if(string.toLowerCase() == "screenroom1".toLowerCase())
+  {
+      //SCREEN
+      var video = document.createElement( 'video' );
+      video.src = './src/images/computerscreen.webm';
+      video.load(); // must call after setting/changing source
+      video.preload = 'auto';
+      video.loop = true;
+      video.autoload = true;
+      video.transparent = true;
+      video.playbackRate = 1.06;
+
+      //this.videoTex = video;
+      this.videoTexs[this.videoTexs.length] = video;
+
+
+      var texture = new THREE.VideoTexture( video );
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      texture.format = THREE.RGBAFormat;
+
+      var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0.5 } );
+      runnerMaterial.transparent = true;
+      material = runnerMaterial;
+    //   var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
+    // var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
+    // runner.position.set(0,5,0);
+    // runner.scale.set(0.1, 0.1, 0.1);
+    // this.scene.add(runner);
+  }
 
   return material;
 }
@@ -835,23 +889,6 @@ addRoomToScene(i, string)
 {
       //ADD MODEL
       var localThis = this;
-    const texture = new THREE.TextureLoader().load( "./src/images/DeadEnds_globalmaterial.png");
-    texture.encoding = THREE.sRGBEncoding;
-
-    var material = new THREE.MeshStandardMaterial({
-      color: 0xffff00,
-      roughness: 0.5,
-      metalness: 0.0,
-      // refractionRatio: 0.98,
-      envMapIntensity: 1.0,
-      map: texture,
-      //normalMap: materials.normalMap,
-      //roughnessMap: materials.roughnessMap,
-      //metalnessMap: materials.metalnessMap,
-      //envMap: me.reflectionCube,
-      skinning: true,
-      normalScale: new THREE.Vector2( 1, -1 )
-    });
 
     //---------------------------------
     //GLTF LOADER
@@ -870,13 +907,17 @@ addRoomToScene(i, string)
       //ADD TO DICTIONARY***
       gltf.scene.pathName = string;
       gltf.scene.index = i;
-      localThis.roomModels[i] = gltf.scene;
+      localThis.roomModels[i] = gltf.scene; //set to parent node
 
-      gltf.scene.position.set(0,4,0);
-      gltf.scene.scale.set(0.1,0.1,0.1);
+      if(i == 0)
+      {
+        localThis.addLightsRoom1(localThis.roomModels[i]);
+      }
 
-        gltf.scene.updateMatrixWorld(true);
+      gltf.scene.position.set(0,3,6);
+      gltf.scene.scale.set(1,1,1);
 
+      gltf.scene.updateMatrixWorld(true);
       gltf.scene.traverse(function (node) {
 
       if (node.isMesh)
@@ -887,21 +928,34 @@ addRoomToScene(i, string)
         node.castShadow = true;
         node.receiveShadow = true;
 
-        //**ADD TO INTERACTIVES
-        if(node.name.includes('(repel)'))
+        //**ADD TO INTERACTIVES ------------------------------------------------------>
+
+        //0- nothing - dont move
+        //1- (hover) - low speed no rotation
+        //2- (repel) - medium rotation medium speed
+        //3- (particles) - high rotation high speed
+
+        if(node.name.includes('(hover)'))
         {
 
-          localThis.interactiveMeshes[localThis.interactiveMeshes.length] = node;
-          node.initialPosition = node.position;
-          node.initialRotation = {
-            x: node.rotation.x,
-            y: node.rotation.y,
-            z: node.rotation.z,
-          };
-         node.material = localThis.getMaterial('repeller');
-         //node.material = localThis.getMaterial('glass-real');
+        }
+        else if(node.name.includes('(repel)'))
+        {
+
+              localThis.interactiveMeshes[localThis.interactiveMeshes.length] = node;
+              node.initialPosition = node.position;
+              node.initialRotation = {
+                x: node.rotation.x,
+                y: node.rotation.y,
+                z: node.rotation.z,
+              };
 
         }
+        else if(node.name.includes('(particles)'))
+        {
+
+        }
+           //------------------------------------------------------------------->
       }
     });
 
@@ -947,11 +1001,13 @@ loadRoomModels()
   //**When export to glb, make sure no missing images in material
   var paths = [
   // "./src/scripts/elements/dancing.glb",
-  "./src/scripts/elements/shapestest.glb"
+  // "./src/scripts/elements/shapestest.glb"
+  "./src/scripts/elements/room1.glb"
 ];
 
   for(var i = 0; i<paths.length;i++)
   {
+    console.log('adding room '+i);
     this.addRoomToScene(i, paths[i]);
   }
 
@@ -959,7 +1015,7 @@ loadRoomModels()
 
 var localThis = this;
   setTimeout( function(){
-    console.log("Models length: "+localThis.roomModels.length);
+    //console.log("Models length: "+localThis.roomModels.length);
 
     localThis.roomModels.forEach(function(obj) {
       //console.log(obj.pathName + " | "+obj.index); //this
@@ -1251,13 +1307,11 @@ animatedTexturePngs()
 
     //this.createGrid();
 
-    //this.addFloor();
-
-    this.addAmbientLight();
+    //this.addAmbientLight();
 
     //this.cubeCloud();
 
-    this.addTestObject();
+    //this.addTestObject();
 
     this.addTextureAnimationObject();
 
@@ -1272,14 +1326,6 @@ animatedTexturePngs()
     //this.glowSphere();
 
     this.loadRoomModels();
-
-    //this.addModelToScene({ x: 0, y: 5, z: -15 }, "./src/scripts/elements/dancing.glb"); //**model string
-
-    //this.addRectLight();
-
-    //this.addOtherPointLights();
-
-    this.addDirectionalLight();
 
     this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
 
@@ -1334,11 +1380,12 @@ animatedTexturePngs()
   }
   onScroll(event)
   {
+    //ZOOM
               if(event.deltaY > 0) { //up
 
               while(this.scl==0) {
 
-                this.scl+=2.5;
+                this.scl+=2;
                 if(this.camera.position.z <= 9)
                 {
                   //this.camera.position.z+=this.scl;
@@ -1356,7 +1403,7 @@ animatedTexturePngs()
 
               while(this.scl==0) {
 
-                this.scl+=2.5;
+                this.scl+=2;
                 if(this.camera.position.z >= 7)
                 {
                   TweenMax.to(this.camera.position, .7, {
@@ -1464,12 +1511,17 @@ onKeyDown(event)
 {
 
   //do this when come in from loading
+
+  this.forceDoneLoading(); //TEMP
   this.playAudio();
 
-        if(this.videoTex)
-        {
-          this.videoTex.play();
-        }
+        // if(this.videoTex)
+        // {
+        //   this.videoTex.play();
+        // }
+    this.videoTexs.forEach(function() {
+      this.play();
+    });
 
   //console.log("keydown "+event.key);
   if(event.key == 0)
