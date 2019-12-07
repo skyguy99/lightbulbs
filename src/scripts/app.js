@@ -41,7 +41,11 @@ this.testCube = new THREE.Mesh();
     this.mixers = [];
     this.animatedMeshes = [];
     this.roomModels = [];
-    this.interactiveMeshes = [];
+
+    this.interactiveMeshes = []; //repel
+    this.hoverMeshes = [];
+    this.particleMeshes = [];
+
     this.audio = new Audio();
     this.audioVolume = 0.7;
     this.textureCube = null;
@@ -60,6 +64,7 @@ this.testCube = new THREE.Mesh();
     this.mouseDown = false;
     this.readyToChangeRooms = false;
     this.mousedownTimeout = null;
+    this.testMesh = null;
 
     //UI
     $('.dots li').first().addClass('active');
@@ -260,8 +265,9 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
     light.add( helper );
   }
 
-  addLightsRoom1(parent)
+  addLightsRoom1(parent, positions)
   {
+
     const light = new THREE.DirectionalLight('#7C8D8D', 0.5);
     light.castShadow = true;
     var helper = new THREE.DirectionalLightHelper( light );
@@ -270,36 +276,26 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
     light.shadow.mapSize.height = 1024;
 
     light.add( helper );
-    light.position.set(-1, 4, 4);
+    // light.position.set(-1, 4, 4);
+    light.position.set(positions[0]);
     light.lookAt(0, 0, 0);
 
     parent.add(light);
 
-    const light2 = new THREE.DirectionalLight('#8D805C', 0.2);
+    const light2 = new THREE.DirectionalLight('#ff0000', 0.2); //'#8D805C',
     light2.castShadow = true;
-    var helper2 = new THREE.DirectionalLightHelper( light2 );
+    var helper2 = new THREE.DirectionalLightHelper( light2, 3);
 
     light2.shadow.mapSize.width = 1024;
     light2.shadow.mapSize.height = 1024;
 
     light2.add( helper2 );
-    light2.position.set(1, 4, 5);
+    light2.position.set(0, 4, 0);
+    //light2.position.set(positions[1]);
     light2.lookAt(0, 0, 0);
-
     parent.add(light2);
-  }
+      helper2.update();
 
-  addRectLight() {
-    const light = new THREE.RectAreaLight('#ffffff', 1, 2000, 2000);
-
-    var helper = new THREE.RectAreaLightHelper( light );
-
-    light.add( helper );
-
-    light.position.set(0, 10, 0);
-    light.lookAt(0, 0, 0);
-
-    //this.scene.add(light);
   }
 
 //FOLLOWS MOUSE
@@ -782,6 +778,7 @@ getMaterial(string)
     //roughnessMap: materials.roughnessMap,
     //metalnessMap: materials.metalnessMap,
     //envMap: me.reflectionCube,
+    flatShading: true,
     skinning: true
   });
 
@@ -828,7 +825,7 @@ getMaterial(string)
   } else if(string.toLowerCase() == "mirror".toLowerCase())
   {
       material = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
+        color: 0xdddddd,
         roughness: 0,
         metalness: 1,
         //normalMap: materials.normalMap,
@@ -908,11 +905,7 @@ addRoomToScene(i, string)
       gltf.scene.pathName = string;
       gltf.scene.index = i;
       localThis.roomModels[i] = gltf.scene; //set to parent node
-
-      if(i == 0)
-      {
-        localThis.addLightsRoom1(localThis.roomModels[i]);
-      }
+      var lightsPositions = [];
 
       gltf.scene.position.set(0,3,6);
       gltf.scene.scale.set(1,1,1);
@@ -922,9 +915,8 @@ addRoomToScene(i, string)
 
       if (node.isMesh)
       {
-        // console.log(node.material.name);
+
         node.material = localThis.getMaterial(node.material.name);
-        //node.material = material;
         node.castShadow = true;
         node.receiveShadow = true;
 
@@ -935,28 +927,89 @@ addRoomToScene(i, string)
         //2- (repel) - medium rotation medium speed
         //3- (particles) - high rotation high speed
 
+
         if(node.name.includes('(hover)'))
         {
+          localThis.hoverMeshes[localThis.hoverMeshes.length] = node;
 
+          if(!node.initialPosition)
+          {
+            node.initialPosition = {
+              x: node.position.x,
+              y: node.position.y,
+              z: node.position.z,
+            }
+          }
+          if(!node.initialRotation)
+          {
+            node.initialRotation = {
+              x: node.rotation.x,
+              y: node.rotation.y,
+              z: node.rotation.z,
+            };
+          }
         }
         else if(node.name.includes('(repel)'))
         {
-
               localThis.interactiveMeshes[localThis.interactiveMeshes.length] = node;
-              node.initialPosition = node.position;
+              if(!node.initialPosition)
+              {
+                node.initialPosition = {
+                  x: node.position.x,
+                  y: node.position.y,
+                  z: node.position.z,
+                }
+              }
+              if(!node.initialRotation)
+              {
+                node.initialRotation = {
+                  x: node.rotation.x,
+                  y: node.rotation.y,
+                  z: node.rotation.z,
+                };
+              }
+        }
+        else if(node.name.includes('(particles)'))
+        {
+            localThis.particleMeshes[localThis.particleMeshes.length] = node;
+            if(!node.initialPosition)
+            {
+              node.initialPosition = {
+                x: node.position.x,
+                y: node.position.y,
+                z: node.position.z,
+              }
+            }
+            if(!node.initialRotation)
+            {
               node.initialRotation = {
                 x: node.rotation.x,
                 y: node.rotation.y,
                 z: node.rotation.z,
               };
-
-        }
-        else if(node.name.includes('(particles)'))
-        {
+            }
 
         }
            //------------------------------------------------------------------->
-      }
+     } //end of mesh nodes
+     // else {
+     //           //we reuse this array
+     //       if(node.name.toLowerCase() == 'light1pos'.toLowerCase())
+     //       {
+     //          lightsPositions[0] = node.position;
+     //          //console.log(node.position);
+     //       }
+     //       else if(node.name.toLowerCase() == 'light2pos'.toLowerCase())
+     //       {
+     //          lightsPositions[1] = node.position;
+     //       }
+     // }
+//Lights setup
+      // if(i == 0 && lightsPositions.length > 1 && !localThis.roomModels[i].didAddLights)
+      // {
+      //     localThis.roomModels[i].didAddLights = true;
+      //     localThis.addLightsRoom1(localThis.roomModels[i], lightsPositions);
+      // }
     });
 
       var myMixer = new THREE.AnimationMixer(gltf.scene);
@@ -1002,7 +1055,8 @@ loadRoomModels()
   var paths = [
   // "./src/scripts/elements/dancing.glb",
   // "./src/scripts/elements/shapestest.glb"
-  "./src/scripts/elements/room1.glb"
+  // "./src/scripts/elements/room1.glb"
+  "./src/scripts/elements/scene.glb"
 ];
 
   for(var i = 0; i<paths.length;i++)
@@ -1255,20 +1309,22 @@ animatedTexturePngs()
     //   }
     // }
 
-//MY OBJECTS ANIMATE -------------------------------
+//INTERACTIVES ANIMATE -------------------------------
   var localThis = this;
+
+  //1
   this.interactiveMeshes.forEach(function(mesh)
   {
-          //console.log(localThis.getMouseDistance(mesh));
           var mouseDistance = localThis.getMouseDistance(mesh);
-          const y = map(mouseDistance, 3.3, 0, 0, 22); //2nd val- higher = more sensitive, last val is the max height it goes to
+          //const y = map(mouseDistance, 3.3, 0, 0, 22); //2nd val- higher = more sensitive, last val is the max height it goes to
 
-          //const y = map(mouseDistance, 7, 0, 0, 6);
+          const y = map(mouseDistance, 3.3, 0, 0, 4);
 
-          TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+        TweenMax.to(mesh.position, .3, { y: y < 1 ? mesh.initialPosition.y : mesh.initialPosition.y+y });
+          // TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
           //TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
 
-          const scaleFactor = mesh.position.y / 1.2;
+          const scaleFactor = mesh.position.y / 2;
           const scale = scaleFactor < 1 ? 1 : scaleFactor;
           // TweenMax.to(mesh.scale, .3, {
           //   ease: Expo.easeOut,
@@ -1277,16 +1333,51 @@ animatedTexturePngs()
           //   z: scale,
           // });
 
-          TweenMax.to(mesh.rotation, .9, {
-            ease: Expo.easeOut,
-            x: map(mesh.position.y, -1, 11, radians(270), mesh.initialRotation.x),
-            z: map(mesh.position.y, -1, 11, radians(-90), mesh.initialRotation.z),
-            y: map(mesh.position.y, -1, 11, radians(45), mesh.initialRotation.y),
+          // TweenMax.to(mesh.rotation, .9, {
+          //   ease: Expo.easeOut,
+          //   x: map(mesh.position.y, mesh.initialPosition.y, mesh.initialPosition.y+y, radians(270), mesh.initialRotation.x), //val 2 and 3 are the ranges that control rotation
+          //   z: map(mesh.position.y, mesh.initialPosition.y, mesh.initialPosition.y+y, radians(-90), mesh.initialRotation.z),
+          //   y: map(mesh.position.y, mesh.initialPosition.y, mesh.initialPosition.y+y, radians(45), mesh.initialRotation.y),
+          // });
+
+          TweenMax.to(mesh.rotation, .3, {
+            x: y < 1 ? mesh.initialRotation.x : radians(45),
+            y: y < 1 ? mesh.initialRotation.y : radians(270),
+            z: y < 1 ? mesh.initialRotation.z : radians(0)
           });
+
+          //WORKS!
+          //TweenMax.to(mesh.rotation, .3, { y: y < 1 ? mesh.initialRotation.y : radians(45)});
   //
   }); //-----
 
+//2
+  this.particleMeshes.forEach(function(mesh)
+  {
+    var mouseDistance = localThis.getMouseDistance(mesh);
 
+  
+    const y = map(mouseDistance, 4, 0, 0, 2);
+
+  TweenMax.to(mesh.position, .3, { x: y < 1 ? mesh.initialPosition.x : mesh.initialPosition.x+y });
+    // TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+    //TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+
+    const scaleFactor = mesh.position.x / 1.2;
+    const scale = scaleFactor < 1 ? 1 : scaleFactor;
+    // TweenMax.to(mesh.scale, .3, {
+    //   ease: Expo.easeOut,
+    //   x: scale,
+    //   y: scale,
+    //   z: scale,
+    // });
+  });
+
+  //3
+  this.hoverMeshes.forEach(function(mesh)
+  {
+
+  });
   }
 
   mouseIsCloseTo(object)
@@ -1327,7 +1418,7 @@ animatedTexturePngs()
 
     this.loadRoomModels();
 
-    this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
+    //this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
 
     this.applyTVShader();
 
@@ -1612,12 +1703,12 @@ if(this.middleMenuIsUp)
       this.sphere.visible = true;
     //-------------------------
 
-
 //other logic
 this.effect.renderToScreen = this.mouseDown;
 this.audio.volume = this.loadingHasStarted ? 0.2 : this.audioVolume;
 
 if (this.particles) this.particles.update(this.clock.getDelta());
+
 
 //--ANIMATE MODELS------------------------------
 //this.mixer.update(this.clock.getDelta());
