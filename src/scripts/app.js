@@ -41,6 +41,7 @@ this.testCube = new THREE.Mesh();
     this.mixers = [];
     this.animatedMeshes = [];
     this.roomModels = [];
+    this.distanceBrightLight = null;
 
     this.interactiveMeshes = []; //repel
     this.hoverMeshes = [];
@@ -646,31 +647,31 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
     // runner.scale.set(0.5, 0.5, 0.5);
   	// this.scene.add(runner);
 
-    // //SCREEN
-    // var video = document.createElement( 'video' );
-    // video.src = './src/images/computerscreen.webm';
-    // video.load(); // must call after setting/changing source
-    // video.preload = 'auto';
-    // video.loop = true;
-    // video.autoload = true;
-    // video.transparent = true;
-    // video.playbackRate = 1.06;
-    //
-    // this.videoTex = video;
-    //
-    //
-    // var texture = new THREE.VideoTexture( video );
-    // texture.minFilter = THREE.LinearFilter;
-    // texture.magFilter = THREE.LinearFilter;
-    // texture.format = THREE.RGBAFormat;
-    //
-  	// var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0.5 } );
-  	// var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
-    // runnerMaterial.transparent = true;
-  	// var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
-    // runner.position.set(0,5,0);
-    // runner.scale.set(0.1, 0.1, 0.1);
-  	// this.scene.add(runner);
+    //DUSTMOTES
+    var video = document.createElement( 'video' );
+    video.src = './src/images/dustmotes.webm';
+    video.load(); // must call after setting/changing source
+    video.preload = 'auto';
+    video.loop = true;
+    video.autoload = true;
+    video.transparent = true;
+    video.playbackRate = 1.06; //1.06
+
+    this.videoTexs[this.videoTexs.length] = video;
+
+
+    var texture = new THREE.VideoTexture( video );
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.format = THREE.RGBAFormat;
+
+    var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0 } );
+    //var runnerMaterial = new THREE.MeshBasicMaterial( { color: '0xff0000'} );
+    var runnerGeometry = new THREE.PlaneGeometry(1, 1, 1, 1);
+    runnerMaterial.transparent = true;
+    var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
+    runner.position.set(0,4,8);
+    this.scene.add(runner);
 
   }
 
@@ -782,10 +783,46 @@ getMaterial(string)
     skinning: true
   });
 
-  if(string.toLowerCase() == "glass".toLowerCase())
+if(string.toLowerCase().includes('screenroom1'))
+{
+    var video = document.createElement( 'video' );
+    video.src = './src/images/computerscreen.webm'; //try w fire if cant see it
+    video.load(); // must call after setting/changing source
+    video.preload = 'auto';
+    video.loop = true;
+    video.autoload = true;
+    video.transparent = true;
+    video.playbackRate = 1.06; //1.06
+
+    this.videoTexs[this.videoTexs.length] = video;
+
+
+    var texture = new THREE.VideoTexture( video );
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.format = THREE.RGBAFormat;
+
+    // material = new THREE.MeshBasicMaterial( {
+    //   map: texture,
+    //   transparent: false,
+    //   side:THREE.DoubleSide,
+    //   alphaTest: 0 } );
+
+    material = new THREE.MeshStandardMaterial({
+        map: texture,
+        roughness: 0,
+        metalness: 0.2,
+        skinning: true
+      });
+
+}
+  else if(string.toLowerCase() == "glass".toLowerCase())
   {
-    var imagePrefix = "./src/images/dawnmountain-";
-    var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+
+//------------------------------------------------------------
+//DEFAULT - assign room skybox
+    var imagePrefix = "./src/images/cubemap-";
+    var directions  = ["back", "front",  "front", "bottom",  "front",  "front"];
     var imageSuffix = ".png";
     var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
 
@@ -799,20 +836,29 @@ getMaterial(string)
         map: new THREE.TextureLoader().load( imagePrefix + directions[i] + imageSuffix ),
         side: THREE.BackSide
       }));
+      this.textureCube = new THREE.CubeTextureLoader().load(this.urls);
+      this.textureCube.mapping = THREE.CubeRefractionMapping;
 
-    this.textureCube = new THREE.CubeTextureLoader().load(this.urls);
-    this.textureCube.mapping = THREE.CubeRefractionMapping;
+        var fShader = THREE.FresnelShader;
+        var fresnelUniforms =
+        {
+          "mRefractionRatio": { type: "f", value: 1.02 },
+          "mFresnelBias": 	{ type: "f", value: 0.1 },
+          "mFresnelPower": 	{ type: "f", value: 2.0 },
+          "mFresnelScale": 	{ type: "f", value: 1.0 },
+          "tCube": 			{ type: "t", value: this.textureCube} //textureCube
+        };
 
-      var fShader = THREE.FresnelShader;
 
-      var fresnelUniforms =
-      {
-        "mRefractionRatio": { type: "f", value: 1.02 },
-        "mFresnelBias": 	{ type: "f", value: 0.1 },
-        "mFresnelPower": 	{ type: "f", value: 2.0 },
-        "mFresnelScale": 	{ type: "f", value: 1.0 },
-        "tCube": 			{ type: "t", value: this.textureCube} //textureCube
-      };
+//Option 01- Hiding a screen
+      // if(!string.toLowerCase().includes('screenroom1'))
+      // {
+   //later - thing doesnt work
+      // }
+
+      //---------------------------------------------------
+
+
 
       // create custom material for the shader
       material = new THREE.ShaderMaterial(
@@ -847,36 +893,6 @@ getMaterial(string)
         //envMap: me.reflectionCube,
         skinning: true
       });
-  }
-  else if(string.toLowerCase() == "screenroom1".toLowerCase())
-  {
-      //SCREEN
-      var video = document.createElement( 'video' );
-      video.src = './src/images/computerscreen.webm';
-      video.load(); // must call after setting/changing source
-      video.preload = 'auto';
-      video.loop = true;
-      video.autoload = true;
-      video.transparent = true;
-      video.playbackRate = 1.06;
-
-      //this.videoTex = video;
-      this.videoTexs[this.videoTexs.length] = video;
-
-
-      var texture = new THREE.VideoTexture( video );
-      texture.minFilter = THREE.LinearFilter;
-      texture.magFilter = THREE.LinearFilter;
-      texture.format = THREE.RGBAFormat;
-
-      var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0.5 } );
-      runnerMaterial.transparent = true;
-      material = runnerMaterial;
-    //   var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
-    // var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
-    // runner.position.set(0,5,0);
-    // runner.scale.set(0.1, 0.1, 0.1);
-    // this.scene.add(runner);
   }
 
   return material;
@@ -1356,7 +1372,7 @@ animatedTexturePngs()
   {
     var mouseDistance = localThis.getMouseDistance(mesh);
 
-  
+
     const y = map(mouseDistance, 4, 0, 0, 2);
 
   TweenMax.to(mesh.position, .3, { x: y < 1 ? mesh.initialPosition.x : mesh.initialPosition.x+y });
@@ -1418,7 +1434,7 @@ animatedTexturePngs()
 
     this.loadRoomModels();
 
-    //this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
+    this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
 
     this.applyTVShader();
 
@@ -1610,9 +1626,13 @@ onKeyDown(event)
         // {
         //   this.videoTex.play();
         // }
-    this.videoTexs.forEach(function() {
-      this.play();
-    });
+    // this.videoTexs.forEach(function() {
+    //   this.play();
+    // });
+    if(this.videoTexs.length > 0)
+    {
+      this.videoTexs[0].play();
+    }
 
   //console.log("keydown "+event.key);
   if(event.key == 0)
@@ -1708,6 +1728,13 @@ this.effect.renderToScreen = this.mouseDown;
 this.audio.volume = this.loadingHasStarted ? 0.2 : this.audioVolume;
 
 if (this.particles) this.particles.update(this.clock.getDelta());
+
+if(this.distanceBrightLight)
+{
+  var brightness = (1/(this.getMouseDistance(this.distanceBrightLight)*0.2)); //last val should up the intensity
+  console.log('light intensity -'+brightness);
+  this.distanceBrightLight.intensity = brightness;
+}
 
 
 //--ANIMATE MODELS------------------------------
