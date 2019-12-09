@@ -253,17 +253,18 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
     this.scene.add(light);
   }
 
-  addOtherPointLights()
+  addDistanceAffectLight()
   {
-    var light = new THREE.PointLight(0xffffff, 0.5);
+    var light = new THREE.PointLight(0xffffff, 1);
     light.castShadow = true;
     light.shadow.radius = 10;
 
-    light.position.set(0, 4, 2);
-    this.scene.add(light);
+    light.position.set(0, 4, 5);
+    this.distanceBrightLight = light;
+    this.scene.add(this.distanceBrightLight);
 
-    var helper = new THREE.PointLightHelper(light, 1);
-    light.add( helper );
+    var helper = new THREE.PointLightHelper(this.distanceBrightLight, 1);
+    this.distanceBrightLight.add( helper );
   }
 
   addLightsRoom1(parent, positions)
@@ -618,9 +619,40 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
     return this.geometries[Math.floor(Math.random() * Math.floor(this.geometries.length))];
   }
 
-  addTextureAnimationObject()
+  addTextureAnimationObject(key, parent)
   {
 
+if(key == 'dust')
+{
+  //DUSTMOTES ** these are the correct settings for alpha channel
+  var video = document.createElement( 'video' );
+  video.src = './src/images/dust2.webm'; //dust2
+  video.load(); // must call after setting/changing source
+  video.preload = 'auto';
+  video.loop = true;
+  video.autoload = true;
+  video.transparent = true;
+  video.playbackRate = 0.8; //1.06
+
+  this.videoTexs[this.videoTexs.length] = video;
+
+
+  var texture = new THREE.VideoTexture( video );
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.format = THREE.RGBAFormat;
+
+  var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0 } );
+  //var runnerMaterial = new THREE.MeshBasicMaterial( { color: '0xff0000'} );
+  var runnerGeometry = new THREE.PlaneGeometry(1, 1, 1, 1);
+  runnerMaterial.transparent = true;
+  var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
+  runner.position.set(0,4,8);
+  runner.scale.set(1.4,1,-1);
+
+this.scene.add(runner);
+
+}
 //FIRE
     // var video = document.createElement( 'video' );
     // video.src = './src/images/firenoalpha.webm';
@@ -646,32 +678,6 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
   	// runner.position.set(0,5,1);
     // runner.scale.set(0.5, 0.5, 0.5);
   	// this.scene.add(runner);
-
-    //DUSTMOTES
-    var video = document.createElement( 'video' );
-    video.src = './src/images/dustmotes.webm';
-    video.load(); // must call after setting/changing source
-    video.preload = 'auto';
-    video.loop = true;
-    video.autoload = true;
-    video.transparent = true;
-    video.playbackRate = 1.06; //1.06
-
-    this.videoTexs[this.videoTexs.length] = video;
-
-
-    var texture = new THREE.VideoTexture( video );
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    texture.format = THREE.RGBAFormat;
-
-    var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0 } );
-    //var runnerMaterial = new THREE.MeshBasicMaterial( { color: '0xff0000'} );
-    var runnerGeometry = new THREE.PlaneGeometry(1, 1, 1, 1);
-    runnerMaterial.transparent = true;
-    var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
-    runner.position.set(0,4,8);
-    this.scene.add(runner);
 
   }
 
@@ -810,10 +816,13 @@ if(string.toLowerCase().includes('screenroom1'))
 
     material = new THREE.MeshStandardMaterial({
         map: texture,
+        emissive: 0xb5b5b5,
+        emissiveMap: texture,
         roughness: 0,
         metalness: 0.2,
         skinning: true
       });
+
 
 }
   else if(string.toLowerCase() == "glass".toLowerCase())
@@ -921,10 +930,15 @@ addRoomToScene(i, string)
       gltf.scene.pathName = string;
       gltf.scene.index = i;
       localThis.roomModels[i] = gltf.scene; //set to parent node
-      var lightsPositions = [];
+
 
       gltf.scene.position.set(0,3,6);
       gltf.scene.scale.set(1,1,1);
+
+      if(i==0)
+      {
+        localThis.addTextureAnimationObject('dust', localThis.roomModels[0]);
+      }
 
       gltf.scene.updateMatrixWorld(true);
       gltf.scene.traverse(function (node) {
@@ -1007,25 +1021,7 @@ addRoomToScene(i, string)
 
         }
            //------------------------------------------------------------------->
-     } //end of mesh nodes
-     // else {
-     //           //we reuse this array
-     //       if(node.name.toLowerCase() == 'light1pos'.toLowerCase())
-     //       {
-     //          lightsPositions[0] = node.position;
-     //          //console.log(node.position);
-     //       }
-     //       else if(node.name.toLowerCase() == 'light2pos'.toLowerCase())
-     //       {
-     //          lightsPositions[1] = node.position;
-     //       }
-     // }
-//Lights setup
-      // if(i == 0 && lightsPositions.length > 1 && !localThis.roomModels[i].didAddLights)
-      // {
-      //     localThis.roomModels[i].didAddLights = true;
-      //     localThis.addLightsRoom1(localThis.roomModels[i], lightsPositions);
-      // }
+     }
     });
 
       var myMixer = new THREE.AnimationMixer(gltf.scene);
@@ -1079,18 +1075,23 @@ loadRoomModels()
   {
     console.log('adding room '+i);
     this.addRoomToScene(i, paths[i]);
+
+    if(i == 1)
+    {
+      this.addDistanceAffectLight();
+    }
   }
 
   //verify
 
-var localThis = this;
-  setTimeout( function(){
-    //console.log("Models length: "+localThis.roomModels.length);
-
-    localThis.roomModels.forEach(function(obj) {
-      //console.log(obj.pathName + " | "+obj.index); //this
-    });
-}  , 3000);
+// var localThis = this;
+//   setTimeout( function(){
+//     //console.log("Models length: "+localThis.roomModels.length);
+//
+//     localThis.roomModels.forEach(function(obj) {
+//       //console.log(obj.pathName + " | "+obj.index); //this
+//     });
+// }  , 3000);
 }
 
 updateCurrentRoom()
@@ -1099,6 +1100,8 @@ updateCurrentRoom()
   this.roomModels.forEach(function(obj) {
     obj.visible = (obj.index == localThis.currentRoom);
   });
+
+  this.distanceBrightLight.visible = (this.currentRoom == 1);
 }
 
 animatedTexturePngs()
@@ -1253,6 +1256,18 @@ animatedTexturePngs()
     return mesh;
   }
 
+  getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+getRandomFloat(min, max, decimalPlaces) {
+    var rand = Math.random()*(max-min) + min;
+    var power = Math.pow(10, decimalPlaces);
+    return Math.floor(rand*power) / power;
+}
+
   getMouseDistance(mesh)
   {
     //mesh world pos
@@ -1332,11 +1347,11 @@ animatedTexturePngs()
   this.interactiveMeshes.forEach(function(mesh)
   {
           var mouseDistance = localThis.getMouseDistance(mesh);
-          //const y = map(mouseDistance, 3.3, 0, 0, 22); //2nd val- higher = more sensitive, last val is the max height it goes to
+          var duration = 0.6;
 
-          const y = map(mouseDistance, 3.3, 0, 0, 4);
+          const y = map(mouseDistance, 5, 0, 0, 5);
 
-        TweenMax.to(mesh.position, .3, { y: y < 1 ? mesh.initialPosition.y : mesh.initialPosition.y+y });
+        TweenMax.to(mesh.position, duration, { y: y < 1 ? mesh.initialPosition.y : mesh.initialPosition.y+y });
           // TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
           //TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
 
@@ -1356,9 +1371,9 @@ animatedTexturePngs()
           //   y: map(mesh.position.y, mesh.initialPosition.y, mesh.initialPosition.y+y, radians(45), mesh.initialRotation.y),
           // });
 
-          TweenMax.to(mesh.rotation, .3, {
+          TweenMax.to(mesh.rotation, duration-0.3, {
             x: y < 1 ? mesh.initialRotation.x : radians(45),
-            y: y < 1 ? mesh.initialRotation.y : radians(270),
+            y: y < 1 ? mesh.initialRotation.y : radians(180),
             z: y < 1 ? mesh.initialRotation.z : radians(0)
           });
 
@@ -1370,14 +1385,19 @@ animatedTexturePngs()
 //2
   this.particleMeshes.forEach(function(mesh)
   {
+
+
     var mouseDistance = localThis.getMouseDistance(mesh);
 
+    const y = map(mouseDistance, 3, 0, 0, 3);
 
-    const y = map(mouseDistance, 4, 0, 0, 2);
+    var changer = y;
+    if(mesh.initialPosition.x > 0) //right side goes in
+    {
+      changer*=-1;
+    }
 
-  TweenMax.to(mesh.position, .3, { x: y < 1 ? mesh.initialPosition.x : mesh.initialPosition.x+y });
-    // TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
-    //TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+  //TweenMax.to(mesh.position, 0.5, { x: y < 1 ? mesh.initialPosition.x : mesh.initialPosition.x+localThis.getRandomInt(changer-1,changer+1) });
 
     const scaleFactor = mesh.position.x / 1.2;
     const scale = scaleFactor < 1 ? 1 : scaleFactor;
@@ -1392,6 +1412,14 @@ animatedTexturePngs()
   //3
   this.hoverMeshes.forEach(function(mesh)
   {
+    var mouseDistance = localThis.getMouseDistance(mesh);
+    var duration = 0.6;
+
+    const y = map(mouseDistance, 5, 0, 0, 1.5);
+
+  TweenMax.to(mesh.position, duration, { y: y < 1 ? mesh.initialPosition.y : mesh.initialPosition.y+y });
+    // TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+    //TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
 
   });
   }
@@ -1412,15 +1440,13 @@ animatedTexturePngs()
 
     this.createCamera();
 
-    //this.createGrid();
-
-    //this.addAmbientLight();
+    //this.addDistanceAffectLight();
 
     //this.cubeCloud();
 
     //this.addTestObject();
 
-    this.addTextureAnimationObject();
+    //this.addTextureAnimationObject();
 
     //this.animatedTexturePngs();
 
@@ -1626,12 +1652,13 @@ onKeyDown(event)
         // {
         //   this.videoTex.play();
         // }
-    // this.videoTexs.forEach(function() {
-    //   this.play();
-    // });
+
     if(this.videoTexs.length > 0)
     {
-      this.videoTexs[0].play();
+      for(var i =0;i<this.videoTexs.length;i++)
+      {
+        this.videoTexs[i].play();
+      }
     }
 
   //console.log("keydown "+event.key);
@@ -1731,8 +1758,9 @@ if (this.particles) this.particles.update(this.clock.getDelta());
 
 if(this.distanceBrightLight)
 {
-  var brightness = (1/(this.getMouseDistance(this.distanceBrightLight)*0.2)); //last val should up the intensity
-  console.log('light intensity -'+brightness);
+  var brightness = (1/(this.getMouseDistance(this.distanceBrightLight)*0.8)); //last val should up the intensity
+  //console.log(this.getMouseDistance(this.distanceBrightLight));
+  //console.log('light intensity -'+brightness);
   this.distanceBrightLight.intensity = brightness;
 }
 
