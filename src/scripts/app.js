@@ -255,16 +255,17 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
 
   addDistanceAffectLight()
   {
-    var light = new THREE.PointLight(0xffffff, 1);
+    var light = new THREE.PointLight(0xe66d00, 1);
     light.castShadow = true;
     light.shadow.radius = 10;
 
-    light.position.set(0, 4, 5);
+    // light.position.set(0, 4, 5); //-0.016651358914349323, 1.0135781033773235, -0.24438868304759298
+    light.position.set(-0.2, 4, 6);
     this.distanceBrightLight = light;
     this.scene.add(this.distanceBrightLight);
 
     var helper = new THREE.PointLightHelper(this.distanceBrightLight, 1);
-    this.distanceBrightLight.add( helper );
+    //this.distanceBrightLight.add( helper );
   }
 
   addLightsRoom1(parent, positions)
@@ -808,12 +809,6 @@ if(string.toLowerCase().includes('screenroom1'))
     texture.magFilter = THREE.LinearFilter;
     texture.format = THREE.RGBAFormat;
 
-    // material = new THREE.MeshBasicMaterial( {
-    //   map: texture,
-    //   transparent: false,
-    //   side:THREE.DoubleSide,
-    //   alphaTest: 0 } );
-
     material = new THREE.MeshStandardMaterial({
         map: texture,
         emissive: 0xb5b5b5,
@@ -823,9 +818,8 @@ if(string.toLowerCase().includes('screenroom1'))
         skinning: true
       });
 
-
 }
-  else if(string.toLowerCase() == "glass".toLowerCase())
+  else if(string.toLowerCase().includes('glass'))
   {
 
 //------------------------------------------------------------
@@ -890,12 +884,36 @@ if(string.toLowerCase().includes('screenroom1'))
         skinning: true
       });
   }
-  else if(string.toLowerCase() == "repeller".toLowerCase())
+  else if(string.toLowerCase().includes('fire'))
+  {
+    var video = document.createElement( 'video' );
+    video.src = './src/images/firealpha.webm'; //USE FIREALPHA
+    video.load(); // must call after setting/changing source
+    video.preload = 'auto';
+    video.loop = true;
+    video.autoload = true;
+    video.transparent = true;
+    video.playbackRate = 1.4; //1.06
+
+    this.videoTexs[this.videoTexs.length] = video;
+
+
+    var texture = new THREE.VideoTexture( video );
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.format = THREE.RGBAFormat;
+
+    var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0 } );
+    runnerMaterial.transparent = true;
+
+    material = runnerMaterial;
+  }
+  else if(string.toLowerCase().includes('*mainmaterial.004'))
   {
       material = new THREE.MeshStandardMaterial({
-        color: 0xff0000,
+        //map: new THREE.TextureLoader().load( './src/images/Deadends_room2mat.png' ),
         roughness: 0.8,
-        metalness: 0.5,
+        metalness: 0,
         //normalMap: materials.normalMap,
         //roughnessMap: materials.roughnessMap,
         //metalnessMap: materials.metalnessMap,
@@ -932,7 +950,7 @@ addRoomToScene(i, string)
       localThis.roomModels[i] = gltf.scene; //set to parent node
 
 
-      gltf.scene.position.set(0,3,6);
+      gltf.scene.position.set(-0.2,3,6); //0,3,6
       gltf.scene.scale.set(1,1,1);
 
       if(i==0)
@@ -942,6 +960,7 @@ addRoomToScene(i, string)
 
       gltf.scene.updateMatrixWorld(true);
       gltf.scene.traverse(function (node) {
+
 
       if (node.isMesh)
       {
@@ -1044,6 +1063,10 @@ addRoomToScene(i, string)
             // action.play();
             //action.loop = THREE.LoopOnce;
         }
+
+
+        //END OF LOADING ----------------------------
+        localThis.updateCurrentRoom();
     },
     // called while loading is progressing
     function ( xhr ) {
@@ -1067,8 +1090,8 @@ loadRoomModels()
   var paths = [
   // "./src/scripts/elements/dancing.glb",
   // "./src/scripts/elements/shapestest.glb"
-  // "./src/scripts/elements/room1.glb"
-  "./src/scripts/elements/scene.glb"
+  "./src/scripts/elements/scene.glb",
+    "./src/scripts/elements/scene2.glb"
 ];
 
   for(var i = 0; i<paths.length;i++)
@@ -1080,6 +1103,7 @@ loadRoomModels()
     {
       this.addDistanceAffectLight();
     }
+
   }
 
   //verify
@@ -1460,7 +1484,7 @@ getRandomFloat(min, max, decimalPlaces) {
 
     this.loadRoomModels();
 
-    this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
+    //this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
 
     this.applyTVShader();
 
@@ -1637,7 +1661,12 @@ getRandomFloat(min, max, decimalPlaces) {
   triggerRoomChange()
   {
     //TRIGGER ROOM CHANGE
-      this.currentRoom++;
+      if(this.currentRoom < this.roomModels.length-1)
+      {
+          this.currentRoom++;
+      } else {
+        this.currentRoom = 0;
+      }
       this.roomTransition();
   }
 onKeyDown(event)
@@ -1758,7 +1787,7 @@ if (this.particles) this.particles.update(this.clock.getDelta());
 
 if(this.distanceBrightLight)
 {
-  var brightness = (1/(this.getMouseDistance(this.distanceBrightLight)*0.8)); //last val should up the intensity
+  var brightness = (1/(this.getMouseDistance(this.distanceBrightLight)*0.5)); //last val should up the intensity
   //console.log(this.getMouseDistance(this.distanceBrightLight));
   //console.log('light intensity -'+brightness);
   this.distanceBrightLight.intensity = brightness;
