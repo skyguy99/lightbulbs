@@ -23,6 +23,7 @@ console.log("SKY");
     this.height = window.innerHeight;
     this.mouse3D = new THREE.Vector2();
     this.effect = new THREE.ShaderPass();
+    this.rgbeffect = new THREE.ShaderPass();
     this.geometries = [
       new Cone(),
       new Tourus(),
@@ -52,8 +53,10 @@ this.testCube = new THREE.Mesh();
     this.textureCube = null;
     this.videoTexs = [];
 
-    this.interactive = new InteractiveControls();
+    this.interactive = new InteractiveControls(); //failed - for now
     this.particles = new Particles();
+
+    this.dustscreen = null;
 
     //LOGIC
     this.loadingHasStarted = false;
@@ -63,6 +66,7 @@ this.testCube = new THREE.Mesh();
     this.scl = 0;
     this.hasTransitioned = false;
     this.mouseDown = false;
+    this.triggerRGB = false;
     this.readyToChangeRooms = false;
     this.mousedownTimeout = null;
     this.testMesh = null;
@@ -358,20 +362,28 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
 		this.effect.renderToScreen = true;
 		this.composer.addPass(this.effect);
 
-	// this.composer = new THREE.EffectComposer(this.renderer); //THREE.whatever is different
-	// var renderPass = new THREE.RenderPass(this.scene, this.camera);
-	// this.composer.addPass(renderPass);
-  //
-	// // badtv pass
-  //
-	// var shaderMaterial = new THREE.ShaderMaterial({
-	// 	uniforms: this.uniforms,
-	// 	vertexShader: document.getElementById("vertexShader").textContent,
-	// 	fragmentShader: document.getElementById("fragmentShader").textContent
-	// });
-  //
-	// var effectBadTV = new THREE.ShaderPass(shaderMaterial, "u_texture");
-	// this.composer.addPass(effectBadTV);
+  }
+
+  applyRGBShader() //goes AFTER Tv shader
+  {
+    // postprocessing
+    var material = new THREE.ShaderMaterial({
+      uniforms : this.uniforms,
+      vertexShader : document.getElementById("vertexShader-rgb").textContent,
+      fragmentShader : document.getElementById("fragmentShader-rgb").textContent
+    });
+
+    // Initialize the effect composer
+    //this.composer = new THREE.EffectComposer(this.renderer);
+    if(this.composer)
+    {
+      this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
+
+      // Add the post-processing effect
+      this.rgbeffect = new THREE.ShaderPass(material, "u_texture");
+      this.rgbeffect.renderToScreen = true;
+      this.composer.addPass(this.rgbeffect);
+    }
   }
 
   addFloor() {
@@ -647,11 +659,11 @@ if(key == 'dust')
   //var runnerMaterial = new THREE.MeshBasicMaterial( { color: '0xff0000'} );
   var runnerGeometry = new THREE.PlaneGeometry(1, 1, 1, 1);
   runnerMaterial.transparent = true;
-  var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
-  runner.position.set(0,4,8);
-  runner.scale.set(1.4,1,-1);
+  this.dustscreen = new THREE.Mesh(runnerGeometry, runnerMaterial);
+  this.dustscreen.position.set(0,4,8);
+  this.dustscreen.scale.set(1.4,1,-1);
 
-this.scene.add(runner);
+this.scene.add(this.dustscreen);
 
 }
 //FIRE
@@ -908,12 +920,16 @@ if(string.toLowerCase().includes('screenroom1'))
 
     material = runnerMaterial;
   }
-  else if(string.toLowerCase().includes('*mainmaterial.004'))
+  else if(string.toLowerCase().includes('paper'))
   {
+
+    var texture = new THREE.TextureLoader().load( './src/images/Deadends_room2mat.png' );
       material = new THREE.MeshStandardMaterial({
         //map: new THREE.TextureLoader().load( './src/images/Deadends_room2mat.png' ),
         roughness: 0.8,
         metalness: 0,
+        emissive: 0xb5b5b5,
+        emissiveMap: texture,
         //normalMap: materials.normalMap,
         //roughnessMap: materials.roughnessMap,
         //metalnessMap: materials.metalnessMap,
@@ -1366,86 +1382,88 @@ getRandomFloat(min, max, decimalPlaces) {
 
 //INTERACTIVES ANIMATE -------------------------------
   var localThis = this;
-
-  //1
-  this.interactiveMeshes.forEach(function(mesh)
+  if(!localThis.triggerRGB)
   {
-          var mouseDistance = localThis.getMouseDistance(mesh);
-          var duration = 0.6;
+      //1
+      this.interactiveMeshes.forEach(function(mesh)
+      {
+              var mouseDistance = localThis.getMouseDistance(mesh);
+              var duration = 0.6;
 
-          const y = map(mouseDistance, 5, 0, 0, 5);
+              const y = map(mouseDistance, 5, 0, 0, 5);
 
-        TweenMax.to(mesh.position, duration, { y: y < 1 ? mesh.initialPosition.y : mesh.initialPosition.y+y });
-          // TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
-          //TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+            TweenMax.to(mesh.position, duration, { y: y < 1 ? mesh.initialPosition.y : mesh.initialPosition.y+y });
+              // TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+              //TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
 
-          const scaleFactor = mesh.position.y / 2;
-          const scale = scaleFactor < 1 ? 1 : scaleFactor;
-          // TweenMax.to(mesh.scale, .3, {
-          //   ease: Expo.easeOut,
-          //   x: scale,
-          //   y: scale,
-          //   z: scale,
-          // });
+              const scaleFactor = mesh.position.y / 2;
+              const scale = scaleFactor < 1 ? 1 : scaleFactor;
+              // TweenMax.to(mesh.scale, .3, {
+              //   ease: Expo.easeOut,
+              //   x: scale,
+              //   y: scale,
+              //   z: scale,
+              // });
 
-          // TweenMax.to(mesh.rotation, .9, {
-          //   ease: Expo.easeOut,
-          //   x: map(mesh.position.y, mesh.initialPosition.y, mesh.initialPosition.y+y, radians(270), mesh.initialRotation.x), //val 2 and 3 are the ranges that control rotation
-          //   z: map(mesh.position.y, mesh.initialPosition.y, mesh.initialPosition.y+y, radians(-90), mesh.initialRotation.z),
-          //   y: map(mesh.position.y, mesh.initialPosition.y, mesh.initialPosition.y+y, radians(45), mesh.initialRotation.y),
-          // });
+              // TweenMax.to(mesh.rotation, .9, {
+              //   ease: Expo.easeOut,
+              //   x: map(mesh.position.y, mesh.initialPosition.y, mesh.initialPosition.y+y, radians(270), mesh.initialRotation.x), //val 2 and 3 are the ranges that control rotation
+              //   z: map(mesh.position.y, mesh.initialPosition.y, mesh.initialPosition.y+y, radians(-90), mesh.initialRotation.z),
+              //   y: map(mesh.position.y, mesh.initialPosition.y, mesh.initialPosition.y+y, radians(45), mesh.initialRotation.y),
+              // });
 
-          TweenMax.to(mesh.rotation, duration-0.3, {
-            x: y < 1 ? mesh.initialRotation.x : radians(45),
-            y: y < 1 ? mesh.initialRotation.y : radians(180),
-            z: y < 1 ? mesh.initialRotation.z : radians(0)
-          });
+              TweenMax.to(mesh.rotation, duration-0.3, {
+                x: y < 1 ? mesh.initialRotation.x : radians(45),
+                y: y < 1 ? mesh.initialRotation.y : radians(180),
+                z: y < 1 ? mesh.initialRotation.z : radians(0)
+              });
 
-          //WORKS!
-          //TweenMax.to(mesh.rotation, .3, { y: y < 1 ? mesh.initialRotation.y : radians(45)});
-  //
-  }); //-----
+              //WORKS!
+              //TweenMax.to(mesh.rotation, .3, { y: y < 1 ? mesh.initialRotation.y : radians(45)});
+      //
+      }); //-----
 
-//2
-  this.particleMeshes.forEach(function(mesh)
-  {
+    //2
+      this.particleMeshes.forEach(function(mesh)
+      {
 
 
-    var mouseDistance = localThis.getMouseDistance(mesh);
+        var mouseDistance = localThis.getMouseDistance(mesh);
 
-    const y = map(mouseDistance, 3, 0, 0, 3);
+        const y = map(mouseDistance, 3, 0, 0, 3);
 
-    var changer = y;
-    if(mesh.initialPosition.x > 0) //right side goes in
-    {
-      changer*=-1;
-    }
+        var changer = y;
+        if(mesh.initialPosition.x > 0) //right side goes in
+        {
+          changer*=-1;
+        }
 
-  //TweenMax.to(mesh.position, 0.5, { x: y < 1 ? mesh.initialPosition.x : mesh.initialPosition.x+localThis.getRandomInt(changer-1,changer+1) });
+      //TweenMax.to(mesh.position, 0.5, { x: y < 1 ? mesh.initialPosition.x : mesh.initialPosition.x+localThis.getRandomInt(changer-1,changer+1) });
 
-    const scaleFactor = mesh.position.x / 1.2;
-    const scale = scaleFactor < 1 ? 1 : scaleFactor;
-    // TweenMax.to(mesh.scale, .3, {
-    //   ease: Expo.easeOut,
-    //   x: scale,
-    //   y: scale,
-    //   z: scale,
-    // });
-  });
+        const scaleFactor = mesh.position.x / 1.2;
+        const scale = scaleFactor < 1 ? 1 : scaleFactor;
+        // TweenMax.to(mesh.scale, .3, {
+        //   ease: Expo.easeOut,
+        //   x: scale,
+        //   y: scale,
+        //   z: scale,
+        // });
+      });
 
-  //3
-  this.hoverMeshes.forEach(function(mesh)
-  {
-    var mouseDistance = localThis.getMouseDistance(mesh);
-    var duration = 0.6;
+      //3
+      this.hoverMeshes.forEach(function(mesh)
+      {
+        var mouseDistance = localThis.getMouseDistance(mesh);
+        var duration = 0.6;
 
-    const y = map(mouseDistance, 5, 0, 0, 1.5);
+        const y = map(mouseDistance, 5, 0, 0, 1.5);
 
-  TweenMax.to(mesh.position, duration, { y: y < 1 ? mesh.initialPosition.y : mesh.initialPosition.y+y });
-    // TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
-    //TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+      TweenMax.to(mesh.position, duration, { y: y < 1 ? mesh.initialPosition.y : mesh.initialPosition.y+y });
+        // TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
+        //TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
 
-  });
+      });
+  }
   }
 
   mouseIsCloseTo(object)
@@ -1487,6 +1505,8 @@ getRandomFloat(min, max, decimalPlaces) {
     //this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
 
     this.applyTVShader();
+
+    this.applyRGBShader();
 
     this.animate();
 
@@ -1586,34 +1606,56 @@ getRandomFloat(min, max, decimalPlaces) {
   clearRoomChange(){
 
     this.readyToChangeRooms = true;
-    console.log('READY');
+    //console.log('READY');
   };
 
-  onMouseDown()
+  onMouseDown(eventdata)
   {
+    console.log(eventdata.which);
 
-    this.mousedownTimeout = setTimeout(this.clearRoomChange.bind(this), 2900);
-    this.mouseDown++;
-  }
-  onMouseUp()
-  {
-    clearTimeout(this.mousedownTimeout);
-
-
-    console.log(this.readyToChangeRooms);
-    if(this.readyToChangeRooms)
+    if(eventdata.which == 3) //right click
     {
-      this.triggerRoomChange();
-      this.readyToChangeRooms = false;
+      this.triggerRGB++;
+    } else {
+      this.mousedownTimeout = setTimeout(this.clearRoomChange.bind(this), 2900);
+      this.mouseDown++;
     }
-    this.mouseDown--;
+  }
+  onMouseUp(eventdata)
+  {
+    if(eventdata.which == 3) //right click
+    {
+      this.triggerRGB--;
+    } else {
+      clearTimeout(this.mousedownTimeout);
+
+
+      //console.log(this.readyToChangeRooms);
+      if(this.readyToChangeRooms)
+      {
+        this.triggerRoomChange();
+        this.readyToChangeRooms = false;
+      }
+      this.mouseDown--;
+    }
   }
 
   onClick({ clientX, clientY })
   {
+
+
     // console.log($('#audioplayer')[0]);
     //$('#audioplayer')[0].play(); //this will FUCK UP REST OF APP SKYLAR
     $('#audioplayer')[0].muted = false;
+
+    this.playAudio();
+      if(this.videoTexs.length > 0)
+      {
+        for(var i =0;i<this.videoTexs.length;i++)
+        {
+          this.videoTexs[i].play();
+        }
+      }
   }
 
   onMouseMove({ clientX, clientY }) {
@@ -1676,12 +1718,6 @@ onKeyDown(event)
 
   this.forceDoneLoading(); //TEMP
   this.playAudio();
-
-        // if(this.videoTex)
-        // {
-        //   this.videoTex.play();
-        // }
-
     if(this.videoTexs.length > 0)
     {
       for(var i =0;i<this.videoTexs.length;i++)
@@ -1689,15 +1725,6 @@ onKeyDown(event)
         this.videoTexs[i].play();
       }
     }
-
-  //console.log("keydown "+event.key);
-  if(event.key == 0)
-  {
-    if(this.currentRoom < $('.bottomTitle .dots li').length)
-    {
-      //this.triggerRoomChange();
-    }
-  }
 
 if(this.middleMenuIsUp)
 {
@@ -1779,9 +1806,17 @@ if(this.middleMenuIsUp)
       this.sphere.visible = true;
     //-------------------------
 
-//other logic
+//other logic ------------------------
+
+//SHADERS
 this.effect.renderToScreen = this.mouseDown;
+this.rgbeffect.renderToScreen = (this.triggerRGB && this.currentRoom == 1); //only certain rooms
+
 this.audio.volume = this.loadingHasStarted ? 0.2 : this.audioVolume;
+if(this.dustscreen)
+{
+    this.dustscreen.visible = (this.currentRoom == 0);
+}
 
 if (this.particles) this.particles.update(this.clock.getDelta());
 
