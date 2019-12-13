@@ -191,13 +191,20 @@ const initHovers = () => {
 
 var notAlreadyUp = true;
 var mouseDown = 0;
-document.body.onmousedown = function() {
-  //$('#myVideo').currentTime = 0;
-  ++mouseDown;
+document.body.onmousedown = function(eventdata) {
+
+  if(eventdata.which != 3)
+  {
+    ++mouseDown;
+  }
 }
-document.body.onmouseup = function() {
+document.body.onmouseup = function(eventdata) {
+
+  if(eventdata.which != 3)
+  {
   --mouseDown;
-  notAlreadyUp = true;
+}
+notAlreadyUp = true;
 }
 
 //TRANSITION - change opacity of big video

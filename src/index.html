@@ -385,6 +385,9 @@ void main() {
     // Extract the pixel color values from the input texture
     float red = texture2D(u_texture, v_uv - offset_size * red_offset / u_resolution).r;
     float green = texture2D(u_texture, v_uv - offset_size * green_offset / u_resolution).g;
+
+		//float blue = green; //if only want blue and red
+
     float blue = texture2D(u_texture, v_uv - offset_size * blue_offset / u_resolution).b;
 
     // Fragment shader output

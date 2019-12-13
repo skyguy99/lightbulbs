@@ -786,7 +786,7 @@ addParticleEngine(parameters)
   engine.initialize();
 
 }
-getMaterial(string)
+getMaterial(string, room)
 {
 
   //DEFAULT
@@ -835,9 +835,17 @@ if(string.toLowerCase().includes('screenroom1'))
   {
 
 //------------------------------------------------------------
-//DEFAULT - assign room skybox
-    var imagePrefix = "./src/images/cubemap-";
-    var directions  = ["back", "front",  "front", "bottom",  "front",  "front"];
+//DEFAULT - assign room skybox cubemap
+    // var imagePrefix = "./src/images/cubemap-";
+    // var directions  = ["back", "front",  "front", "bottom",  "front",  "front"];
+    var imagePrefix = "./src/images/lmcity_";
+    var directions  = ["bk", "ft",  "up", "dn",  "rt",  "lf"];
+
+    if(room == 1)
+    {
+      imagePrefix = "./src/images/wkcamp_";
+      directions  = ["bk", "ft",  "up", "dn",  "rt",  "lf"];
+    }
     var imageSuffix = ".png";
     var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
 
@@ -925,10 +933,10 @@ if(string.toLowerCase().includes('screenroom1'))
 
     var texture = new THREE.TextureLoader().load( './src/images/Deadends_room2mat.png' );
       material = new THREE.MeshStandardMaterial({
-        //map: new THREE.TextureLoader().load( './src/images/Deadends_room2mat.png' ),
+        map: texture,
         roughness: 0.8,
         metalness: 0,
-        emissive: 0xb5b5b5,
+        emissive: 0x242424,
         emissiveMap: texture,
         //normalMap: materials.normalMap,
         //roughnessMap: materials.roughnessMap,
@@ -981,7 +989,7 @@ addRoomToScene(i, string)
       if (node.isMesh)
       {
 
-        node.material = localThis.getMaterial(node.material.name);
+        node.material = localThis.getMaterial(node.material.name, i);
         node.castShadow = true;
         node.receiveShadow = true;
 
@@ -1101,6 +1109,8 @@ addRoomToScene(i, string)
 
 loadRoomModels()
 {
+
+  //skyboxes - http://www.custommapmakers.org/skyboxes.php
 
   //**When export to glb, make sure no missing images in material
   var paths = [
@@ -1552,7 +1562,7 @@ getRandomFloat(min, max, decimalPlaces) {
       });
 
     //stats
-    (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
+    //(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
 
   }
   onScroll(event)
@@ -1611,7 +1621,6 @@ getRandomFloat(min, max, decimalPlaces) {
 
   onMouseDown(eventdata)
   {
-    console.log(eventdata.which);
 
     if(eventdata.which == 3) //right click
     {
