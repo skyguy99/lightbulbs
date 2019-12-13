@@ -786,7 +786,7 @@ addParticleEngine(parameters)
   engine.initialize();
 
 }
-getMaterial(string, room)
+getMaterial(string, room) //**NOTE - flip all textures vertically, idk why
 {
 
   //DEFAULT
