@@ -237,7 +237,7 @@ $(function(){
 
            if(perc >= 71)
            {
-             $('#myVideo').get(0).pause();
+             //$('#myVideo').get(0).pause();
            }
 
            if((e.pageY > h*0.6) && mouseDown && notAlreadyUp)

@@ -48,7 +48,7 @@ this.testCube = new THREE.Mesh();
     this.hoverMeshes = [];
     this.particleMeshes = [];
 
-    this.audio = new Audio();
+    this.audio = null;
     this.audioVolume = 0.7;
     this.textureCube = null;
     this.videoTexs = [];
@@ -399,17 +399,16 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
   }
 
   playAudio(){
-    this.audio = new Audio("./src/resources/test.mp3");
-    this.audio.loop = true;
-    this.audio.autoplay = true;
 
-  //   this.audio = $('#audioplayer')[0];
-  // //
-  //   var localThis = this;
-  // setTimeout( function(){
-  //   //$('#audioplayer')[0].play();
-  //   $('#audioplayer')[0].muted = false;
-  // }  , 500);
+    if(!this.audio)
+    {
+      this.audio = new Audio("./src/resources/test.mp3");
+      this.audio.loop = true;
+      this.audio.autoplay = true;
+    } else {
+      this.audio.autoplay = true;
+    }
+
   }
 
   cubeCloud()
@@ -1677,11 +1676,6 @@ getRandomFloat(min, max, decimalPlaces) {
     this.mouse.x = (clientX - this.windowHalf.x );
     this.mouse.y = (clientY - this.windowHalf.x );
 
-    // if(this.mouseDown && $('#myVideo').get(0).paused)
-    // {
-    //   this.readyToChangeRooms = true; //set flag
-    // }
-
     //track to mouse
   var vector = new THREE.Vector3(this.mouse3D.x, this.mouse3D.y, 0.5); //0.5
 	vector.unproject( this.camera );
@@ -1821,7 +1815,10 @@ if(this.middleMenuIsUp)
 this.effect.renderToScreen = this.mouseDown;
 this.rgbeffect.renderToScreen = (this.triggerRGB && this.currentRoom == 1); //only certain rooms
 
-this.audio.volume = this.loadingHasStarted ? 0.2 : this.audioVolume;
+if(this.audio)
+{
+    this.audio.volume = this.loadingHasStarted ? 0.2 : this.audioVolume;
+}
 if(this.dustscreen)
 {
     this.dustscreen.visible = (this.currentRoom == 0);
