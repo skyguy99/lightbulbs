@@ -1,22 +1,15 @@
 import 'styles/index.scss';
-import Cone from './elements/cone';
-import Tourus from './elements/tourus';
-import Cylinder from './elements/cylinder';
 import { radians, map, distance } from './helpers';
 
 import { TweenLite } from 'gsap/TweenMax';
 import InteractiveControls from './vendor/InteractiveControls';
-import Particles from './vendor/Particles';
 
 const glslify = require('glslify');
 
 export default class App {
   setup() {
 
-console.log("SKY");
-
   //3D STUFF
-    this.gutter = { size: 4 };
     this.meshes = []; //objects we need to worry about for interaction
     this.grid = { rows: 5, cols: 5 };
     this.width = window.innerWidth;
@@ -24,14 +17,9 @@ console.log("SKY");
     this.mouse3D = new THREE.Vector2();
     this.effect = new THREE.ShaderPass();
     this.rgbeffect = new THREE.ShaderPass();
-    this.geometries = [
-      new Cone(),
-      new Tourus(),
-      new Cylinder(),
-    ];
 
     this.raycaster = new THREE.Raycaster();
-this.testCube = new THREE.Mesh();
+    this.testCube = new THREE.Mesh();
     this.mouse = new THREE.Vector2();
     this.target = new THREE.Vector2();
     this.windowHalf = new THREE.Vector2( window.innerWidth / 2, window.innerHeight / 2 );
@@ -54,7 +42,6 @@ this.testCube = new THREE.Mesh();
     this.videoTexs = [];
 
     this.interactive = new InteractiveControls(); //failed - for now
-    this.particles = new Particles();
 
     this.dustscreen = null;
 
@@ -185,35 +172,6 @@ loader.load(
 
   }
 );
-
-}
-
-//PARTICLES --------------------------------------
-
-particlesTest()
-{
-
-this.interactive = new InteractiveControls(this.camera, this.renderer.domElement);
-  this.particles = new Particles(this);
-  		this.scene.add(this.particles.container);
-  		this.particles.container.position.set(0,4,0);
-  // const uniforms = {
-  //   uTime: { value: 0.2 },
-  //   uRandom: { value: 1.0 },
-  //   uDepth: { value: 2.0 },
-  //   uSize: { value: 1.0 },
-  //   uTextureSize: { value: new THREE.Vector2(this.width, this.height) },
-  //   uTexture: { value: this.texture },
-  //   uTouch: { value: null },
-  // };
-  // const material = new THREE.RawShaderMaterial({
-  //   uniforms,
-  //   vertexShader: glslify(require('./vendor/shaders/particle.vert')),
-  //   fragmentShader: glslify(require('./vendor/shaders/particle.frag')),
-  //   depthTest: false, //change later?
-  //   transparent: true,
-  //   // blending: THREE.AdditiveBlending
-  // });
 
 }
 
@@ -409,38 +367,6 @@ this.interactive = new InteractiveControls(this.camera, this.renderer.domElement
       this.audio.autoplay = true;
     }
 
-  }
-
-  cubeCloud()
-  {
-    const geometry = new THREE.BoxBufferGeometry();
-    const material = new THREE.MeshStandardMaterial( {
-
-    color: 0xffffff,
-
-    roughness: 0.3,
-    metalness: 1
-
-    // roughnessMap: roughnessMap,
-    // metalnessMap: metalnessMap,
-    //
-    // envMap: envMap, // important -- especially for metals!
-    // envMapIntensity: envMapIntensity
-
-} );
-
-    for ( let i = 0; i < 1000; i ++ ) {
-
-      const object = new THREE.Mesh( geometry, material );
-      object.position.x = Math.random() * 80 - 40;
-      object.position.y = Math.random() * 80 - 40;
-      object.position.z = Math.random() * 80 - 40;
-      object.rotation.x = Math.random() * 2 * Math.PI;
-      object.rotation.y = Math.random() * 2 * Math.PI;
-      object.rotation.z = Math.random() * 2 * Math.PI;
-      this.scene.add( object );
-
-		}
   }
 
   runParallax()
@@ -839,12 +765,6 @@ if(string.toLowerCase().includes('screenroom1'))
     // var directions  = ["back", "front",  "front", "bottom",  "front",  "front"];
     var imagePrefix = "./src/images/lmcity_";
     var directions  = ["bk", "ft",  "up", "dn",  "rt",  "lf"];
-
-    if(room == 1)
-    {
-      imagePrefix = "./src/images/wkcamp_";
-      directions  = ["bk", "ft",  "up", "dn",  "rt",  "lf"];
-    }
     var imageSuffix = ".png";
     var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
 
@@ -1239,63 +1159,6 @@ animatedTexturePngs()
   	//this.refractSphereCamera.position.set(this.sphere.position);
   }
 
-//ADDS MESHES
-  createGrid() {
-    this.groupMesh = new THREE.Object3D();
-
-    const material = new THREE.MeshPhysicalMaterial({
-      color: '#3e2917',
-      metalness: .58,
-      emissive: '#000000',
-      roughness: .05,
-    });
-
-    for (let row = 0; row < this.grid.rows; row++) {
-      this.meshes[row] = [];
-
-      for (let index = 0; index < 1; index++) {
-        const totalCol = this.getTotalRows(row);
-
-        for (let col = 0; col < totalCol; col++) {
-          const geometry = this.getRandomGeometry();
-          const mesh = this.getMesh(geometry.geom, material);
-
-          mesh.position.y = 0;
-          mesh.position.x = col + (col * this.gutter.size) + (totalCol === this.grid.cols ? 0 : 2.5);
-          mesh.position.z = row + (row * (index + .25));
-
-          mesh.rotation.x = geometry.rotationX;
-          mesh.rotation.y = geometry.rotationY;
-          mesh.rotation.z = geometry.rotationZ;
-
-//Store vars for use later
-          mesh.initialRotation = {
-            x: mesh.rotation.x,
-            y: mesh.rotation.y,
-            z: mesh.rotation.z,
-          };
-
-          // mesh.name = "Mesh num"+col.toString();
-
-          this.groupMesh.add(mesh);
-
-          this.meshes[row][col] = mesh;
-        }
-      }
-    }
-
-    const centerX = -(this.grid.cols / 2) * this.gutter.size - 1;
-    const centerZ = -(this.grid.rows / 2) - .8;
-
-    this.groupMesh.position.set(centerX, 0, centerZ);
-
-    this.scene.add(this.groupMesh);
-  }
-
-  getTotalRows(col) {
-    return (col % 2 === 0 ? this.grid.cols : this.grid.cols - 1);
-  }
-
   getMesh(geometry, material) {
     const mesh = new THREE.Mesh(geometry, material);
 
@@ -1342,52 +1205,6 @@ getRandomFloat(min, max, decimalPlaces) {
   draw() {
     this.raycaster.setFromCamera(this.mouse3D, this.camera);
 
-
-//GRID OF OBJECTS ANIMATE
-    // const intersects = this.raycaster.intersectObjects([this.floor]);
-    //
-    // if (intersects.length) {
-    //   const { x, z } = intersects[0].point;
-    //
-    //   for (let row = 0; row < this.grid.rows; row++) {
-    //     for (let index = 0; index < 1; index++) {
-    //       const totalCols = this.getTotalRows(row);
-    //
-    //       for (let col = 0; col < totalCols; col++) {
-    //         const mesh = this.meshes[row][col];
-    //
-    //         const mouseDistance = distance(x, z,
-    //           mesh.position.x + this.groupMesh.position.x,
-    //           mesh.position.z + this.groupMesh.position.z);
-    //
-    //         const y = map(mouseDistance, 7, 0, 0, 6);
-    //         TweenMax.to(mesh.position, .3, { y: y < 1 ? 1 : y });
-    //
-    //         //check for interaction -----------
-    //         if(y<1)
-    //         {
-    //           this.mouseIsCloseTo(mesh);
-    //         }
-    //
-    //         const scaleFactor = mesh.position.y / 1.2;
-    //         const scale = scaleFactor < 1 ? 1 : scaleFactor;
-    //         TweenMax.to(mesh.scale, .3, {
-    //           ease: Expo.easeOut,
-    //           x: scale,
-    //           y: scale,
-    //           z: scale,
-    //         });
-    //
-    //         TweenMax.to(mesh.rotation, .7, {
-    //           ease: Expo.easeOut,
-    //           x: map(mesh.position.y, -1, 1, radians(270), mesh.initialRotation.x),
-    //           z: map(mesh.position.y, -1, 1, radians(-90), mesh.initialRotation.z),
-    //           y: map(mesh.position.y, -1, 1, radians(45), mesh.initialRotation.y),
-    //         });
-    //       }
-    //     }
-    //   }
-    // }
 
 //INTERACTIVES ANIMATE -------------------------------
   var localThis = this;
@@ -1491,18 +1308,6 @@ getRandomFloat(min, max, decimalPlaces) {
 
     this.createCamera();
 
-    //this.addDistanceAffectLight();
-
-    //this.cubeCloud();
-
-    //this.addTestObject();
-
-    //this.addTextureAnimationObject();
-
-    //this.animatedTexturePngs();
-
-    //this.stemoskiScene();
-
     this.glassSphere();
 
     //this.particleemitter();
@@ -1520,8 +1325,6 @@ getRandomFloat(min, max, decimalPlaces) {
     this.animate();
 
     this.playAudio();
-
-    //this.particlesTest();
 
     //Interaction setup
     window.addEventListener('resize', this.onResize.bind(this));

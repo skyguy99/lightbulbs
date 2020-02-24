@@ -1,7 +1,5 @@
 <html lang="en">
 	<head>
-		<!-- <base href="https://deadends-d64b4.firebaseapp.com/" target="_blank"> -->
-
 		<link rel="icon" type="image/png" sizes="192x192" href="./src/images/icon-192.png">
 		<!-- <link rel="icon" type="image/png" sizes="32x32" href="./src/images//icon-32.png">
 		<link rel="icon" type="image/png" sizes="16x16" href="./src/images/icon-16.png"> -->
@@ -9,14 +7,14 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 		<meta name="theme-color" content="#000000">
-		<meta name="description" content="Skylar's THREE js" />
+		<meta name="description" content="skyguy" />
 		<meta name="keywords" content="webgl, threejs, repulsion, effect, hover, web development, demo, tutorial" />
 		<meta name="author" content="Skylar Thomas" />
 		<meta name="target" content="all">
 		<meta http-equiv="cleartype" content="on">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="mobile-web-app-capable" content="yes">
-		<title>DeadEnds</title>
+		<title>lightbulbs</title>
 		<link href="https://fonts.googleapis.com/css?family=Sacramento|Montserrat:700" rel="stylesheet">
 		<link rel="stylesheet" href="https://use.typekit.net/zjs0dpp.css">
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/99/three.min.js"></script>
@@ -38,16 +36,16 @@
 	</head>
 	<body oncontextmenu="return false;">
 		<main>
-		      <!-- The cursor elements -->
+		    <!-- The cursor elements -->
         <div class="cursor cursor--small"></div>
         <canvas class="cursor cursor--canvas" resize></canvas>
 
-			<iframe src="../src/resources/silence.mp3" allow="autoplay" style="display:none"></iframe>
 			<audio id="audioplayer" autoplay muted loop>
-    		<source src="../src/resources/test.mp3" type="audio/mp3">
+    			<source src="../src/resources/test.mp3" type="audio/mp3">
 			</audio>
 
 			<div class = "loadingScreen">
+
 				<div data-depth="0.15" class="link" id = "parallaxBuffer"></div>
 				<div class = 'endLoading'></div>
 				<div class = "parallax" data-relative-input="true">
@@ -55,72 +53,25 @@
 				<img data-depth="0.16" src="../src/images/skull-new.png" alt="">
 						<img data-depth="0.19" src="../src/images/eye1-new.png" alt="">
 						<img data-depth="0.21" src="../src/images/eye2-new.png" alt="">
-			</img>
 				<img data-depth="0.26" src="../src/images/title-new.png" alt="">
-					<!-- <img class = "introslide1" data-depth="0.12" src="../src/images/enterbox-new.png" alt=""> -->
-					<img class = "introslide2" data-depth="0.12" src="../src/images/percent-new.png" alt="">
-
-<!--The first video-->
-				<video preload = 'auto' autoplay muted false data-depth="0.16">
-						<source src="../src/images/intro3.mp4" type="video/mp4">
-				</video>
+				<img class = "introslide2" data-depth="0.12" src="../src/images/percent-new.png" alt="">
 
 				</div>
-
-				<video preload = 'auto' autoplay muted false id = "bgVideo">
-				<source src="" type="video/mp4">
-				 </video>
 			</div>
 			<div class="sketch-container" id="sketch-container">
 			<div class="frame" style = "">
-				<video autoplay muted id="myVideo">
+				<!-- <video autoplay muted id="myVideo">
   			<source src="" type="video/mp4">
-				</video>
-				<div class = "topmenu">
+				</video> -->
+				<!-- <div class = "topmenu">
 								<a href = "" class = "link"><img src="../src/images/skull-small.png" alt=""></a>
 							<div class = audioBtn>
-					    <!-- <a href="https://soundcloud.com/heartbeats-music" target="_blank" data-value="GoToSoundCloud">Audio via <b>Heartbeats </b> </a>
 
 	      <span><img class = "audiogif" src="../src/images/equalizer.gif" alt=""></span> -->
 					</div>
 			</div>
-			<div class = "middleMenu">
-					<ul class = "menuText">
-						<li>MORE WORK BY <a href="https://www.artstation.com/skythomas1"><b>SKYLAR THOMAS</b></a></li>
-						<li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin in augue sed nibh mollis sodales at in velit. Maecenas ullamcorper mollis posuere.</li>
-						<li>
-								<a href="https://www.artstation.com/skythomas1"><span></span></a>
-								<a href="https://www.artstation.com/skythomas1">FB</a>
-								<a href="https://www.artstation.com/skythomas1">GM</a>
-						</li>
-					</ul>
 
-					<div class="table">
-				  <div class="cell">
-				    <ul class="dots">
-				      <li><a href="#"></a></li>
-				      <li><a href="#"></a></li>
-				      <li><a href="#"></a></li>
-				    </ul>
-				  </div>
-				</div>
-			</div>
-			<!-- <div class = "bottomTitle">
-				<h1>DEADENDS</h1>
-				<img src="../src/images/equalizer.gif" alt="">
-
-				<!-- <div class="table">
-				<div class="cell">
-					<ul class="dots">
-						<li><a href="#"></a></li>
-						<li><a href="#"></a></li>
-						<li><a href="#"></a></li>
-						<li><a href="#"></a></li>
-					</ul>
-				</div>
-			</div> -->
-			</div> -->
-			</div>
+			<!--SHADERS-->
 			<script type="x-shader/x-vertex" id="vertexShader">
 #define GLSLIFY 1
 // Texture varyings
@@ -399,7 +350,7 @@ void main() {
 		</script>
 
 		</main>
+		<!--Custom mouse-->
 		<script src="./src/scripts/tutorial.js"></script>
-		<!-- <script src="./src/scripts/vendor/shader-example-postprocessing.js"></script> -->
 	</body>
 </html>
