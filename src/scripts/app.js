@@ -1,5 +1,6 @@
 import 'styles/index.scss';
 import { radians, map, distance } from './helpers';
+import {data} from './data.js';
 
 import { TweenLite } from 'gsap/TweenMax';
 import InteractiveControls from './vendor/InteractiveControls';
@@ -8,7 +9,6 @@ const glslify = require('glslify');
 
 export default class App {
   setup() {
-
   //3D STUFF
     this.meshes = []; //objects we need to worry about for interaction
     this.grid = { rows: 5, cols: 5 };
@@ -30,7 +30,11 @@ export default class App {
     this.mixers = [];
     this.animatedMeshes = [];
     this.roomModels = [];
-    this.distanceBrightLight = null;
+
+    //LIGHTS----------
+    this.led = new THREE.PointLight();
+    this.halogen = new THREE.PointLight();
+    //--------------------------------
 
     this.interactiveMeshes = []; //repel
     this.hoverMeshes = [];
@@ -57,6 +61,9 @@ export default class App {
     this.readyToChangeRooms = false;
     this.mousedownTimeout = null;
     this.testMesh = null;
+
+    //GET DATA FROM HELPER FILE
+    //console.log('DATA: '+data['02-22-20_11:00AM'][0][0]);
 
     //UI
     $('.dots li').first().addClass('active');
@@ -228,39 +235,6 @@ loader.load(
 
     var helper = new THREE.PointLightHelper(this.distanceBrightLight, 1);
     //this.distanceBrightLight.add( helper );
-  }
-
-  addLightsRoom1(parent, positions)
-  {
-
-    const light = new THREE.DirectionalLight('#7C8D8D', 0.5);
-    light.castShadow = true;
-    var helper = new THREE.DirectionalLightHelper( light );
-
-    light.shadow.mapSize.width = 1024;
-    light.shadow.mapSize.height = 1024;
-
-    light.add( helper );
-    // light.position.set(-1, 4, 4);
-    light.position.set(positions[0]);
-    light.lookAt(0, 0, 0);
-
-    parent.add(light);
-
-    const light2 = new THREE.DirectionalLight('#ff0000', 0.2); //'#8D805C',
-    light2.castShadow = true;
-    var helper2 = new THREE.DirectionalLightHelper( light2, 3);
-
-    light2.shadow.mapSize.width = 1024;
-    light2.shadow.mapSize.height = 1024;
-
-    light2.add( helper2 );
-    light2.position.set(0, 4, 0);
-    //light2.position.set(positions[1]);
-    light2.lookAt(0, 0, 0);
-    parent.add(light2);
-      helper2.update();
-
   }
 
 //FOLLOWS MOUSE
@@ -560,63 +534,37 @@ loader.load(
   addTextureAnimationObject(key, parent)
   {
 
-if(key == 'dust')
-{
-  //DUSTMOTES ** these are the correct settings for alpha channel
-  var video = document.createElement( 'video' );
-  video.src = './src/images/dust2.webm'; //dust2
-  video.load(); // must call after setting/changing source
-  video.preload = 'auto';
-  video.loop = true;
-  video.autoload = true;
-  video.transparent = true;
-  video.playbackRate = 0.8; //1.06
+      if(key == 'dust')
+      {
+        //DUSTMOTES ** these are the correct settings for alpha channel
+        var video = document.createElement( 'video' );
+        video.src = './src/images/dust2.webm'; //dust2
+        video.load(); // must call after setting/changing source
+        video.preload = 'auto';
+        video.loop = true;
+        video.autoload = true;
+        video.transparent = true;
+        video.playbackRate = 0.8; //1.06
 
-  this.videoTexs[this.videoTexs.length] = video;
+        this.videoTexs[this.videoTexs.length] = video;
 
 
-  var texture = new THREE.VideoTexture( video );
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.format = THREE.RGBAFormat;
+        var texture = new THREE.VideoTexture( video );
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.format = THREE.RGBAFormat;
 
-  var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0 } );
-  //var runnerMaterial = new THREE.MeshBasicMaterial( { color: '0xff0000'} );
-  var runnerGeometry = new THREE.PlaneGeometry(1, 1, 1, 1);
-  runnerMaterial.transparent = true;
-  this.dustscreen = new THREE.Mesh(runnerGeometry, runnerMaterial);
-  this.dustscreen.position.set(0,4,8);
-  this.dustscreen.scale.set(1.4,1,-1);
+        var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0 } );
+        //var runnerMaterial = new THREE.MeshBasicMaterial( { color: '0xff0000'} );
+        var runnerGeometry = new THREE.PlaneGeometry(1, 1, 1, 1);
+        runnerMaterial.transparent = true;
+        this.dustscreen = new THREE.Mesh(runnerGeometry, runnerMaterial);
+        this.dustscreen.position.set(0,4,8);
+        this.dustscreen.scale.set(1.4,1,-1);
 
-this.scene.add(this.dustscreen);
+      //this.scene.add(this.dustscreen);
 
-}
-//FIRE
-    // var video = document.createElement( 'video' );
-    // video.src = './src/images/firenoalpha.webm';
-    // video.load(); // must call after setting/changing source
-    // video.preload = 'auto';
-    // video.loop = true;
-    // video.autoload = true;
-    // video.transparent = true;
-    // video.playbackRate = 1.06;
-    //
-    // this.videoTex = video;
-    //
-    //
-    // var texture = new THREE.VideoTexture( video );
-    // texture.minFilter = THREE.LinearFilter;
-    // texture.magFilter = THREE.LinearFilter;
-    // texture.format = THREE.RGBAFormat;
-    //
-  	// var runnerMaterial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, side:THREE.DoubleSide, alphaTest: 0.5 } );
-  	// var runnerGeometry = new THREE.PlaneGeometry(5, 5, 1, 1);
-    // runnerMaterial.transparent = true;
-  	// var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
-  	// runner.position.set(0,5,1);
-    // runner.scale.set(0.5, 0.5, 0.5);
-  	// this.scene.add(runner);
-
+      }
   }
 
   addTestObject()
@@ -637,49 +585,6 @@ this.testCube.position.set(0,5,0);
 this.scene.add(this.testCube);
 
   }
-
-  stemoskiScene()
-{
-  // LIGHT
-  var light = new THREE.PointLight(0xffffff);
-  light.position.set(0,250,0);
-  this.scene.add(light);
-  // FLOOR
-  var floorTexture = new THREE.TextureLoader().load( './src/images/checkerboard.jpg' );
-  floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-  floorTexture.repeat.set( 10, 10 );
-  var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-  var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-  var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-  floor.position.y = -50.5;
-  floor.rotation.x = Math.PI / 2;
-  this.scene.add(floor);
-  // SKYBOX
-  var imagePrefix = "./src/images/dawnmountain-";
-  var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
-  var imageSuffix = ".png";
-  var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
-
-  this.urls = [];
-  for (var i = 0; i < 6; i++)
-    this.urls.push( imagePrefix + directions[i] + imageSuffix );
-
-  var materialArray = [];
-  for (var i = 0; i < 6; i++)
-    materialArray.push( new THREE.MeshBasicMaterial({
-      map: new THREE.TextureLoader().load( imagePrefix + directions[i] + imageSuffix ),
-      side: THREE.BackSide
-    }));
-
-    // for (var i = 0; i < 6; i++)
-    // 	materialArray.push( new THREE.MeshBasicMaterial({
-    // 		map: new THREE.TextureLoader().load("./src/scripts/images/bg.png"),
-    // 		side: THREE.BackSide
-    // 	}));
-
-  var skyBox = new THREE.Mesh(skyGeometry, materialArray);
-  this.scene.add( skyBox );
-}
 
 glowSphere()
   {
@@ -847,20 +752,14 @@ if(string.toLowerCase().includes('screenroom1'))
 
     material = runnerMaterial;
   }
-  else if(string.toLowerCase().includes('paper'))
+  else if(string.toLowerCase().includes('metal'))
   {
 
-    var texture = new THREE.TextureLoader().load( './src/images/Deadends_room2mat.png' );
+    // var texture = new THREE.TextureLoader().load( './src/images/Deadends_room2mat.png' );
       material = new THREE.MeshStandardMaterial({
         map: texture,
-        roughness: 0.8,
-        metalness: 0,
-        emissive: 0x242424,
-        emissiveMap: texture,
-        //normalMap: materials.normalMap,
-        //roughnessMap: materials.roughnessMap,
-        //metalnessMap: materials.metalnessMap,
-        //envMap: me.reflectionCube,
+        roughness: 0.2,
+        metalness: 1,
         skinning: true
       });
   }
@@ -894,7 +793,7 @@ addRoomToScene(i, string)
 
 
       gltf.scene.position.set(-0.2,3,6); //0,3,6
-      gltf.scene.scale.set(1,1,1);
+      gltf.scene.scale.set(0.2,0.2,0.2);
 
       if(i==0)
       {
@@ -904,6 +803,32 @@ addRoomToScene(i, string)
       gltf.scene.updateMatrixWorld(true);
       gltf.scene.traverse(function (node) {
 
+      //Assign lights----------------------
+      if(node.name.toLowerCase().includes('led'))
+      {
+          localThis.led = node;
+          //console.log(node.distance);
+          console.log(localThis.led.distance);
+
+      } else if (node.name.toLowerCase().includes('halogen')){
+
+      }
+      else if (node.name.toLowerCase().includes('sunlight')){
+
+      }
+      else if (node.name.toLowerCase().includes('bluelight')){
+
+      }
+      else if (node.name.toLowerCase().includes('fluorescent')){
+
+      }
+      else if (node.name.toLowerCase().includes('white neon')){
+
+      }
+      else if (node.name.toLowerCase().includes('pink neon')){
+
+      }
+      //-------------------------------
 
       if (node.isMesh)
       {
@@ -1033,10 +958,7 @@ loadRoomModels()
 
   //**When export to glb, make sure no missing images in material
   var paths = [
-  // "./src/scripts/elements/dancing.glb",
-  // "./src/scripts/elements/shapestest.glb"
-  "./src/scripts/elements/scene.glb",
-    "./src/scripts/elements/scene2.glb"
+  "./src/scripts/elements/lightbulbs.glb"
 ];
 
   for(var i = 0; i<paths.length;i++)
@@ -1070,7 +992,7 @@ updateCurrentRoom()
     obj.visible = (obj.index == localThis.currentRoom);
   });
 
-  this.distanceBrightLight.visible = (this.currentRoom == 1);
+  //this.distanceBrightLight.visible = (this.currentRoom == 1);
 }
 
 animatedTexturePngs()
@@ -1316,7 +1238,9 @@ getRandomFloat(min, max, decimalPlaces) {
 
     this.loadRoomModels();
 
-    //this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
+    this.addAmbientLight();
+
+    this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
 
     this.applyTVShader();
 
@@ -1324,7 +1248,7 @@ getRandomFloat(min, max, decimalPlaces) {
 
     this.animate();
 
-    this.playAudio();
+    //this.playAudio();
 
     //Interaction setup
     window.addEventListener('resize', this.onResize.bind(this));
@@ -1370,45 +1294,45 @@ getRandomFloat(min, max, decimalPlaces) {
   onScroll(event)
   {
     //ZOOM
-              if(event.deltaY > 0) { //up
-
-              while(this.scl==0) {
-
-                this.scl+=2;
-                if(this.camera.position.z <= 9)
-                {
-                  //this.camera.position.z+=this.scl;
-
-                  TweenMax.to(this.camera.position, .7, {
-                        ease: Expo.easeOut,
-                        x: this.camera.position.x,
-                        y: this.camera.position.y,
-                        z: this.camera.position.z+this.scl,
-                      });
-                }
-              }
-
-            } else { //down
-
-              while(this.scl==0) {
-
-                this.scl+=2;
-                if(this.camera.position.z >= 7)
-                {
-                  TweenMax.to(this.camera.position, .7, {
-                        ease: Expo.easeOut,
-                        x: this.camera.position.x,
-                        y: this.camera.position.y,
-                        z: this.camera.position.z-this.scl,
-                      });
-                }
-              }
-
-            }
-            this.scl=0;
-      window.setInterval(function(){
-         this.scl=0;
-      }, 10);
+      //         if(event.deltaY > 0) { //up
+      //
+      //         while(this.scl==0) {
+      //
+      //           this.scl+=2;
+      //           if(this.camera.position.z <= 9)
+      //           {
+      //             //this.camera.position.z+=this.scl;
+      //
+      //             TweenMax.to(this.camera.position, .7, {
+      //                   ease: Expo.easeOut,
+      //                   x: this.camera.position.x,
+      //                   y: this.camera.position.y,
+      //                   z: this.camera.position.z+this.scl,
+      //                 });
+      //           }
+      //         }
+      //
+      //       } else { //down
+      //
+      //         while(this.scl==0) {
+      //
+      //           this.scl+=2;
+      //           if(this.camera.position.z >= 7)
+      //           {
+      //             TweenMax.to(this.camera.position, .7, {
+      //                   ease: Expo.easeOut,
+      //                   x: this.camera.position.x,
+      //                   y: this.camera.position.y,
+      //                   z: this.camera.position.z-this.scl,
+      //                 });
+      //           }
+      //         }
+      //
+      //       }
+      //       this.scl=0;
+      // window.setInterval(function(){
+      //    this.scl=0;
+      // }, 10);
     // console.log(this.camera.position.z);
     //this.camera.position.set(this.camera.position.x, this.camera.position.y, 10);
     //https://greensock.com/ease-visualizer/
@@ -1428,7 +1352,7 @@ getRandomFloat(min, max, decimalPlaces) {
     {
       this.triggerRGB++;
     } else {
-      this.mousedownTimeout = setTimeout(this.clearRoomChange.bind(this), 2900);
+      //this.mousedownTimeout = setTimeout(this.clearRoomChange.bind(this), 2900);
       this.mouseDown++;
     }
   }
@@ -1561,11 +1485,6 @@ if(this.middleMenuIsUp)
 
 }
 
-// isCloseTo(target)
-// {
-//   return (new THREE.Vector3(this.mouse.x, this.mouse.y, target.position.z).distanceTo(target.position)) <= 100;
-// }
-
   onResize() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -1622,10 +1541,10 @@ if(this.audio)
 {
     this.audio.volume = this.loadingHasStarted ? 0.2 : this.audioVolume;
 }
-if(this.dustscreen)
-{
-    this.dustscreen.visible = (this.currentRoom == 0);
-}
+// if(this.dustscreen)
+// {
+//     this.dustscreen.visible = (this.currentRoom == 0);
+// }
 
 if (this.particles) this.particles.update(this.clock.getDelta());
 
