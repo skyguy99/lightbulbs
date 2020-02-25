@@ -122,4 +122,6 @@ export {data};
 
 //console.log(imagesDictionary['02-23-20_9:00PM'][1][0]);
 
-//to access one: imagesDictionary.AK[0]
+//To aggregate:
+//1) Individual visual- each light source gets a 0-10 intensity based on mood (not there = 0)
+//2) Aggregate visual - each light gets intensity = [(sum of all moods where not in array = 0)/ (length of list*10)]

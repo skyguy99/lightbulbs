@@ -62,9 +62,6 @@ export default class App {
     this.mousedownTimeout = null;
     this.testMesh = null;
 
-    //GET DATA FROM HELPER FILE
-    //console.log('DATA: '+data['02-22-20_11:00AM'][0][0]);
-
     //UI
     $('.dots li').first().addClass('active');
     $('.bottomTitle .dots li').first().addClass('active');
@@ -767,6 +764,16 @@ if(string.toLowerCase().includes('screenroom1'))
   return material;
 }
 
+
+updateLights()
+{
+    //GET DATA FROM HELPER FILE
+    //console.log('DATA: '+data['02-22-20_11:00AM'][0][0]);
+    data.forEach(function (obj){ //not a function?
+      console.log(obj);
+    })
+}
+
 addRoomToScene(i, string)
 {
       //ADD MODEL
@@ -828,6 +835,8 @@ addRoomToScene(i, string)
       else if (node.name.toLowerCase().includes('pink neon')){
 
       }
+
+      localThis.updateLights();
       //-------------------------------
 
       if (node.isMesh)
