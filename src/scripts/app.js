@@ -34,6 +34,13 @@ export default class App {
     //LIGHTS----------
     this.led = new THREE.PointLight();
     this.halogen = new THREE.PointLight();
+    this.fluorescent = new THREE.PointLight();
+    this.pinkneon = new THREE.PointLight();
+    this.whiteneon = new THREE.PointLight();
+    this.bluelight = new THREE.PointLight();
+    this.sunlight = new THREE.PointLight();
+
+    this.allLights = [this.led, this.halogen, this.fluorescent, this.pinkneon, this.whiteneon, this.bluelight, this.sunlight]
     //--------------------------------
 
     this.interactiveMeshes = []; //repel
@@ -46,7 +53,6 @@ export default class App {
     this.videoTexs = [];
 
     this.interactive = new InteractiveControls(); //failed - for now
-
     this.dustscreen = null;
 
     //LOGIC
@@ -60,7 +66,8 @@ export default class App {
     this.triggerRGB = false;
     this.readyToChangeRooms = false;
     this.mousedownTimeout = null;
-    this.testMesh = null;
+    this.currentKey = Object.keys(data)[0];
+    this.setupLights = false;
 
     //UI
     $('.dots li').first().addClass('active');
@@ -767,11 +774,44 @@ if(string.toLowerCase().includes('screenroom1'))
 
 updateLights()
 {
+
     //GET DATA FROM HELPER FILE
     //console.log('DATA: '+data['02-22-20_11:00AM'][0][0]);
-    data.forEach(function (obj){ //not a function?
-      console.log(obj);
-    })
+
+if(!this.setupLights){ //check so dont repeat
+
+  var localThis = this;
+
+  var dictLength = Object.keys(data).length*10;
+
+  this.allLights.forEach(function(l) {
+      l.aggregateIntensity = 0;
+      l.intensity = 0;
+
+        Object.keys(data).forEach(function(key) {
+        //console.log(key, data[key]);
+        if(data[key][0].includes(l.name)){
+
+          if(l.name == 'bluelight'){
+            //console.log('Adding: '+data[key][1]);
+
+          }
+          l.aggregateIntensity = (((l.aggregateIntensity)*dictLength)+data[key][1])/(dictLength);
+        }
+    });
+    console.log(l.name+' | '+l.aggregateIntensity*10);
+  });
+
+  //To set individual point:
+  this.allLights.forEach(function(l) {
+    if(data[localThis.currentKey][0].includes(l.name)){
+      l.intensity = data[localThis.currentKey][1];
+    }
+  });
+  console.log('Led intensity: '+this.led.intensity);
+
+  this.setupLights = true;
+}
 }
 
 addRoomToScene(i, string)
@@ -813,29 +853,35 @@ addRoomToScene(i, string)
       //Assign lights----------------------
       if(node.name.toLowerCase().includes('led'))
       {
-          localThis.led = node;
-          //console.log(node.distance);
-          console.log(localThis.led.distance);
-
+        localThis.led = node;
       } else if (node.name.toLowerCase().includes('halogen')){
-
+        localThis.halogen = node;
       }
       else if (node.name.toLowerCase().includes('sunlight')){
-
+        localThis.sunlight = node;
       }
       else if (node.name.toLowerCase().includes('bluelight')){
-
+        localThis.bluelight = node;
       }
       else if (node.name.toLowerCase().includes('fluorescent')){
-
+        localThis.fluorescent = node;
       }
       else if (node.name.toLowerCase().includes('white neon')){
-
+        localThis.whiteneon = node;
       }
       else if (node.name.toLowerCase().includes('pink neon')){
-
+        localThis.pinkneon = node;
       }
 
+      localThis.led.name = 'led';
+      localThis.halogen.name = 'halogen';
+      localThis.pinkneon.name = 'pink neon';
+      localThis.whiteneon.name = 'white neon';
+      localThis.fluorescent.name = 'fluorescent';
+      localThis.bluelight.name = 'bluelight';
+      localThis.sunlight.name = 'sunlight';
+
+//assuming none are null
       localThis.updateLights();
       //-------------------------------
 
@@ -972,7 +1018,7 @@ loadRoomModels()
 
   for(var i = 0; i<paths.length;i++)
   {
-    console.log('adding room '+i);
+    //console.log('adding room '+i);
     this.addRoomToScene(i, paths[i]);
 
     if(i == 1)
@@ -981,17 +1027,6 @@ loadRoomModels()
     }
 
   }
-
-  //verify
-
-// var localThis = this;
-//   setTimeout( function(){
-//     //console.log("Models length: "+localThis.roomModels.length);
-//
-//     localThis.roomModels.forEach(function(obj) {
-//       //console.log(obj.pathName + " | "+obj.index); //this
-//     });
-// }  , 3000);
 }
 
 updateCurrentRoom()
@@ -1297,7 +1332,7 @@ getRandomFloat(min, max, decimalPlaces) {
       });
 
     //stats
-    //(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
+    (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
 
   }
   onScroll(event)
@@ -1390,7 +1425,7 @@ getRandomFloat(min, max, decimalPlaces) {
 
     // console.log($('#audioplayer')[0]);
     //$('#audioplayer')[0].play(); //this will FUCK UP REST OF APP SKYLAR
-    $('#audioplayer')[0].muted = false;
+    //$('#audioplayer')[0].muted = false;
 
     this.playAudio();
       if(this.videoTexs.length > 0)

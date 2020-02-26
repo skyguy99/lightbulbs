@@ -110,10 +110,6 @@ const data = {
      '02-24-20_10:00AM':[['bluelight', 'sunlight', 'fluorescent'], 7.1],
      '02-24-20_3:00PM':[['sunlight', 'bluelight'], 6],
      '02-24-20_9:00PM':[['halogen', 'bluelight'], 8],
-
-     '02-25-20_10:00AM':[['bluelight', 'sunlight', 'fluorescent'], 7.1],
-     '02-25-20_3:00PM':[['sunlight', 'bluelight'], 6],
-     '02-25-20_9:00PM':[['halogen', 'bluelight'], 8],
 };
 
 // const data = {'t':4, 'y':2};
