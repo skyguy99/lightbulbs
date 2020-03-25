@@ -68,6 +68,7 @@ export default class App {
     this.mousedownTimeout = null;
     this.currentKey = Object.keys(data)[0];
     this.setupLights = false;
+    this.lightsAreImmediateSetting = true;
 
     //UI
     $('.dots li').first().addClass('active');
@@ -247,7 +248,7 @@ loader.load(
 
     this.movableLight.position.set(position.x, position.y, position.z);
 
-    this.scene.add(this.movableLight);
+    //this.scene.add(this.movableLight);
 
     var helper = new THREE.PointLightHelper(this.movableLight, 1);
 
@@ -382,7 +383,7 @@ loader.load(
   var localThis = this;
   setTimeout( function(){
     localThis.switchSiteVideo();
-  }  , 6500);
+  }  , 0);
 
   setTimeout( function(){
     localThis.forceDoneLoading(); //end w song
@@ -779,6 +780,7 @@ updateLights()
     //console.log('DATA: '+data['02-22-20_11:00AM'][0][0]);
 
 if(!this.setupLights){ //check so dont repeat
+var teststr = '';
 
   var localThis = this;
 
@@ -792,14 +794,10 @@ if(!this.setupLights){ //check so dont repeat
         //console.log(key, data[key]);
         if(data[key][0].includes(l.name)){
 
-          if(l.name == 'bluelight'){
-            //console.log('Adding: '+data[key][1]);
-
-          }
           l.aggregateIntensity = (((l.aggregateIntensity)*dictLength)+data[key][1])/(dictLength);
         }
     });
-    console.log(l.name+' | '+l.aggregateIntensity*10);
+    //console.log(l.name+' | '+l.aggregateIntensity*10);
   });
 
   //To set individual point:
@@ -807,11 +805,71 @@ if(!this.setupLights){ //check so dont repeat
     if(data[localThis.currentKey][0].includes(l.name)){
       l.intensity = data[localThis.currentKey][1];
     }
+
+    //check
+    //console.log(l.name+" = "+l.intensity);
+    teststr = teststr + '\n'+l.name+" = "+l.intensity+'\n';
   });
-  console.log('Led intensity: '+this.led.intensity);
 
   this.setupLights = true;
+
+  var localThis = this;
+  this.allLights.forEach(function(l) {
+
+      
+  });
+
+  console.log("intensity "+this.led.intensity);
+  console.log("aggregate"+this.led.aggregateIntensity);
 }
+
+$('.tester').text(teststr);
+}
+
+connectToMysql()
+{
+  var mysql = require('mysql');
+  var connection = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
+    database : 'SkylarData'
+  });
+
+  connection.connect();
+
+  connection.query('SELECT * from LightingTypes', function(err, rows, fields) {
+    if (!err)
+      console.log('The solution is: ', rows);
+    else
+      console.log('Error while performing Query.');
+  });
+
+  connection.end();
+}
+
+//change from aggregate to immediate
+switchLightIntensitySetting(isImmediate)
+{
+  this.lightsAreImmediateSetting = isImmediate;
+  console.log('Changing to immediate: '+isImmediate)
+
+  var localThis = this;
+  if(!isImmediate)
+  {
+    this.allLights.forEach(function(l) {
+      if(data[localThis.currentKey][0].includes(l.name)){
+        l.intensity = l.aggregateIntensity;
+      }
+    });
+  } else {
+    this.allLights.forEach(function(l) {
+      if(data[localThis.currentKey][0].includes(l.name)){
+        l.intensity = data[localThis.currentKey][1];
+      }
+    });
+  }
+
 }
 
 addRoomToScene(i, string)
@@ -842,34 +900,30 @@ addRoomToScene(i, string)
       gltf.scene.position.set(-0.2,3,6); //0,3,6
       gltf.scene.scale.set(0.2,0.2,0.2);
 
-      if(i==0)
-      {
-        localThis.addTextureAnimationObject('dust', localThis.roomModels[0]);
-      }
-
       gltf.scene.updateMatrixWorld(true);
       gltf.scene.traverse(function (node) {
 
       //Assign lights----------------------
-      if(node.name.toLowerCase().includes('led'))
+      if(node.name.toLowerCase() == 'led')
       {
         localThis.led = node;
-      } else if (node.name.toLowerCase().includes('halogen')){
+        // node.intensity = 4.2;
+      } else if (node.name.toLowerCase() == 'halogen'){
         localThis.halogen = node;
       }
-      else if (node.name.toLowerCase().includes('sunlight')){
+      else if (node.name.toLowerCase() == 'sunlight'){
         localThis.sunlight = node;
       }
-      else if (node.name.toLowerCase().includes('bluelight')){
+      else if (node.name.toLowerCase() == 'bluelight'){
         localThis.bluelight = node;
       }
-      else if (node.name.toLowerCase().includes('fluorescent')){
+      else if (node.name.toLowerCase() == 'fluorescent'){
         localThis.fluorescent = node;
       }
-      else if (node.name.toLowerCase().includes('white neon')){
+      else if (node.name.toLowerCase() == 'white neon'){
         localThis.whiteneon = node;
       }
-      else if (node.name.toLowerCase().includes('pink neon')){
+      else if (node.name.toLowerCase() == 'pink neon'){
         localThis.pinkneon = node;
       }
 
@@ -1013,7 +1067,7 @@ loadRoomModels()
 
   //**When export to glb, make sure no missing images in material
   var paths = [
-  "./src/scripts/elements/lightbulbs.glb"
+  "./src/scripts/elements/scene.glb"
 ];
 
   for(var i = 0; i<paths.length;i++)
@@ -1266,6 +1320,8 @@ getRandomFloat(min, max, decimalPlaces) {
   init() {
     this.runParallax();
 
+    //this.connectToMysql();
+
     this.setup();
 
     this.doneLoading();
@@ -1425,9 +1481,6 @@ getRandomFloat(min, max, decimalPlaces) {
 
     // console.log($('#audioplayer')[0]);
     //$('#audioplayer')[0].play(); //this will FUCK UP REST OF APP SKYLAR
-    //$('#audioplayer')[0].muted = false;
-
-    this.playAudio();
       if(this.videoTexs.length > 0)
       {
         for(var i =0;i<this.videoTexs.length;i++)
@@ -1473,25 +1526,27 @@ getRandomFloat(min, max, decimalPlaces) {
     // this.uniforms.u_mouse.value.set(event.touches[0].pageX, window.innerHeight - event.touches[0].pageY).multiplyScalar(
     //    window.devicePixelRatio);
   }
-
-  triggerRoomChange()
-  {
-    //TRIGGER ROOM CHANGE
-      if(this.currentRoom < this.roomModels.length-1)
-      {
-          this.currentRoom++;
-      } else {
-        this.currentRoom = 0;
-      }
-      this.roomTransition();
-  }
 onKeyDown(event)
 {
+
+//Show aggregate view
+if(event.key == 1)
+{
+  console.log('--AGGREGATE--');
+  this.switchLightIntensitySetting(false);
+}
+
+//show immediate view
+if(event.key == 2)
+{
+  console.log('--IMMEDIATE--');
+  this.switchLightIntensitySetting(true);
+}
 
   //do this when come in from loading
 
   this.forceDoneLoading(); //TEMP
-  this.playAudio();
+
     if(this.videoTexs.length > 0)
     {
       for(var i =0;i<this.videoTexs.length;i++)
@@ -1581,10 +1636,6 @@ if(this.middleMenuIsUp)
 this.effect.renderToScreen = this.mouseDown;
 this.rgbeffect.renderToScreen = (this.triggerRGB && this.currentRoom == 1); //only certain rooms
 
-if(this.audio)
-{
-    this.audio.volume = this.loadingHasStarted ? 0.2 : this.audioVolume;
-}
 // if(this.dustscreen)
 // {
 //     this.dustscreen.visible = (this.currentRoom == 0);
