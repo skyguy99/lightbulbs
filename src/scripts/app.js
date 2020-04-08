@@ -808,44 +808,40 @@ var teststr = '';
 
     //check
     //console.log(l.name+" = "+l.intensity);
-    teststr = teststr + '\n'+l.name+" = "+l.intensity+'\n';
   });
 
   this.setupLights = true;
 
   var localThis = this;
-  this.allLights.forEach(function(l) {
-
-      
-  });
 
   console.log("intensity "+this.led.intensity);
   console.log("aggregate"+this.led.aggregateIntensity);
 }
 
-$('.tester').text(teststr);
 }
 
 connectToMysql()
 {
-  var mysql = require('mysql');
-  var connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : 'root',
-    password : '',
-    database : 'SkylarData'
-  });
-
-  connection.connect();
-
-  connection.query('SELECT * from LightingTypes', function(err, rows, fields) {
-    if (!err)
-      console.log('The solution is: ', rows);
-    else
-      console.log('Error while performing Query.');
-  });
-
-  connection.end();
+  // var mysql = require('mysql');
+  // var connection = mysql.createConnection({
+  //   host     : 'localhost',
+  //   user     : 'root',
+  //   password : '',
+  //   database : 'SkylarData'
+  // });
+  //
+  // connection.connect();
+  //
+  // connection.query('SELECT * from LightingTypes', function(err, rows, fields) {
+  //   if (!err)
+  //   {
+  //       console.log('The solution is: ', rows);
+  //   }
+  //   else
+  //     console.log('Error while performing Query.');
+  // });
+  //
+  // connection.end();
 }
 
 //change from aggregate to immediate
@@ -855,20 +851,20 @@ switchLightIntensitySetting(isImmediate)
   console.log('Changing to immediate: '+isImmediate)
 
   var localThis = this;
-  if(!isImmediate)
-  {
-    this.allLights.forEach(function(l) {
-      if(data[localThis.currentKey][0].includes(l.name)){
-        l.intensity = l.aggregateIntensity;
-      }
-    });
-  } else {
-    this.allLights.forEach(function(l) {
-      if(data[localThis.currentKey][0].includes(l.name)){
-        l.intensity = data[localThis.currentKey][1];
-      }
-    });
-  }
+  // if(!isImmediate)
+  // {
+  //   this.allLights.forEach(function(l) {
+  //     if(data[localThis.currentKey][0].includes(l.name)){
+  //       l.intensity = l.aggregateIntensity;
+  //     }
+  //   });
+  // } else {
+  //   this.allLights.forEach(function(l) {
+  //     if(data[localThis.currentKey][0].includes(l.name)){
+  //       l.intensity = data[localThis.currentKey][1];
+  //     }
+  //   });
+  // }
 
 }
 
@@ -1320,7 +1316,7 @@ getRandomFloat(min, max, decimalPlaces) {
   init() {
     this.runParallax();
 
-    //this.connectToMysql();
+    this.connectToMysql();
 
     this.setup();
 
@@ -1336,15 +1332,11 @@ getRandomFloat(min, max, decimalPlaces) {
 
     //this.glowSphere();
 
-    this.loadRoomModels();
-
-    this.addAmbientLight();
-
-    this.addPointLight(0xffffff, { x: 0, y: 10, z: -100 }); //the movable one
+    //this.loadRoomModels();
 
     this.applyTVShader();
 
-    this.applyRGBShader();
+  //  this.applyRGBShader();
 
     this.animate();
 
@@ -1388,54 +1380,12 @@ getRandomFloat(min, max, decimalPlaces) {
       });
 
     //stats
-    (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
+    //(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
 
   }
   onScroll(event)
   {
-    //ZOOM
-      //         if(event.deltaY > 0) { //up
-      //
-      //         while(this.scl==0) {
-      //
-      //           this.scl+=2;
-      //           if(this.camera.position.z <= 9)
-      //           {
-      //             //this.camera.position.z+=this.scl;
-      //
-      //             TweenMax.to(this.camera.position, .7, {
-      //                   ease: Expo.easeOut,
-      //                   x: this.camera.position.x,
-      //                   y: this.camera.position.y,
-      //                   z: this.camera.position.z+this.scl,
-      //                 });
-      //           }
-      //         }
-      //
-      //       } else { //down
-      //
-      //         while(this.scl==0) {
-      //
-      //           this.scl+=2;
-      //           if(this.camera.position.z >= 7)
-      //           {
-      //             TweenMax.to(this.camera.position, .7, {
-      //                   ease: Expo.easeOut,
-      //                   x: this.camera.position.x,
-      //                   y: this.camera.position.y,
-      //                   z: this.camera.position.z-this.scl,
-      //                 });
-      //           }
-      //         }
-      //
-      //       }
-      //       this.scl=0;
-      // window.setInterval(function(){
-      //    this.scl=0;
-      // }, 10);
-    // console.log(this.camera.position.z);
-    //this.camera.position.set(this.camera.position.x, this.camera.position.y, 10);
-    //https://greensock.com/ease-visualizer/
+
 
   }
 
@@ -1633,7 +1583,7 @@ if(this.middleMenuIsUp)
 //other logic ------------------------
 
 //SHADERS
-this.effect.renderToScreen = this.mouseDown;
+//this.effect.renderToScreen = this.mouseDown; //trigger shader w mousedown!
 this.rgbeffect.renderToScreen = (this.triggerRGB && this.currentRoom == 1); //only certain rooms
 
 // if(this.dustscreen)

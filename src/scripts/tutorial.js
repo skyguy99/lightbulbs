@@ -230,7 +230,7 @@ $(function(){
            }
 
            opacity = ((e.pageY > h*0.6) && mouseDown) ? 1 : 0;
-           $('#myVideo').css('opacity',opacity);
+
 
            // var perc = Math.floor((($('#myVideo').get(0).currentTime/$('#myVideo').get(0).duration) * 100).toFixed(2));
            // // console.log(perc);
