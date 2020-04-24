@@ -6,7 +6,7 @@ article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,su
 }
 
 :root {
-	font-size: 28px;
+	font-size: 20px;
     letter-spacing: 0.8px;
 }
 
@@ -31,6 +31,81 @@ html {
 //     font-family: BeeTwo;
 //     src:url("./src/resources/SequelSansLightDisp.ttf");
 // }
+
+// @media screen and (min-width: 53em) {
+	.frame {
+		position: fixed;
+		display: none;
+		z-index: 10000;
+		top: 0;
+		left: 0;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		max-width: none;
+		height: 100vh;
+		padding: 3rem;
+		box-sizing: border-box;
+		bottom: 0;
+		// grid-template-columns: 15% 70% 15%;
+		// grid-template-rows: 15% 70% 15%;
+	}
+
+#topBar {
+	text-align: center;
+	justify-content: center;
+  align-items: center;
+	margin: auto;
+	float: center;
+	position: relative;
+
+}
+#bottomCol {
+	bottom: 0;
+	position: relative;
+}
+#leftCol {
+	float: left;
+	width: 33%;
+	position: relative;
+
+}
+
+#leftCol h2, p{
+	 transform: rotate(-90deg);
+}
+#rightCol p {
+ transform: rotate(-90deg);
+}
+#rightCol {
+	float: right;
+	position: relative;
+}
+.scrollBar {
+	width: 2px;
+	height: 55px;
+	background: white;
+	border-radius: 10px;
+	top: 15px;
+	overflow-y: scroll;
+}
+#center {
+  justify-content: center;
+  width: 200px;
+	position: relative;
+}
+#inner {
+	width: 100px;
+	transition-timing-function: ease-in-out;
+	transition: transform 0.4s;
+  -webkit-transition: transform 0.4s;
+  -moz-transition: transform 0.4s;
+  -o-transition: transform 0.4s;
+}
+#center #svgContainer {
+	perspective: 15px;
+
+}
 
 body {
 	--color-text: #fff;
@@ -432,38 +507,6 @@ z-index: -10000;
 	margin-right: 1rem;
 }
 
-.frame__demo--current {
-	color: var(--color-text);
-}
-
-.bottomright {
-	position: absolute;
-bottom: 30px;
-right: 40px;
-overflow: hidden;
-z-index: 300;
-}
-
-// @media screen and (min-width: 53em) {
-	.frame {
-		position: fixed;
-		display: none;
-		z-index: 10000;
-		top: 0;
-		left: 0;
-		display: grid;
-		align-content: space-between;
-		width: 100%;
-		max-width: none;
-		height: 100vh;
-		padding: 3rem;
-		pointer-events: none;
-		grid-template-columns: 75% 25%;
-		grid-template-rows: auto auto auto;
-		grid-template-areas: 'title demos'
-							'... ...'
-							'github links';
-	}
 	.frame__title-wrap {
 		grid-area: title;
 		display: flex;
