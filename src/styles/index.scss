@@ -91,19 +91,22 @@ html {
 }
 #center {
   justify-content: center;
-  width: 200px;
+  width: 400px;
 	position: relative;
+	overflow: visible;
 }
 #inner {
-	width: 100px;
+	width: 400px;
 	transition-timing-function: ease-in-out;
 	transition: transform 0.4s;
   -webkit-transition: transform 0.4s;
   -moz-transition: transform 0.4s;
   -o-transition: transform 0.4s;
+	overflow: visible;
 }
 #center #svgContainer {
-	perspective: 15px;
+	perspective: 20px;
+	overflow: visible;
 
 }
 
