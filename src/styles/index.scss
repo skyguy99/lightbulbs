@@ -90,13 +90,10 @@ html {
 	overflow-y: scroll;
 }
 #center {
-  justify-content: center;
-  width: 400px;
 	position: relative;
 	overflow: visible;
 }
 #inner {
-	width: 400px;
 	transition-timing-function: ease-in-out;
 	transition: transform 0.4s;
   -webkit-transition: transform 0.4s;
@@ -105,7 +102,7 @@ html {
 	overflow: visible;
 }
 #center #svgContainer {
-	perspective: 20px;
+	perspective: 25px;
 	overflow: visible;
 
 }

@@ -1397,7 +1397,9 @@ getRandomFloat(min, max, decimalPlaces) {
 
   onMouseDown(eventdata)
   {
-
+    //document.querySelector("#center span:nth-child(1) filter").setAttribute("stdDeviation", "5");
+      document.querySelector("#Blur").setAttribute("stdDeviation", "0");
+      console.log(document.querySelector("#Blur").getAttribute("stdDeviation"))
     if(eventdata.which == 3) //right click
     {
       this.triggerRGB++;
