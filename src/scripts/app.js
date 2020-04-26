@@ -32,13 +32,13 @@ export default class App {
     this.roomModels = [];
 
     //LIGHTS----------
-    this.led = new THREE.PointLight();
-    this.halogen = new THREE.PointLight();
-    this.fluorescent = new THREE.PointLight();
-    this.pinkneon = new THREE.PointLight();
-    this.whiteneon = new THREE.PointLight();
-    this.bluelight = new THREE.PointLight();
-    this.sunlight = new THREE.PointLight();
+    this.led = null;
+    this.halogen = null;
+    this.fluorescent = null;
+    this.pinkneon = null;
+    this.whiteneon = null;
+    this.bluelight = null;
+    this.sunlight = null;
 
     this.allLights = [this.led, this.halogen, this.fluorescent, this.pinkneon, this.whiteneon, this.bluelight, this.sunlight]
     //--------------------------------
@@ -771,6 +771,8 @@ if(string.toLowerCase().includes('screenroom1'))
 
   return material;
 }
+
+
 
 
 updateLights()
