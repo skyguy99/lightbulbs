@@ -6,7 +6,6 @@ article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,su
 }
 
 :root {
-	font-size: 20px;
     letter-spacing: 0.8px;
 }
 
@@ -14,25 +13,23 @@ html {
 	overflow: hidden;
 	background-color: #000000;
 }
+// @font-face {
+//     font-family: 'sequel_sansblack_disp';
+//     src: url('./styles/sequel_sans_black_disp-webfont.woff2') format('woff2'),
+//          url('./styles/sequel_sans_black_disp-webfont.woff') format('woff');
+//     font-weight: normal;
+//     font-style: normal;
+//
+// }
+// @font-face {
+//     font-family: 'sequel_sanslight_disp';
+//     src: url('sequel_sans_light_disp-webfont.woff2') format('woff2'),
+//          url('sequel_sans_light_disp-webfont.woff') format('woff');
+//     font-weight: normal;
+//     font-style: normal;
+//
+// }
 
-// @font-face {
-//     font-family: BeeFour;
-//     src:url("./resources/BeeThreeT.ttf");
-// }
-// @font-face {
-//     font-family: BeeTwo;
-//     src:url("./src/resources/BeeTwoT.ttf");
-// }
-// @font-face {
-//     font-family: SequelSansBlackDisp;
-//     src:url('./src/resources/SequelSansBlackDisp.ttf') format('truetype');
-// }
-// @font-face {
-//     font-family: SequelSansLightDisp;
-//     src: url('./src/resources/SequelSansLightDisp.ttf') format('truetype');
-// }
-
-// @media screen and (min-width: 53em) {
 .frame {
 		display: grid;
 		width: 100vw;
@@ -43,7 +40,7 @@ html {
 			"leftCol bottomCol rightCol";
 		grid-template-rows: 10% 80% 10%;
 		grid-template-columns: 10% 80% 10%;
-		padding: 3rem;
+		padding: 3.2rem;
 		 z-index: 10000;
 	}
 
@@ -141,7 +138,11 @@ body {
 	text-transform: uppercase;
 	color: var(--color-text);
 	background-color: #000000;
-	font-family: SequelSansBlackDisp, Times, sans-serif;
+	font-family: 'Roboto',Arial, sans-serif;
+	font-weight: 400;
+	letter-spacing: -0.03em;
+	font-size: 12px;
+	text-transform: lowercase;
 	overflow: hidden;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
