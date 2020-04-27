@@ -805,8 +805,17 @@ if(string.toLowerCase().includes('screenroom1'))
   return material;
 }
 
+updateEachLight(lightName, dataPt, span)
+{
+  //animation
+  var colors = {'halogen': '#000'};
+  var intensity = dataPt[1]*1.2;
 
+  // $(span).children().forEach((item, i) => {
+  //
+  // });
 
+}
 
 updateLights()
 {
@@ -852,13 +861,15 @@ updateLights()
 //   console.log("intensity "+this.led.intensity);
 //   console.log("aggregate"+this.led.aggregateIntensity);
 // }
+
 var localThis = this;
-$('#center').children().each(function(child) {
+$('#center').children().each(function(i, child) {
+  $(child).removeClass('active');
   localThis.currentDataPt[0].forEach(function(obj) {
-    //console.log(obj.trim());
-    if(child.attr('name').includes(obj.trim()))
+    if($(child).attr('name') == obj.trim())
     {
-    
+      $(child).addClass('active');
+      localThis.updateLights(obj.trim(), localThis.currentDataPt, child);
     }
   })
 })
@@ -982,13 +993,13 @@ addRoomToScene(i, string)
         localThis.pinkneon = node;
       }
 
-      localThis.led.name = 'led';
-      localThis.halogen.name = 'halogen';
-      localThis.pinkneon.name = 'pink neon';
-      localThis.whiteneon.name = 'white neon';
-      localThis.fluorescent.name = 'fluorescent';
-      localThis.bluelight.name = 'bluelight';
-      localThis.sunlight.name = 'sunlight';
+      // localThis.led.name = 'led';
+      // localThis.halogen.name = 'halogen';
+      // localThis.pinkneon.name = 'pink neon';
+      // localThis.whiteneon.name = 'white neon';
+      // localThis.fluorescent.name = 'fluorescent';
+      // localThis.bluelight.name = 'bluelight';
+      // localThis.sunlight.name = 'sunlight';
 
 //assuming none are null
       localThis.updateLights();
@@ -1471,6 +1482,7 @@ getRandomFloat(min, max, decimalPlaces) {
       //update visuals
       console.log(this.currentDataPt);
       this.updateLights();
+      $('#dateLabel').text(this.currentKey);
     }
 
   }
