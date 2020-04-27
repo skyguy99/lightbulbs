@@ -805,18 +805,6 @@ if(string.toLowerCase().includes('screenroom1'))
   return material;
 }
 
-updateEachLight(lightName, dataPt, span)
-{
-  //animation
-  var colors = {'halogen': '#000'};
-  var intensity = dataPt[1]*1.2;
-
-  // $(span).children().forEach((item, i) => {
-  //
-  // });
-
-}
-
 updateLights()
 {
 
@@ -830,19 +818,19 @@ updateLights()
 //
 //   var dictLength = Object.keys(data).length*10;
 //
-//   this.allLights.forEach(function(l) {
-//       l.aggregateIntensity = 0;
-//       l.intensity = 0;
-//
-//         Object.keys(data).forEach(function(key) {
-//         //console.log(key, data[key]);
-//         if(data[key][0].includes(l.name)){
-//
-//           l.aggregateIntensity = (((l.aggregateIntensity)*dictLength)+data[key][1])/(dictLength);
-//         }
-//     });
-//     //console.log(l.name+' | '+l.aggregateIntensity*10);
-//   });
+  // this.allLights.forEach(function(l) {
+  //     l.aggregateIntensity = 0;
+  //     l.intensity = 0;
+  //
+  //       Object.keys(data).forEach(function(key) {
+  //       //console.log(key, data[key]);
+  //       if(data[key][0].includes(l.name)){
+  //
+  //         l.aggregateIntensity = (((l.aggregateIntensity)*dictLength)+data[key][1])/(dictLength);
+  //       }
+  //   });
+  //   //console.log(l.name+' | '+l.aggregateIntensity*10);
+  // });
 //
 //   //To set individual point:
 //   this.allLights.forEach(function(l) {
@@ -863,17 +851,34 @@ updateLights()
 // }
 
 var localThis = this;
-$('#center').children().each(function(i, child) {
-  $(child).removeClass('active');
-  localThis.currentDataPt[0].forEach(function(obj) {
-    if($(child).attr('name') == obj.trim())
-    {
-      $(child).addClass('active');
-      localThis.updateLights(obj.trim(), localThis.currentDataPt, child);
-    }
-  })
-})
 
+if(this.lightsAreImmediateSetting)
+{
+    $('#center').children().each(function(i, child) {
+      $(child).removeClass('active');
+
+      //update each light ----------------
+        var intensity = localThis.currentDataPt[1]*1.2;
+
+       $(child).find('filter').attr("stdDeviation", "0");
+       var thing =  $(child).find('use')[0];
+       $(thing).css('fill', '#42c4fd');
+
+       $(child).find('h5').text(localThis.currentDataPt[1]);
+      //--------------------------------------
+
+      localThis.currentDataPt[0].forEach(function(obj) {
+        if($(child).attr('name') == obj.trim())
+        {
+          $(child).addClass('active');
+        }
+      })
+    })
+} else {
+  $('#center').children().each(function(i, child) {
+    $(child).addClass('active');
+  })
+}
 
 }
 
@@ -935,6 +940,7 @@ switchLightIntensitySetting(isImmediate)
   //     }
   //   });
   // }
+  this.updateLights();
 
 }
 
@@ -1495,9 +1501,7 @@ getRandomFloat(min, max, decimalPlaces) {
 
   onMouseDown(eventdata)
   {
-    //document.querySelector("#center span:nth-child(1) filter").setAttribute("stdDeviation", "5");
-      document.querySelector("#Blur").setAttribute("stdDeviation", "0");
-      console.log(document.querySelector("#Blur").getAttribute("stdDeviation"))
+
     if(eventdata.which == 3) //right click
     {
       this.triggerRGB++;
