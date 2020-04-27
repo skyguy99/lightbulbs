@@ -39,7 +39,6 @@ export default class App {
     this.whiteneon = null;
     this.bluelight = null;
     this.sunlight = null;
-
     this.allLights = [this.led, this.halogen, this.fluorescent, this.pinkneon, this.whiteneon, this.bluelight, this.sunlight]
     //--------------------------------
 
@@ -66,9 +65,13 @@ export default class App {
     this.triggerRGB = false;
     this.readyToChangeRooms = false;
     this.mousedownTimeout = null;
+
+    //For data
+    this.currentKeydex = 0;
     this.currentKey = Object.keys(data)[0];
     this.setupLights = false;
     this.lightsAreImmediateSetting = true;
+    this.currentDataPt = data[this.currentKey];
 
     //UI
     // $('.dots li').first().addClass('active');
@@ -810,45 +813,56 @@ updateLights()
 
     //GET DATA FROM HELPER FILE
     //console.log('DATA: '+data['02-22-20_11:00AM'][0][0]);
-
-if(!this.setupLights){ //check so dont repeat
-var teststr = '';
-
-  var localThis = this;
-
-  var dictLength = Object.keys(data).length*10;
-
-  this.allLights.forEach(function(l) {
-      l.aggregateIntensity = 0;
-      l.intensity = 0;
-
-        Object.keys(data).forEach(function(key) {
-        //console.log(key, data[key]);
-        if(data[key][0].includes(l.name)){
-
-          l.aggregateIntensity = (((l.aggregateIntensity)*dictLength)+data[key][1])/(dictLength);
-        }
-    });
-    //console.log(l.name+' | '+l.aggregateIntensity*10);
-  });
-
-  //To set individual point:
-  this.allLights.forEach(function(l) {
-    if(data[localThis.currentKey][0].includes(l.name)){
-      l.intensity = data[localThis.currentKey][1];
+//
+// if(!this.setupLights){ //check so dont repeat
+// var teststr = '';
+//
+//   var localThis = this;
+//
+//   var dictLength = Object.keys(data).length*10;
+//
+//   this.allLights.forEach(function(l) {
+//       l.aggregateIntensity = 0;
+//       l.intensity = 0;
+//
+//         Object.keys(data).forEach(function(key) {
+//         //console.log(key, data[key]);
+//         if(data[key][0].includes(l.name)){
+//
+//           l.aggregateIntensity = (((l.aggregateIntensity)*dictLength)+data[key][1])/(dictLength);
+//         }
+//     });
+//     //console.log(l.name+' | '+l.aggregateIntensity*10);
+//   });
+//
+//   //To set individual point:
+//   this.allLights.forEach(function(l) {
+//     if(data[localThis.currentKey][0].includes(l.name)){
+//       l.intensity = data[localThis.currentKey][1];
+//     }
+//
+//     //check
+//     //console.log(l.name+" = "+l.intensity);
+//   });
+//
+//   this.setupLights = true;
+//
+//   var localThis = this;
+//
+//   console.log("intensity "+this.led.intensity);
+//   console.log("aggregate"+this.led.aggregateIntensity);
+// }
+var localThis = this;
+$('#center').children().each(function(child) {
+  localThis.currentDataPt[0].forEach(function(obj) {
+    //console.log(obj.trim());
+    if(child.attr('name').includes(obj.trim()))
+    {
+    
     }
+  })
+})
 
-    //check
-    //console.log(l.name+" = "+l.intensity);
-  });
-
-  this.setupLights = true;
-
-  var localThis = this;
-
-  console.log("intensity "+this.led.intensity);
-  console.log("aggregate"+this.led.aggregateIntensity);
-}
 
 }
 
@@ -1430,7 +1444,34 @@ getRandomFloat(min, max, decimalPlaces) {
   }
   onScroll(event)
   {
-  //  $('#scrollBar').
+
+    //updates current immediate
+
+    if(this.lightsAreImmediateSetting)
+    {
+      if(event.deltaY >= 0)
+      {
+        if(this.currentKeydex < Object.keys(data).length-1)
+        {
+          this.currentKeydex++;
+        } else {
+          this.currentKeydex = 0;
+        }
+      } else {
+        if(this.currentKeydex > 0)
+        {
+          this.currentKeydex--;
+        } else {
+          this.currentKeydex = Object.keys(data).length-1;
+        }
+      }
+      this.currentKey = Object.keys(data)[this.currentKeydex];
+      this.currentDataPt = data[this.currentKey];
+
+      //update visuals
+      console.log(this.currentDataPt);
+      this.updateLights();
+    }
 
   }
 
