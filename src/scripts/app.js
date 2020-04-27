@@ -71,11 +71,24 @@ export default class App {
     this.lightsAreImmediateSetting = true;
 
     //UI
-    $('.dots li').first().addClass('active');
-    $('.bottomTitle .dots li').first().addClass('active');
+    // $('.dots li').first().addClass('active');
+    // $('.bottomTitle .dots li').first().addClass('active');
     $('.parallax img').each(function() {
       $(this).hide();
     });
+
+    $('#plusBtn').hover(function(){
+      // For webkit browsers: e.g. Chrome
+               $('#plusBtn').css({ WebkitTransform: 'rotate(' + 90 + 'deg)'});
+          // For Mozilla browser: e.g. Firefox
+               $('#plusBtn').css({ '-moz-transform': 'rotate(' + 90 + 'deg)'});
+    })
+
+    $('#plusBtn').mouseout(function(){
+      $('#plusBtn').css({ WebkitTransform: 'rotate(' + 0 + 'deg)'});
+ // For Mozilla browser: e.g. Firefox
+      $('#plusBtn').css({ '-moz-transform': 'rotate(' + 0 + 'deg)'});
+    })
   }
 
   createScene() {
@@ -850,9 +863,18 @@ connectToMysql()
 switchLightIntensitySetting(isImmediate)
 {
   this.lightsAreImmediateSetting = isImmediate;
-  console.log('Changing to immediate: '+isImmediate)
+  console.log('Changing to immediate: '+isImmediate);
 
   var localThis = this;
+  if(isImmediate)
+  {
+      $('#aggregate').text('aggregate');
+      $('#daily').text('[ daily ]');
+  } else {
+    $('#aggregate').text('[ aggregate ]');
+    $('#daily').text('daily');
+  }
+
   // if(!isImmediate)
   // {
   //   this.allLights.forEach(function(l) {
@@ -1480,22 +1502,10 @@ getRandomFloat(min, max, decimalPlaces) {
     // this.uniforms.u_mouse.value.set(event.touches[0].pageX, window.innerHeight - event.touches[0].pageY).multiplyScalar(
     //    window.devicePixelRatio);
   }
+
 onKeyDown(event)
 {
 
-//Show aggregate view
-if(event.key == 1)
-{
-  console.log('--AGGREGATE--');
-  this.switchLightIntensitySetting(false);
-}
-
-//show immediate view
-if(event.key == 2)
-{
-  console.log('--IMMEDIATE--');
-  this.switchLightIntensitySetting(true);
-}
 
   //do this when come in from loading
 
@@ -1508,33 +1518,20 @@ if(event.key == 2)
         this.videoTexs[i].play();
       }
     }
+    if(event.key == " ")
+    {
+      this.switchLightIntensitySetting(!this.switchLightIntensitySetting);
+      console.log("light setting switch")
+    }
 
-if(this.middleMenuIsUp)
-{
     if(event.key == "ArrowRight")
     {
-      if(this.midMenuIndex < 2)
-      {
-        this.midMenuIndex++;
-      }
-    } else if (event.key == "ArrowLeft")
-    {
-      if(this.midMenuIndex > 0)
-      {
-        this.midMenuIndex--;
-      }
-    }
-    var self = this;
-      $('.middleMenu .dots li').each(function(){
 
-        if($(this).index() <= self.midMenuIndex)
-        {
-          $(this).addClass('active');
-        } else {
-          $(this).removeClass('active');
-        }
-      });
-}
+    }
+    else if (event.key == "ArrowLeft")
+    {
+
+    }
 
 }
 
