@@ -51,8 +51,14 @@ html {
 
 	}
 
+
 	#topBar {
 		grid-area: topBar;
+		text-transform: uppercase;
+	}
+
+	#topBar > * {
+		font-weight: 400;
 	}
 
 	#leftCol {
@@ -78,16 +84,39 @@ html {
 	#center {
 		grid-area: center;
 	}
+
+	#center > span > * {
+		transition-timing-function: ease-in-out;
+		transition: transform 0.4s;
+		-webkit-transition: transform 0.4s;
+		-moz-transition: transform 0.4s;
+		-o-transition: transform 0.4s;
+	}
 	#center > span > h4 {
 		font-weight: 400;
 	}
 
-	#center > span > h4 .active {
+	#center > span > h4.active {
 		font-weight: 700;
 	}
 
-	#center > span {
+	#center > span > h5 {
+		display: none;
+		margin-top: -11px;
+	}
+
+	#center > span > h5.active {
+		display: block;
+	}
+
+	#center > span.active {
 		display: inline-block;
+	}
+
+	#center > span {
+		display: none;
+		margin-left: -35px;
+    margin-right: -35px;
 	}
 
 	#bottomCol {
@@ -109,7 +138,7 @@ html {
 
 
 #leftCol > h2 {
-margin-top: 40px;
+margin-top: 20px;
 }
 
 h5 {
@@ -117,7 +146,17 @@ h5 {
 }
 
 #options {
+	margin-top: 60px;
+	display: none;
+}
+
+#options > * {
 	display: inline;
+	font-weight: 400;
+}
+
+#options > *:hover {
+	font-weight: 700;
 }
 
 #leftCol > h1 {
@@ -149,7 +188,7 @@ margin-left: 46%;
 	perspective: 25px;
 	overflow: visible;
 	width: 180px;
-	margin-bottom: -35px;
+	height: 130px;
 	margin: auto;
 }
 

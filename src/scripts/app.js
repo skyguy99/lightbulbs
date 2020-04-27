@@ -73,15 +73,17 @@ export default class App {
     //UI
     // $('.dots li').first().addClass('active');
     // $('.bottomTitle .dots li').first().addClass('active');
+
+    this.switchLightIntensitySetting(true);
     $('.parallax img').each(function() {
       $(this).hide();
     });
 
     $('#plusBtn').hover(function(){
       // For webkit browsers: e.g. Chrome
-               $('#plusBtn').css({ WebkitTransform: 'rotate(' + 90 + 'deg)'});
+               $('#plusBtn').css({ WebkitTransform: 'rotate(' + 45 + 'deg)'});
           // For Mozilla browser: e.g. Firefox
-               $('#plusBtn').css({ '-moz-transform': 'rotate(' + 90 + 'deg)'});
+               $('#plusBtn').css({ '-moz-transform': 'rotate(' + 45 + 'deg)'});
     })
 
     $('#plusBtn').mouseout(function(){
@@ -89,6 +91,21 @@ export default class App {
  // For Mozilla browser: e.g. Firefox
       $('#plusBtn').css({ '-moz-transform': 'rotate(' + 0 + 'deg)'});
     })
+
+    $('#center > span').hover(function() {
+      $(this).children().each(function () {
+        $(this).addClass('active');
+      })
+    })
+
+    $('#center > span').mouseout(function() {
+      $(this).children().each(function () {
+        $(this).removeClass('active');
+      })
+    })
+
+
+    //---------------------------------------
   }
 
   createScene() {
@@ -1524,8 +1541,7 @@ onKeyDown(event)
     }
     if(event.key == " ")
     {
-      this.switchLightIntensitySetting(!this.switchLightIntensitySetting);
-      console.log("light setting switch")
+      this.switchLightIntensitySetting(!this.lightsAreImmediateSetting);
     }
 
     if(event.key == "ArrowRight")
@@ -1645,6 +1661,5 @@ if(this.mixers.length > 0)
         }
       });
 
-      this.switchLightIntensitySetting(true);
   }
 }
