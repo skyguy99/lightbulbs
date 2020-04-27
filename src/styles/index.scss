@@ -68,8 +68,6 @@ html {
           transition:         transform .4s ease-in-out;
 	}
 
-
-
 	#rightCol > p {
 		transform: rotate(90deg);
 	}
@@ -79,6 +77,13 @@ html {
 
 	#center {
 		grid-area: center;
+	}
+	#center > span > h4 {
+		font-weight: 400;
+	}
+
+	#center > span > h4 .active {
+		font-weight: 700;
 	}
 
 	#center > span {
@@ -91,25 +96,36 @@ html {
 
 #bottomCol p {
 
-	transform: rotate(0deg);
 	display: inline-block;
 	padding: 0;
 	padding-right: 6px;
+	font-size: 13px;
 }
 
-#leftCol > h2, p{
+#leftCol > * {
 	 transform: rotate(-90deg);
+	 font-weight: 400;
 }
+
 
 #leftCol > h2 {
 margin-top: 40px;
 }
+
 h5 {
 	font-weight: 400;
 }
 
+#options {
+	display: inline;
+}
+
 #leftCol > h1 {
 	padding-bottom: 10px;
+	font-weight: 700;
+	font-size: 25px;
+	transform: rotate(0deg);
+	margin-top: 20px;
 }
 
 .scrollBar {
@@ -133,11 +149,15 @@ margin-left: 46%;
 	perspective: 25px;
 	overflow: visible;
 	width: 180px;
+	margin-bottom: -35px;
 	margin: auto;
 }
 
  //------------------------------------------------------
 
+h4, h5, h2, h1 {
+	font-size: 13px;
+}
 body {
 	--color-text: #fff;
 	--color-bg: #424242;
@@ -152,7 +172,6 @@ body {
 	font-family: 'Roboto',Arial, sans-serif;
 	font-weight: 400;
 	letter-spacing: -0.03em;
-	font-size: 12px;
 	text-transform: lowercase;
 	overflow: hidden;
 	-webkit-font-smoothing: antialiased;
@@ -308,7 +327,7 @@ a:hover {
 	text-align: center;
 	position: absolute;
 	top: 68%;
-    font-size: 50px;
+
 	//This absolute centers horz
 	left: 50%;
 	-webkit-transform: translateX(-50%);

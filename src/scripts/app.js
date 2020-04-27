@@ -870,9 +870,13 @@ switchLightIntensitySetting(isImmediate)
   {
       $('#aggregate').text('aggregate');
       $('#daily').text('[ daily ]');
+      $('#daily').css("font-weight", "700");
+      $('#aggregate').css("font-weight", "400");
   } else {
     $('#aggregate').text('[ aggregate ]');
     $('#daily').text('daily');
+    $('#daily').css("font-weight", "400");
+    $('#aggregate').css("font-weight", "700");
   }
 
   // if(!isImmediate)
@@ -1640,5 +1644,7 @@ if(this.mixers.length > 0)
           $(this).removeClass('active');
         }
       });
+
+      this.switchLightIntensitySetting(true);
   }
 }

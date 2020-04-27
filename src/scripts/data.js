@@ -31,7 +31,7 @@ const data = {
      '01-28-20_9:00PM':[['bluelight', 'halogen', 'white neon'], 5],
      '01-29-20_9:00AM':[['bluelight', 'sunlight', 'fluorescent'], 7],
      '01-29-20_3:00PM':[['bluelight', 'sunlight', 'fluorescent'], 2.9],
-     '01-29-20_9:00PM':[['fluorescent', 'pink neon'], 7.9], //grand central market
+     '01-29-20_9:00PM':[['fluorescent', 'white neon'], 7.9], //grand central market
      '01-30-20_10:00AM':[['bluelight', 'sunlight'], 8.3],
      '01-30-20_3:00PM':[['sunlight','led', 'bluelight'], 2.8],
      '01-30-20_9:00PM':[['halogen', 'bluelight'], 6.8],
