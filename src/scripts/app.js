@@ -58,7 +58,7 @@ export default class App {
     this.middleMenuIsUp = true;
     this.midMenuIndex = 0;
     this.currentRoom = 0;
-    this.scl = 0;
+    this.tester = 0;
     this.hasTransitioned = false;
     this.mouseDown = false;
     this.triggerRGB = false;
@@ -849,20 +849,23 @@ if(this.lightsAreImmediateSetting)
 {
     $('#center').children().each(function(i, child) {
 
-      $(child).removeClass('active');
-      $(child).children().each(function(i, child2) {
-        if(i == 0)
-        {
-          $(child2).addClass('notShowing');
-        } else if (i == 1)
-        {
-          $(child2).addClass('strikethru');
-        }
-      })
+      // $(child).css('display', 'none');
+      // localThis.currentDataPt[0].forEach(function(obj) {
+      //   //each light in array
+      //
+      //   if($(child).attr('name') == obj.trim())
+      //   {
+      //     $(child).css('display', 'inline-block');
+      //
+      //   }
+      // })
 
-      //update each light ----------------
+      //update each light ----------------'
+
         var intensity = (localThis.currentDataPt[1])/10;
         var color = '#ffffff';
+
+        var val = (localThis.currentDataPt[1]/10)*45;
 
         if($(child).attr('name') == 'halogen')
         {
@@ -880,10 +883,13 @@ if(this.lightsAreImmediateSetting)
           color = '#75e6ff';
         }
 
-        var fillColor = localThis.calculateColor(color, (localThis.currentDataPt[1])/4);
-        color = localThis.calculateColor(color, (localThis.currentDataPt[1])/18);
+        var fillColor = localThis.calculateColor(color, ((localThis.currentDataPt[1]/10)*45)/25);
 
-       //document.getElementsByTagName("feGaussianBlur")[0].setAttribute("stdDeviation", 3);
+        color = localThis.calculateColor(color, (localThis.currentDataPt[1])/18);
+    
+        $(child).find("feGaussianBlur").attr("stdDeviation", ((localThis.currentDataPt[1]/10)*45).toString());
+       //$(child).find("feGaussianBlur").attr("stdDeviation", ((localThis.currentDataPt[1]/10)*45).toString());
+
        var thing =  $(child).find('use')[0];
        var thing2 = $(child).find('use')[1];
        $(thing).css('fill', color);
@@ -892,22 +898,6 @@ if(this.lightsAreImmediateSetting)
        $(child).find('h5').text(localThis.currentDataPt[1]);
       //--------------------------------------
 
-      localThis.currentDataPt[0].forEach(function(obj) {
-        if($(child).attr('name') == obj.trim())
-        {
-          $(child).addClass('active');
-          $(child).children().each(function(i, child2) {
-            if(i == 0)
-            {
-              $(child2).removeClass('notShowing');
-            } else if (i == 1)
-            {
-              $(child2).removeClass('strikethru');
-            }
-          })
-
-        }
-      })
     })
 } else {
   $('#center').children().each(function(i, child) {
@@ -1623,7 +1613,12 @@ var change = (multi*10).toString+"px";
 onKeyDown(event)
 {
 
-
+// this.tester++;
+// console.log(this.tester);
+// var localThis = this;
+// $('#center').children().each(function(i, child) {
+//   $(child).find("feGaussianBlur").attr("stdDeviation", localThis.tester.toString());
+// })
   //do this when come in from loading
 
   this.forceDoneLoading(); //TEMP

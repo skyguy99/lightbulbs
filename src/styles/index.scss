@@ -31,8 +31,7 @@ html {
 // }
 
 .parallax {
-	// left: 47%;
-	// top: 40%;
+
 	width: 30%;
 	height: 30%;
 	margin: auto;
@@ -135,19 +134,19 @@ html {
 	}
 
 	#center > span > #svgContainer.notShowing {
-		opacity: 0;
+		//opacity: 0;
 	}
 
 	#center > span > #svgContainer {
-		opacity: 1;
+	//	opacity: 1;
 	}
 
 	#center > span.active {
-		display: inline-block;
+		// display: inline-block;
 	}
 
 	#center > span {
-		display: inline-block;
+		// display: none;
 		margin-left: -35px;
     margin-right: -35px;
 	}
