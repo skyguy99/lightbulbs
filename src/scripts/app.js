@@ -468,7 +468,7 @@ loader.load(
 //To actual experience
   forceDoneLoading()
   {
-    $(".frame").show();
+    $(".frame").css('display', 'grid');
     $(".mainCanvas").show();
     $(".loadingScreen").hide();
 
@@ -890,6 +890,26 @@ formatLimitDecimals(value, decimals) {
   }
 }
 
+updateEmoji()
+{
+  var emojis = ["-_-", ":|", ":]", "0-0"];
+  var e = emojis[0];
+  if(this.currentDataPt[1] <= 4.2)
+  {
+    e = emojis[0];
+  } else if(this.currentDataPt[1] > 4.2 && this.currentDataPt[1] <= 7.2)
+  {
+    e = emojis[1];
+  } else if (this.currentDataPt[1] > 7.2 && this.currentDataPt[1] <= 9.4)
+  {
+    e = emojis[2];
+  }
+  else {
+    e = emojis[3];
+  }
+  $('#leftCol > h1').text(e);
+}
+
 updateLights()
 {
 
@@ -903,6 +923,7 @@ if(this.lightsAreImmediateSetting)
   $('#strikedOut').text('');
   var allLights = ['halogen', 'led', 'fluorescent', 'white neon', 'sunlight', 'bluelight'];
 
+  this.updateEmoji();
 
   //spans
     $('#center').children().each(function(i, child) {
