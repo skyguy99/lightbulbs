@@ -871,6 +871,16 @@ calculateColor(hex, intensity)
   return pSBC(intensity, hex);
 }
 
+formatLimitDecimals(value, decimals) {
+  value = value.toString().split('.')
+
+  if (value.length === 2) {
+    return Number([value[0], value[1].slice(0, decimals)].join('.'))
+  } else {
+    return Number(value[0]);
+  }
+}
+
 updateLights()
 {
 
@@ -958,50 +968,52 @@ if(this.lightsAreImmediateSetting)
       })
     }
 
+    for (var key of Object.keys(aggregateIntensities)) {
+      aggregateIntensities[key] = localThis.formatLimitDecimals((aggregateIntensities[key]/Object.keys(data).length), 2); //avg
+      if($(child).attr('name') == key)
+      {
+         $(child).find('h5').text(aggregateIntensities[key]);
+      }
+    }
+
     //update each light ----------------'
 
+      var intensity = (aggregateIntensities[$(child).attr('name')])/10;
+      var color = '#ffffff';
 
+      var val = (aggregateIntensities[$(child).attr('name')]/10)*45;
 
-     //  var intensity = (localThis.currentDataPt[1])/10;
-     //  var color = '#ffffff';
-     //
-     //  var val = (localThis.currentDataPt[1]/10)*45;
-     //
-     //  if($(child).attr('name') == 'halogen')
-     //  {
-     //    color = '#ffcc00';
-     //  } else if ($(child).attr('name') == 'led') {
-     //    color = '#ffffff';
-     //  }
-     //  else if ($(child).attr('name') == 'sunlight') {
-     //    color = '#feffd4';
-     //  }
-     //  else if ($(child).attr('name') == 'white neon') {
-     //    color = '#ff3dbe';
-     //  }
-     //  else if ($(child).attr('name') == 'bluelight') {
-     //    color = '#75e6ff';
-     //  }
-     //
-     //  var fillColor = localThis.calculateColor(color, ((localThis.currentDataPt[1]/10)*45)/25);
-     //
-     //  color = localThis.calculateColor(color, (localThis.currentDataPt[1])/18);
-     //
-     //  $(child).find("feGaussianBlur").attr("stdDeviation", ((localThis.currentDataPt[1]/10)*45).toString());
-     //  //document.getElementsByTagName("feGaussianBlur")[0].setAttribute("stdDeviation", ((localThis.currentDataPt[1]/10)*45).toString());
-     //
-     // var thing =  $(child).find('use')[0];
-     // var thing2 = $(child).find('use')[1];
-     // $(thing).css('fill', color);
-     //
-     // $(thing2).css('fill', fillColor);
-     // $(child).find('h5').text(localThis.currentDataPt[1]);
+      if($(child).attr('name') == 'halogen')
+      {
+        color = '#ffcc00';
+      } else if ($(child).attr('name') == 'led') {
+        color = '#ffffff';
+      }
+      else if ($(child).attr('name') == 'sunlight') {
+        color = '#feffd4';
+      }
+      else if ($(child).attr('name') == 'white neon') {
+        color = '#ff3dbe';
+      }
+      else if ($(child).attr('name') == 'bluelight') {
+        color = '#75e6ff';
+      }
+
+      var fillColor = localThis.calculateColor(color, ((aggregateIntensities[$(child).attr('name')]/10)*45)/25);
+
+      color = localThis.calculateColor(color, (aggregateIntensities[$(child).attr('name')])/18);
+
+      $(child).find("feGaussianBlur").attr("stdDeviation", ((aggregateIntensities[$(child).attr('name')]/10)*45).toString());
+
+     var thing =  $(child).find('use')[0];
+     var thing2 = $(child).find('use')[1];
+     $(thing).css('fill', color);
+
+     $(thing2).css('fill', fillColor);
     //--------------------------------------
 
   })
 }
-    console.log(aggregateIntensities);
-
 }
 
 connectToMysql()
@@ -1043,8 +1055,11 @@ switchLightIntensitySetting(isImmediate)
       $('#daily').css("font-weight", "700");
       $('#aggregate').css("font-weight", "400");
       $('#dateLabel').text(localThis.currentKey);
+      $('.scrollBar').show();
+      $('.scrollBar > h1').text(this.currentDataPt[1]);
 
   } else {
+    $('.scrollBar').hide();
     $('#showStrike').css('display', 'none');
     $('#aggregate').text('[ aggregate ]');
     $('#daily').text('daily');
@@ -1574,10 +1589,6 @@ getRandomFloat(min, max, decimalPlaces) {
   onScroll(event)
   {
 
-//animate scroll
-// var multi = event.deltaY >= 0 ? 1 : -1;
-// var change = (multi*10).toString+"px";
-//     TweenLite.to($('.scrollBar'), 1, {"margin-top":change});
     //updates current immediate
 
     if(this.lightsAreImmediateSetting)
@@ -1601,14 +1612,22 @@ getRandomFloat(min, max, decimalPlaces) {
       this.currentKey = Object.keys(data)[this.currentKeydex];
       this.currentDataPt = data[this.currentKey];
 
+      //scrollBar
+      var newY = ((Object.keys(data).indexOf(this.currentKey)+1)/(Object.keys(data).length))*650;
+      $('.scrollBar').css('margin-top', newY.toString()+"%");
+
       //update visuals
       console.log(this.currentDataPt);
 
       this.updateLights();
-
+      $('.scrollBar > h1').text(this.currentDataPt[1]);
       $('#dateLabel').text(this.currentKey);
+
     } else {
+
+      $('.scrollBar > h1').text('');
       $('#dateLabel').text('---');
+
     }
 
   }

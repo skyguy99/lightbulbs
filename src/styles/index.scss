@@ -160,6 +160,7 @@ html {
 	display: inline-block;
 	padding: 0;
 	padding-right: 6px;
+	transform: rotate(90deg);
 	font-size: 13px;
 }
 
@@ -224,12 +225,7 @@ h5 {
 	margin-top: 146px;
 }
 
-.scrollBar {
-	width: 2px;
-	height: 45px;
-	background: white;
-margin-left: 46%;
-	overflow-y: scroll;
+.scrollBar > h1 {
 	position: fixed;
 }
 
