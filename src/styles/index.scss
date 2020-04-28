@@ -167,8 +167,24 @@ html {
 	 transform: rotate(-90deg);
 	 font-weight: 400;
 }
-#showStrike {
+#showStrike > * {
+	display: inline-block;
+	transition-timing-function: ease-in-out;
+	transition: transform 0.4s;
+  -webkit-transition: transform 0.4s;
+  -moz-transition: transform 0.4s;
+  -o-transition: transform 0.4s;
+	font-weight: 400;
+}
 
+#showStrike {
+	transform: translateY(-25px);
+	display: inline-block;
+	z-index: 10001;
+	width: 50px;
+	margin-left: -19px;
+	position: fixed;
+	margin-top: 160px;
 }
 
 #leftCol > h2 {
@@ -200,6 +216,13 @@ h5 {
 	transform: rotate(0deg);
 	margin-top: 20px;
 }
+#strikedOut {
+	text-decoration: line-through;
+	position: fixed;
+	display: none;
+	margin-left: 25px;
+	margin-top: 146px;
+}
 
 .scrollBar {
 	width: 2px;
@@ -228,7 +251,7 @@ margin-left: 46%;
 
  //------------------------------------------------------
 
-h4, h5, h2, h1 {
+h4, h5, h2, h1, p {
 	font-size: 13px;
 }
 body {

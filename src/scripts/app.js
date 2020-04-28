@@ -73,8 +73,6 @@ export default class App {
     this.currentDataPt = data[this.currentKey];
 
     //UI
-    // $('.dots li').first().addClass('active');
-    // $('.bottomTitle .dots li').first().addClass('active');
 
     this.switchLightIntensitySetting(true);
     $('.parallax img').each(function() {
@@ -92,6 +90,31 @@ export default class App {
       $('#plusBtn').css({ WebkitTransform: 'rotate(' + 0 + 'deg)'});
  // For Mozilla browser: e.g. Firefox
       $('#plusBtn').css({ '-moz-transform': 'rotate(' + 0 + 'deg)'});
+    })
+
+    $('#showStrike').hover(function(){
+
+      $('#strikedOut').css('display', 'inline-block');
+      $(this).children().each(function(i, kid) {
+        if(i == 0)
+        {
+          $(kid).css('transform', 'rotate(-45deg)');
+        }
+        $(kid).css('font-weight', '700');
+      })
+    })
+
+    $('#showStrike').mouseleave(function(){
+
+      $('#strikedOut').css('display', 'none');
+      $(this).children().each(function(i, kid) {
+        if(i == 0)
+        {
+          $(kid).css('transform', 'rotate(0deg)');
+        }
+        $(kid).css('font-weight', '400');
+      })
+
     })
 
 var localThis = this;
@@ -857,11 +880,19 @@ var aggregateIntensities = {};
 
 if(this.lightsAreImmediateSetting)
 {
+  //strikethrus
+  $('#strikedOut').text('');
+  var allLights = ['halogen', 'led', 'fluorescent', 'white neon', 'sunlight', 'bluelight'];
+
+
+  //spans
     $('#center').children().each(function(i, child) {
 
       if(localThis.currentDataPt[0].includes($(child).attr('name')))
       {
         $(child).addClass('active');
+        allLights = allLights.filter(e => e !== $(child).attr('name'));
+
       } else {
         $(child).removeClass('active');
       }
@@ -907,8 +938,12 @@ if(this.lightsAreImmediateSetting)
       //--------------------------------------
 
     })
+
+    $('#strikedOut').text(allLights.join(' '));
+
 } else {
 
+  $('#strikedOut').text('');
   $('#center').children().each(function(i, child) {
     $(child).addClass('active');
 
@@ -1002,6 +1037,7 @@ switchLightIntensitySetting(isImmediate)
   var localThis = this;
   if(isImmediate)
   {
+      $('#showStrike').css('display', 'inline-block');
       $('#aggregate').text('aggregate');
       $('#daily').text('[ daily ]');
       $('#daily').css("font-weight", "700");
@@ -1009,6 +1045,7 @@ switchLightIntensitySetting(isImmediate)
       $('#dateLabel').text(localThis.currentKey);
 
   } else {
+    $('#showStrike').css('display', 'none');
     $('#aggregate').text('[ aggregate ]');
     $('#daily').text('daily');
     $('#daily').css("font-weight", "400");
@@ -1538,9 +1575,9 @@ getRandomFloat(min, max, decimalPlaces) {
   {
 
 //animate scroll
-var multi = event.deltaY >= 0 ? 1 : -1;
-var change = (multi*10).toString+"px";
-    TweenLite.to($('.scrollBar'), 1, {"margin-top":change});
+// var multi = event.deltaY >= 0 ? 1 : -1;
+// var change = (multi*10).toString+"px";
+//     TweenLite.to($('.scrollBar'), 1, {"margin-top":change});
     //updates current immediate
 
     if(this.lightsAreImmediateSetting)
@@ -1566,6 +1603,7 @@ var change = (multi*10).toString+"px";
 
       //update visuals
       console.log(this.currentDataPt);
+
       this.updateLights();
 
       $('#dateLabel').text(this.currentKey);

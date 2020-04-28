@@ -263,8 +263,9 @@ setTimeout(function() {initCanvas()}, 50); //IMPORTANT
 //Perspective svg
 (function() {
   // Init
-  var container = document.getElementById("svgContainer"),
-    inner = document.getElementById("inner");
+  var containers = document.querySelectorAll("#svgContainer"),
+    inners = document.querySelectorAll("#inner");
+
 
   // Mouse
   var mouse = {
@@ -287,7 +288,13 @@ setTimeout(function() {initCanvas()}, 50); //IMPORTANT
   };
 
   // Track the mouse position relative to the center of the container.
-  mouse.setOrigin(container);
+  // mouse.setOrigin(containers[0]);
+  for(var c of containers)
+  {
+    c.onmouseover = function() {
+      mouse.setOrigin(c);
+    }
+  }
 
   //-----------------------------------------
 
@@ -306,11 +313,15 @@ setTimeout(function() {initCanvas()}, 50); //IMPORTANT
   var onMouseLeaveHandler = function() {
      // inner.style = "";
      var style = "rotateX(" + 0 + "deg) rotateY(" + 0 + "deg)";
-     inner.style.transform = style;
-     inner.style.webkitTransform = style;
-     inner.style.mozTransform = style;
-     inner.style.msTransform = style;
-     inner.style.oTransform = style;
+
+     for(var inner of inners)
+     {
+       inner.style.transform = style;
+       inner.style.webkitTransform = style;
+       inner.style.mozTransform = style;
+       inner.style.msTransform = style;
+       inner.style.oTransform = style;
+     }
     //update(event);
   };
 
@@ -324,24 +335,35 @@ setTimeout(function() {initCanvas()}, 50); //IMPORTANT
 
   var update = function(event) {
     mouse.updatePosition(event);
-    updateTransformStyle(
-      (mouse.y / inner.offsetHeight / 2).toFixed(2),
-      (mouse.x / inner.offsetWidth / 2).toFixed(2)
-    );
+
+    for(var inner of inners)
+    {
+      updateTransformStyle(
+        (mouse.y / inner.offsetHeight / 2).toFixed(2),
+        (mouse.x / inner.offsetWidth / 2).toFixed(2)
+      );
+    }
+
   };
 
   var updateTransformStyle = function(x, y) {
     var style = "rotateX(" + x + "deg) rotateY(" + y + "deg)";
-    inner.style.transform = style;
-    inner.style.webkitTransform = style;
-    inner.style.mozTransform = style;
-    inner.style.msTransform = style;
-    inner.style.oTransform = style;
+    for(var inner of inners)
+    {
+      inner.style.transform = style;
+      inner.style.webkitTransform = style;
+      inner.style.mozTransform = style;
+      inner.style.msTransform = style;
+      inner.style.oTransform = style;
+    }
   };
 
   //-----------------------------------------
 
+for (var container of containers)
+{
   container.onmouseenter = onMouseEnterHandler;
   container.onmouseleave = onMouseLeaveHandler;
   container.onmousemove = onMouseMoveHandler;
+}
 })();
