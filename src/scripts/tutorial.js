@@ -289,7 +289,7 @@ setTimeout(function() {initCanvas()}, 50); //IMPORTANT
 
   // Track the mouse position relative to the center of the container.
   // mouse.setOrigin(containers[0]);
-  for(var c of containers)
+  for(const c of containers)
   {
     c.onmouseover = function() {
       mouse.setOrigin(c);

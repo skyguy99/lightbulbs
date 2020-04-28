@@ -67,7 +67,7 @@ html {
 		 z-index: 10000;
 	}
 
-	#topBar, #leftCol, #rightCol, #center, #bottomCol {
+	#topBar, #leftCol, #rightCol, #center, #bottomCol, #centerInfo {
 		z-index: 10000;
 		text-align: center;
 		justify-content: center;
@@ -93,8 +93,16 @@ html {
 	}
 
 	#plusBtn {
+		width: 30px;
+		margin-left: 2.9%;
+    margin-top: -14px;
+		position: fixed;
+		text-align: center;
 		-webkit-transition: -webkit-transform .4s ease-in-out;
           transition:         transform .4s ease-in-out;
+	}
+	#plusBtn:hover {
+		font-weight: 700;
 	}
 
 	#rightCol > p {
@@ -107,6 +115,11 @@ html {
 	#center {
 		grid-area: center;
 		margin-top: 16%;
+	}
+	#centerInfo {
+		grid-area: center;
+		margin-top: 22%;
+		text-align: center;
 	}
 
 	#center > span > * {
@@ -189,7 +202,7 @@ html {
 }
 
 #leftCol > h2 {
-margin-top: 20px;
+margin-top: 50px;
 }
 
 h5 {
@@ -227,6 +240,10 @@ h5 {
 
 .scrollBar > h1 {
 	position: fixed;
+}
+
+#centerInfo {
+	display: none;
 }
 
 #inner {

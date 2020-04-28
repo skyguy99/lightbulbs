@@ -71,26 +71,35 @@ export default class App {
     this.setupLights = false;
     this.lightsAreImmediateSetting = true;
     this.currentDataPt = data[this.currentKey];
+    this.infoIsUp = false;
 
     //UI
 
     this.switchLightIntensitySetting(true);
+    var localThis = this;
     $('.parallax img').each(function() {
       $(this).hide();
     });
 
-    $('#plusBtn').hover(function(){
-      // For webkit browsers: e.g. Chrome
-               $('#plusBtn').css({ WebkitTransform: 'rotate(' + 45 + 'deg)'});
-          // For Mozilla browser: e.g. Firefox
-               $('#plusBtn').css({ '-moz-transform': 'rotate(' + 45 + 'deg)'});
+    $('#plusBtn').click(function(){
+
+      localThis.infoIsUp = !localThis.infoIsUp;
+      var deg = localThis.infoIsUp ? 45 : 0;
+
+       $('#plusBtn').css({ WebkitTransform: 'rotate(' + deg + 'deg)'});
+  // For Mozilla browser: e.g. Firefox
+       $('#plusBtn').css({ '-moz-transform': 'rotate(' + deg + 'deg)'});
+
+       if(localThis.infoIsUp)
+       {
+         $('#center').hide();
+         $('#centerInfo').show();
+       } else {
+         $('#center').show();
+         $('#centerInfo').hide();
+       }
     })
 
-    $('#plusBtn').mouseout(function(){
-      $('#plusBtn').css({ WebkitTransform: 'rotate(' + 0 + 'deg)'});
- // For Mozilla browser: e.g. Firefox
-      $('#plusBtn').css({ '-moz-transform': 'rotate(' + 0 + 'deg)'});
-    })
 
     $('#showStrike').hover(function(){
 
@@ -953,66 +962,73 @@ if(this.lightsAreImmediateSetting)
 
 } else {
 
+//AGGREGATE -------------------------------------------------
   $('#strikedOut').text('');
   $('#center').children().each(function(i, child) {
-    $(child).addClass('active');
 
-    aggregateIntensities = {'halogen' : 0, 'sunlight': 0, 'bluelight': 0, 'white neon': 0, 'led': 0, 'fluorescent': 0};
-    for (var key of Object.keys(data)) {
-      //console.log(key + " -> " + data[key])
-      data[key][0].forEach(function(name, i) {
-        if($(child).attr('name') == name)
+    if(i <= 5) //ONLY THE LIGHTS
+    {
+      $(child).addClass('active');
+
+      aggregateIntensities = {'halogen' : 0, 'sunlight': 0, 'bluelight': 0, 'white neon': 0, 'led': 0, 'fluorescent': 0};
+      for (var key of Object.keys(data)) {
+        //console.log(key + " -> " + data[key])
+        data[key][0].forEach(function(name, i) {
+          if($(child).attr('name') == name)
+          {
+            aggregateIntensities[name] += data[key][1];
+          }
+        })
+      }
+
+      for (var key of Object.keys(aggregateIntensities)) {
+        aggregateIntensities[key] = localThis.formatLimitDecimals((aggregateIntensities[key]/Object.keys(data).length), 2); //avg
+        if($(child).attr('name') == key)
         {
-          aggregateIntensities[name] += data[key][1];
+           $(child).find('h5').text(aggregateIntensities[key]);
         }
-      })
+      }
+
+      //update each light ----------------'
+
+      //console.log(aggregateIntensities[$(child).attr('name')]);
+
+        var color = '#ffffff';
+
+        if($(child).attr('name') == 'halogen')
+        {
+          color = '#ffcc00';
+        } else if ($(child).attr('name') == 'led') {
+          color = '#ffffff';
+        }
+        else if ($(child).attr('name') == 'sunlight') {
+          color = '#feffd4';
+        }
+        else if ($(child).attr('name') == 'white neon') {
+          color = '#ff3dbe';
+        }
+        else if ($(child).attr('name') == 'bluelight') {
+          color = '#75e6ff';
+        }
+
+        var fillColor = localThis.calculateColor(color, ((aggregateIntensities[$(child).attr('name')]/3)*45));
+        color = localThis.calculateColor(color, (aggregateIntensities[$(child).attr('name')])/18);
+
+        var intensity = (aggregateIntensities[$(child).attr('name')]/10)*45;
+        console.log($(child).attr('name')+" | "+intensity);
+
+       var thing =  $(child).find('use')[0];
+       var thing2 = $(child).find('use')[1];
+       $(thing).css('fill', color);
+       $(thing2).css('fill', fillColor);
+      //--------------------------------------
+
     }
-
-    for (var key of Object.keys(aggregateIntensities)) {
-      aggregateIntensities[key] = localThis.formatLimitDecimals((aggregateIntensities[key]/Object.keys(data).length), 2); //avg
-      if($(child).attr('name') == key)
-      {
-         $(child).find('h5').text(aggregateIntensities[key]);
-      }
-    }
-
-    //update each light ----------------'
-
-      var intensity = (aggregateIntensities[$(child).attr('name')])/10;
-      var color = '#ffffff';
-
-      var val = (aggregateIntensities[$(child).attr('name')]/10)*45;
-
-      if($(child).attr('name') == 'halogen')
-      {
-        color = '#ffcc00';
-      } else if ($(child).attr('name') == 'led') {
-        color = '#ffffff';
-      }
-      else if ($(child).attr('name') == 'sunlight') {
-        color = '#feffd4';
-      }
-      else if ($(child).attr('name') == 'white neon') {
-        color = '#ff3dbe';
-      }
-      else if ($(child).attr('name') == 'bluelight') {
-        color = '#75e6ff';
-      }
-
-      var fillColor = localThis.calculateColor(color, ((aggregateIntensities[$(child).attr('name')]/10)*45)/25);
-
-      color = localThis.calculateColor(color, (aggregateIntensities[$(child).attr('name')])/18);
-
-      $(child).find("feGaussianBlur").attr("stdDeviation", ((aggregateIntensities[$(child).attr('name')]/10)*45).toString());
-
-     var thing =  $(child).find('use')[0];
-     var thing2 = $(child).find('use')[1];
-     $(thing).css('fill', color);
-
-     $(thing2).css('fill', fillColor);
-    //--------------------------------------
 
   })
+
+  $('#gauss3').attr("stdDeviation", '5');
+  $('#gauss2').attr("stdDeviation", '50');
 }
 }
 
@@ -1044,7 +1060,7 @@ connectToMysql()
 switchLightIntensitySetting(isImmediate)
 {
   this.lightsAreImmediateSetting = isImmediate;
-  console.log('Changing to immediate: '+isImmediate);
+  console.log('Changing to daily: '+isImmediate);
 
   var localThis = this;
   if(isImmediate)
