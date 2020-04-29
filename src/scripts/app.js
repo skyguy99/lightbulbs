@@ -966,7 +966,7 @@ if(this.lightsAreImmediateSetting)
 
         color = localThis.calculateColor(color, (localThis.currentDataPt[1])/18);
 
-        $(child).find("feGaussianBlur").attr("stdDeviation", ((localThis.currentDataPt[1]/10)*45).toString());
+        $(child).find("feGaussianBlur").attr("stdDeviation", ((localThis.currentDataPt[1]/12)*45).toString());
         //document.getElementsByTagName("feGaussianBlur")[0].setAttribute("stdDeviation", ((localThis.currentDataPt[1]/10)*45).toString());
 
        var thing =  $(child).find('use')[0];
@@ -1015,27 +1015,30 @@ if(this.lightsAreImmediateSetting)
       //console.log(aggregateIntensities[$(child).attr('name')]);
 
         var color = '#ffffff';
+        var intensity = (aggregateIntensities[$(child).attr('name')]/10)*45;
 
         if($(child).attr('name') == 'halogen')
         {
           color = '#ffcc00';
         } else if ($(child).attr('name') == 'led') {
-          color = '#ffffff';
+          color = '#a8a8a8';
+          intensity = 1;
         }
         else if ($(child).attr('name') == 'sunlight') {
           color = '#feffd4';
         }
         else if ($(child).attr('name') == 'white neon') {
-          color = '#ff3dbe';
+          color = '#ffa8ee';
         }
         else if ($(child).attr('name') == 'bluelight') {
           color = '#75e6ff';
         }
 
-        var fillColor = localThis.calculateColor(color, ((aggregateIntensities[$(child).attr('name')]/3)*45));
+        var fillColor = localThis.calculateColor(color, ((aggregateIntensities[$(child).attr('name')]/40)));
         color = localThis.calculateColor(color, (aggregateIntensities[$(child).attr('name')])/18);
 
-        var intensity = (aggregateIntensities[$(child).attr('name')]/10)*45;
+        $(child).find("feGaussianBlur").attr("stdDeviation", (aggregateIntensities[$(child).attr('name')]/8)*45);
+
         console.log($(child).attr('name')+" | "+intensity);
 
        var thing =  $(child).find('use')[0];
@@ -1047,9 +1050,9 @@ if(this.lightsAreImmediateSetting)
     }
 
   })
-
-  $('#gauss3').attr("stdDeviation", '5');
-  $('#gauss2').attr("stdDeviation", '50');
+  //
+  // $('#gauss3').attr("stdDeviation", '5');
+  // $('#gauss2').attr("stdDeviation", '50');
 }
 }
 
@@ -1757,15 +1760,14 @@ getRandomFloat(min, max, decimalPlaces) {
     //    window.devicePixelRatio);
   }
 
+  toggleCalendar()
+  {
+
+  }
+
 onKeyDown(event)
 {
 
-// this.tester++;
-// console.log(this.tester);
-// var localThis = this;
-// $('#center').children().each(function(i, child) {
-//   $(child).find("feGaussianBlur").attr("stdDeviation", localThis.tester.toString());
-// })
   //do this when come in from loading
 
   this.forceDoneLoading(); //TEMP
@@ -1780,6 +1782,11 @@ onKeyDown(event)
     if(event.key == " ")
     {
       this.switchLightIntensitySetting(!this.lightsAreImmediateSetting);
+    }
+
+    if(event.key == "c")
+    {
+      this.toggleCalendar();
     }
 
     if(event.key == "ArrowRight")
