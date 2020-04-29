@@ -79,7 +79,7 @@ svg, filter {
 		 z-index: 10000;
 	}
 
-	#topBar, #leftCol, #rightCol, #center, #bottomCol, #centerInfo {
+	#topBar, #leftCol, #rightCol, #center, #bottomCol, #centerInfo, #centerCalendar {
 		z-index: 10000;
 		text-align: center;
 		justify-content: center;
@@ -131,6 +131,20 @@ svg, filter {
 	#centerInfo {
 		grid-area: center;
 		margin-top: 22%;
+		text-align: center;
+	}
+	#centerCalendar {
+		display: none;
+		grid-area: center;
+		overflow-y: scroll;
+		background: gray;
+	}
+	td {
+		width: 200px;
+	}
+
+	table {
+		width: 100%;
 		text-align: center;
 	}
 

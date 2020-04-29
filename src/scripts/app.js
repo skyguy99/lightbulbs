@@ -72,6 +72,8 @@ export default class App {
     this.lightsAreImmediateSetting = true;
     this.currentDataPt = data[this.currentKey];
     this.infoIsUp = false;
+    this.calIsUp = false;
+    this.didMakeCal = false;
 
     //UI
 
@@ -94,9 +96,17 @@ export default class App {
        {
          $('#center').hide();
          $('#centerInfo').show();
-       } else {
+         $('#centerCalendar').hide();
+       } else if (localThis.calIsUp)
+       {
+         $('#center').hide();
+         $('#centerInfo').hide();
+          $('#centerCalendar').show();
+       }
+       else {
          $('#center').show();
          $('#centerInfo').hide();
+          $('#centerCalendar').hide();
        }
     })
 
@@ -1019,7 +1029,7 @@ if(this.lightsAreImmediateSetting)
 
         if($(child).attr('name') == 'halogen')
         {
-          color = '#ffcc00';
+          color = '#ffe88a';
         } else if ($(child).attr('name') == 'led') {
           color = '#a8a8a8';
           intensity = 1;
@@ -1762,6 +1772,37 @@ getRandomFloat(min, max, decimalPlaces) {
 
   toggleCalendar()
   {
+    this.calIsUp = !this.calIsUp;
+    this.switchLightIntensitySetting(false);
+    if(this.infoIsUp)
+    {
+      $('#center').hide();
+      $('#centerInfo').show();
+      $('#centerCalendar').hide();
+    } else if (this.calIsUp)
+    {
+      $('#center').hide();
+      $('#centerInfo').hide();
+       $('#centerCalendar').show();
+    }
+    else {
+      $('#center').show();
+      $('#centerInfo').hide();
+       $('#centerCalendar').hide();
+    }
+
+    if(!this.didMakeCal)
+    {
+      var html = '<table>';
+      for (var key of Object.keys(data)) {
+        //data[key]
+        html += '<tr><td>[        ]<td></tr>'
+    }
+      html += '</table>';
+      document.getElementById('centerCalendar').innerHTML += html;
+      this.didMakeCal = true;
+    }
+
 
   }
 
@@ -1779,7 +1820,7 @@ onKeyDown(event)
         this.videoTexs[i].play();
       }
     }
-    if(event.key == " ")
+    if(event.key == " " && !this.calIsUp)
     {
       this.switchLightIntensitySetting(!this.lightsAreImmediateSetting);
     }
