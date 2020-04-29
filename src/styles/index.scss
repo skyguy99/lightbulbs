@@ -136,16 +136,53 @@ svg, filter {
 	#centerCalendar {
 		display: none;
 		grid-area: center;
-		overflow-y: scroll;
-		background: gray;
+		// overflow-y: scroll;
+		// background: gray;
+
+		width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
 	}
-	td {
-		width: 200px;
+
+	#innerCal {
+		position: absolute;
+		    top: 0;
+		    bottom: 0;
+		    left: 0;
+		    right: -17px; /* Increase/Decrease this value for cross-browser compatibility */
+		    overflow-y: scroll;
+			text-align: center;
+	}
+#calCell {
+	//display: inline-block;
+	width: 150px;
+}
+
+#calCell > p {
+	display: inline-block;
+}
+
+#calCell > svg {
+display: inline-block;
+}
+
+#calCell > h2 {
+	display: block;
+	text-transform: uppercase;
+}
+
+	tr {
+		float: left;
+	}
+	th, td {
+		width: 75px;
 	}
 
 	table {
 		width: 100%;
 		text-align: center;
+		table-layout: fixed;
 	}
 
 	#center > span > * {
