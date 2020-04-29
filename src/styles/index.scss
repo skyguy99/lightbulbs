@@ -156,13 +156,26 @@ svg, filter {
 	}
 .calCell {
 	display: inline-block;
-	width: 100px;
+	min-width: 120px;
+	height: 100px;
 margin-bottom: -40px;
 }
 
-.calCell > div > svg {
+.calCell > span > svg {
 display: inline-block;
 transform: translate(0px, 30px);
+}
+
+.calCell > span > img {
+	display: inline-block;
+	transform: translate(-10px, 27px);
+    width: 70px;
+}
+
+.svgCalContainer {
+	display: inline-block;
+	// overflow: hidden;
+    width: 50px;
 }
 
 .calCell > h2 {
