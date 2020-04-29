@@ -1770,10 +1770,16 @@ getRandomFloat(min, max, decimalPlaces) {
     //    window.devicePixelRatio);
   }
 
+  randomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
+  }
+
   toggleCalendar()
   {
     this.calIsUp = !this.calIsUp;
     this.switchLightIntensitySetting(false);
+    var localThis = this;
+
     if(this.infoIsUp)
     {
       $('#center').hide();
@@ -1794,20 +1800,84 @@ getRandomFloat(min, max, decimalPlaces) {
     if(!this.didMakeCal)
     {
 
-      
+
       var html = '<div id = "innerCal">';
+      var color = '';
+
      for (var key of Object.keys(data)) {
         //data[key]
         //categorize by small/big, just bring in color data from updateLights
 
-        html += '<div id = "calCell"><p>[</p>';
-        html += '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 447 443"><defs><filter x="-50%" y="-50%" width="200%" height="200%" id="Blur7"><feGaussianBlur stdDeviation="25" /></filter><g id="" data-name="Layer 1"><rect class="cls-1" width="900" height="758"/></g><g id="Img7"><path class="cls-1" d="M227.42,144.69v89.77c0,4.07,6.32,4.08,6.32,0V144.69C233.74,140.62,227.42,140.62,227.42,144.69Z"/><path class="cls-1" d="M221.19,146.76q2.69-3.33,5.6-6.47c.93-1,1.87-2,2.83-3l1.52-1.52.93,1.46,2.44,3.81,4.87,7.63a3.16,3.16,0,0,0,5.46-3.2l-5.6-8.76-2.92-4.58c-1.1-1.71-2.36-3.37-4.62-3.37-3.53,0-6.14,3.58-8.35,5.92s-4.52,5-6.64,7.56a3.28,3.28,0,0,0,0,4.48C217.83,147.87,220.1,148.09,221.19,146.76Z"/><path class="cls-1" d="M286.33,281.85c-.22-1.64-.35-3.28-.44-4.92v0l0-7.44a3.19,3.19,0,0,0-3.16-3.16,3.24,3.24,0,0,0-3.17,3.16,68.82,68.82,0,0,0,0,7.6q-10.76-7.95-21.45-16-6.1-4.57-12.25-9.12c-4.33-3.2-8.62-6.81-13.51-9.13a20,20,0,0,0-14.28-1.44c-5.47,1.48-10.79,3.85-16.1,5.82l-33.34,12.35-31.93,11.83L141,259.77a3.19,3.19,0,0,0-2.21-3.89c-1.83-.5-3.23.63-3.89,2.21q-2.76,6.57-5.53,13.13a2.39,2.39,0,0,0,0,1.8,18.53,18.53,0,0,0-.83,2.41A3.61,3.61,0,0,0,129,279a5.89,5.89,0,0,0,3.25,2.42c1.61.61,3.23,1.2,4.84,1.8l9.68,3.59a3.18,3.18,0,0,0,3.89-2.2,3.24,3.24,0,0,0-2.21-3.9l-8.06-3-1.29-.48,57.74-21.39,16.67-6.17c4.79-1.78,9.38-3.77,14.46-1.9,4.71,1.73,8.79,5.25,12.78,8.19s8.12,6,12.16,9q11.91,8.91,23.84,17.76l-5.91,2.16a3.16,3.16,0,0,0,1.68,6.1l6.82-2.49c2.52-.91,5.35-1.65,6.28-4.5,0-.07,0-.14.05-.21A2.42,2.42,0,0,0,286.33,281.85Z"/></g></defs><use style="fill:pink;" filter="url(#Blur7)" xlink:href="#Img7"transform="translate(0,0)"/><use style="fill:white;" xlink:href="#Img7"/></svg>';
-        html += '<p>]</p><h2>01-02-2020 10:00AM</h2></div>';
+        var svg = '';
+        for(var light of data[key][0])
+        {
+
+          var i = Object.keys(data).indexOf(key);
+          //update each light ----------------
+
+            var intensity = (data[key][1])/10;
+            var color = '#ffffff';
+
+            if(light == 'halogen')
+            {
+              color = '#ffcc00';
+            } else if (light == 'led') {
+              color = '#ffffff';
+            }
+            else if (light == 'sunlight') {
+              color = '#feffd4';
+            }
+            else if (light == 'white neon') {
+              color = '#ff3dbe';
+            }
+            else if (light == 'bluelight') {
+              color = '#75e6ff';
+            }
+
+            //vars
+            var gauss = ((data[key][1]/12)*45).toString();
+            var fillColor = localThis.calculateColor(color, ((data[key][1]/10)*45)/25);
+            color = localThis.calculateColor(color, (data[key][1])/18);
+            
+          //----------------------------------------------
+          svg += `<svg width = "20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 447 443"><defs><filter x="-50%" y="-50%" width="200%" height="200%" id="Blur${i}"><feGaussianBlur stdDeviation="${gauss}" /></filter><g id="Img${i}"><path class="cls-1" d="M202.76,281.72a67.53,67.53,0,0,0,68.67-42.57,66.32,66.32,0,0,0-21.66-76.4,60.38,60.38,0,0,0-75.51,1.82c-11.79,9.87-17.32,23.53-20.44,38.24-1.69,7.94-3.74,16.27-2.77,24.42a30,30,0,0,0,10.2,18.91c12.69,11.33,32.11,19.47,49.24,18.39,15.38-1,29.86-9.82,35.21-24.65,2.17-6-7.43-8.62-9.58-2.64-3.75,10.42-15,16.68-25.63,17.35-13.55.86-27.15-4.91-38.19-12.38-5.07-3.43-9.73-8-11.11-14.15-1.48-6.69.4-13.84,1.74-20.39,2.6-12.63,6.14-24.55,15.69-33.69a50.21,50.21,0,0,1,61.73-5.74c20.3,12.94,29.65,37.62,23.84,60.86-6.89,27.54-33.4,45.3-61.43,42.68-6.36-.59-6.32,9.35,0,9.94Z"/></g></defs><use style="fill:${color};" filter="url(#Blur${i})" xlink:href="#Img${i}"transform="translate(0,0)"/><use style="fill:${fillColor};" xlink:href="#Img${i}"/></svg>`;
+          if(data[key][1] <= 4.2 || light == "white neon" || light == "led")
+          {
+            //small
+            if(localThis.randomNumber(0, 1) == 0)
+            {
+
+            } else {
+              // svg += '<svg width = "50px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 447 443"><defs><filter x="-50%" y="-50%" width="200%" height="200%" id="Blur8"><feGaussianBlur stdDeviation="25" /></filter><g id="Img8"><path class="cls-1" d="M202.76,281.72a67.53,67.53,0,0,0,68.67-42.57,66.32,66.32,0,0,0-21.66-76.4,60.38,60.38,0,0,0-75.51,1.82c-11.79,9.87-17.32,23.53-20.44,38.24-1.69,7.94-3.74,16.27-2.77,24.42a30,30,0,0,0,10.2,18.91c12.69,11.33,32.11,19.47,49.24,18.39,15.38-1,29.86-9.82,35.21-24.65,2.17-6-7.43-8.62-9.58-2.64-3.75,10.42-15,16.68-25.63,17.35-13.55.86-27.15-4.91-38.19-12.38-5.07-3.43-9.73-8-11.11-14.15-1.48-6.69.4-13.84,1.74-20.39,2.6-12.63,6.14-24.55,15.69-33.69a50.21,50.21,0,0,1,61.73-5.74c20.3,12.94,29.65,37.62,23.84,60.86-6.89,27.54-33.4,45.3-61.43,42.68-6.36-.59-6.32,9.35,0,9.94Z"/></g></defs><use style="fill:pink;" filter="url(#Blur8)" xlink:href="#Img8"transform="translate(0,0)"/><use style="fill:white;" xlink:href="#Img8"/></svg>';
+            }
+
+          } else if (data[key][1] > 4.2)
+          {
+            //big
+
+          }
+
+
+        }
+
+        //svgs must add up to 70px
+
+        html += '<div class = "calCell"><span>[</span><div style = "width 100px; display: inline-block">';
+        html += svg;
+        html += '</div><span>]</span><h2>'+key+'</h2></div>';
     }
       html += '</div>';
       document.getElementById('centerCalendar').innerHTML += html;
       this.didMakeCal = true;
     }
+
+    $('.calCell').hover(function() {
+
+      $(this).find('h2').css('opacity', '1');
+    })
+    $('.calCell').mouseleave(function() {
+      $(this).find('h2').css('opacity', '0');
+    })
 
 
   }

@@ -154,22 +154,21 @@ svg, filter {
 		    overflow-y: scroll;
 			text-align: center;
 	}
-#calCell {
-	//display: inline-block;
-	width: 150px;
-}
-
-#calCell > p {
+.calCell {
 	display: inline-block;
+	width: 100px;
+margin-bottom: -40px;
 }
 
-#calCell > svg {
+.calCell > div > svg {
 display: inline-block;
+transform: translate(0px, 30px);
 }
 
-#calCell > h2 {
-	display: block;
+.calCell > h2 {
 	text-transform: uppercase;
+	opacity: 0;
+	font-weight: 400;
 }
 
 	tr {
